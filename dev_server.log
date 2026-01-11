@@ -1,0 +1,1609 @@
+
+> learnci-web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.0
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.172:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1552ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s (650 modules)
+ HEAD / 200 in 3168ms
+ ✓ Compiled in 294ms (304 modules)
+ GET / 200 in 43ms
+ ✓ Compiled /favicon.ico in 361ms (646 modules)
+ GET /favicon.ico 200 in 525ms
+ GET /apple-touch-icon-precomposed.png 404 in 576ms
+ GET /apple-touch-icon.png 404 in 16ms
+ ✓ Compiled in 143ms (290 modules)
+ ✓ Compiled in 138ms (304 modules)
+ GET / 200 in 47ms
+ ✓ Compiled in 99ms (304 modules)
+ GET / 200 in 19ms
+ ✓ Compiled in 82ms (304 modules)
+ GET / 200 in 55ms
+ ✓ Compiled in 80ms (304 modules)
+ GET / 200 in 19ms
+ ✓ Compiled in 841ms (636 modules)
+ GET / 200 in 164ms
+ ✓ Compiled in 181ms (296 modules)
+ GET / 200 in 23ms
+ ✓ Compiled in 131ms (296 modules)
+ GET / 200 in 24ms
+ GET / 200 in 123ms
+ ✓ Compiled in 280ms (636 modules)
+ GET / 200 in 84ms
+ ✓ Compiled in 107ms (296 modules)
+ GET / 200 in 34ms
+ ✓ Compiled in 163ms (636 modules)
+ GET / 200 in 101ms
+ ○ Compiling /reset-password ...
+ ✓ Compiled /reset-password in 1778ms (776 modules)
+ HEAD /reset-password 200 in 2198ms
+ GET / 200 in 451ms
+ ✓ Compiled /_not-found in 269ms (766 modules)
+ GET /_next/static/css/app/layout.css?v=1768149177415 404 in 351ms
+ GET / 200 in 59ms
+ GET /_next/static/css/app/layout.css?v=1768149212619 404 in 27ms
+ GET /_next/static/chunks/main-app.js?v=1768149212619 404 in 38ms
+ GET /_next/static/chunks/app/page.js 404 in 37ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 39ms
+ GET /login 404 in 24ms
+ GET /_next/static/css/app/layout.css?v=1768149265186 404 in 23ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 25ms
+ GET /_next/static/chunks/main-app.js?v=1768149265186 404 in 26ms
+ GET / 200 in 29ms
+ GET /_next/static/css/app/layout.css?v=1768149272880 404 in 31ms
+ GET /_next/static/chunks/main-app.js?v=1768149272880 404 in 29ms
+ ✓ Compiled in 261ms (366 modules)
+ ✓ Compiled in 133ms (366 modules)
+ ✓ Compiled in 322ms (706 modules)
+ ✓ Compiled in 204ms (366 modules)
+ ✓ Compiled in 228ms (706 modules)
+ ✓ Compiled in 124ms (366 modules)
+ GET / 200 in 149ms
+ ✓ Compiled /_not-found in 301ms (710 modules)
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1307ms (938 modules)
+ GET /login 500 in 2875ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 33ms
+   Reload env: .env.local
+ ✓ Compiled in 260ms (938 modules)
+ ✓ Compiled in 172ms (566 modules)
+ ✓ Compiled in 341ms (566 modules)
+ ✓ Compiled in 158ms (566 modules)
+ ✓ Compiled in 415ms (951 modules)
+ ✓ Compiled in 197ms (563 modules)
+ ✓ Compiled in 260ms (948 modules)
+ ✓ Compiled in 140ms (563 modules)
+ ✓ Compiled in 293ms (948 modules)
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 734ms (148 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (131kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ GET / 200 in 76ms
+ ✓ Compiled /_not-found in 391ms (952 modules)
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 492ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 35ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768151778803 500 in 85ms
+ GET /_next/static/chunks/fallback/main.js?ts=1768151778803 500 in 84ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768151778803 500 in 149ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768151778803 500 in 148ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768151778803 500 in 108ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 75ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768151787183 500 in 50ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768151787183 500 in 147ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768151787183 500 in 146ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768151787183 500 in 145ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768151787183 500 in 144ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 36ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768151792027 500 in 96ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768151792027 500 in 166ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768151792027 500 in 165ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768151792027 500 in 130ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768151792027 500 in 130ms
+ ✓ Compiled in 291ms (566 modules)
+ ✓ Compiled in 169ms (563 modules)
+ ✓ Compiled in 484ms (1096 modules)
+ ✓ Compiled in 160ms (563 modules)
+ ✓ Compiled in 342ms (1096 modules)
+ ✓ Compiled in 127ms (563 modules)
+ ✓ Compiled in 130ms (563 modules)
+ ○ Compiling /login ...
+ ✓ Compiled /login in 546ms (1020 modules)
+ ✓ Compiled /_not-found in 252ms (1010 modules)
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 924ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768151982439 500 in 50ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768151982439 500 in 143ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768151982439 500 in 143ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768151982439 500 in 143ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768151982439 500 in 142ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 68ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768152008062 500 in 48ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768152008062 500 in 135ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768152008062 500 in 135ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768152008062 500 in 134ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768152008062 500 in 135ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 50ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768152030644 500 in 54ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768152030644 500 in 157ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768152030644 500 in 156ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768152030644 500 in 157ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768152030644 500 in 156ms
+   Reload env: .env.local
+ ✓ Compiled in 368ms (1084 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (131kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ GET / 200 in 71ms
+ ✓ Compiled /login in 142ms (455 modules)
+ ✓ Compiled /_not-found in 216ms (1010 modules)
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 496ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /login 500 in 38ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768152239987 500 in 38ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768152239987 500 in 133ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768152239987 500 in 131ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768152239987 500 in 130ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768152239987 500 in 131ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET / 500 in 87ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768152257538 500 in 60ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js?ts=1768152257538 500 in 201ms
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768152257538 500 in 200ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768152257538 500 in 200ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768152257538 500 in 199ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET / 500 in 53ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js?ts=1768152258362 500 in 95ms
+ GET /_next/static/chunks/fallback/main.js?ts=1768152258362 500 in 93ms
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './638.js'
+Require stack:
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/webpack-runtime.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/.next/server/app/_not-found/page.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/require.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/load-components.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/utils.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/options.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/swc/index.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/alanglass/Documents/dev/_AI/learnci-web/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2844)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2889) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/pages/_app.js?ts=1768152258362 500 in 157ms
+ GET /_next/static/chunks/fallback/pages/_error.js?ts=1768152258362 500 in 156ms
+ GET /_next/static/chunks/fallback/react-refresh.js?ts=1768152258362 500 in 116ms
