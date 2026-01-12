@@ -29,7 +29,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ user
                     <User className="h-12 w-12 text-zinc-400" />
                 </div>
                 <h1 className="text-2xl font-bold">Private Profile</h1>
-                <p className="mt-2 text-muted-foreground">This learner's profile is currently private.</p>
+                <p className="mt-2 text-muted-foreground">This learner&apos;s profile is currently private.</p>
                 <Link href="/" className="mt-6">
                     <Button variant="outline">Back to Home</Button>
                 </Link>

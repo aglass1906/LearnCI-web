@@ -93,7 +93,7 @@ export default async function AdminDashboard() {
                                                 <p className="text-sm text-muted-foreground">
                                                     {item.activity_type} • {item.language || "Unknown"}
                                                 </p>
-                                                {item.comment && <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">"{item.comment}"</p>}
+                                                {item.comment && <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">&quot;{item.comment}&quot;</p>}
                                             </div>
                                             <div className="text-xs text-muted-foreground self-start">
                                                 {new Date(item.date).toLocaleDateString()}

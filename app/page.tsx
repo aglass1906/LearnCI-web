@@ -63,7 +63,7 @@ export default async function Home() {
               Why LearnCI Works
             </h2>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-              Built on the scientific principles of Stephen Krashen's Input Hypothesis.
+              Built on the scientific principles of Stephen Krashen&apos;s Input Hypothesis.
             </p>
           </div>
           <div className="mx-auto grid justify-center gap-8 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">

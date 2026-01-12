@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         }
 
         const adminSupabase = await createAdminClient();
-        let updateParams: any = {};
+        const updateParams: any = {};
 
         if (action === 'suspend') {
             // Ban for ~100 years
