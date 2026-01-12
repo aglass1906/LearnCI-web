@@ -22,7 +22,10 @@ export default async function PublicProfile({ params }: { params: Promise<{ user
     }
 
     // Check privacy
-    if (!profile.is_public) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const isOwner = user?.id === profile.user_id;
+
+    if (!profile.is_public && !isOwner) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
                 <div className="mb-4 rounded-full bg-zinc-100 p-6 dark:bg-zinc-800">
