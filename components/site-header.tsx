@@ -1,26 +1,62 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
 import { User as UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
-export async function SiteHeader() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+export function SiteHeader() {
+    const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
+    const supabase = createClient();
 
-    let profileName = null;
-    let currentLanguage = null;
+    const fetchProfile = async (currentUser: User) => {
+        try {
+            const { data } = await supabase
+                .from("profiles")
+                .select("name, current_language, is_admin")
+                .eq("user_id", currentUser.id)
+                .single();
+            setProfile(data);
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
 
-    if (user) {
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("name, current_language")
-            .eq("user_id", user.id)
-            .single();
-        profileName = profile?.name;
-        currentLanguage = profile?.current_language;
-    }
+    useEffect(() => {
+        const initUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            if (user) {
+                await fetchProfile(user);
+            }
+            setLoading(false);
+        };
 
-    const isAdmin = user?.email && (process.env.ADMIN_EMAILS?.split(",") || []).includes(user.email);
+        initUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session?.user) {
+                setUser(session.user);
+                await fetchProfile(session.user);
+            } else if (event === 'SIGNED_OUT') {
+                setUser(null);
+                setProfile(null);
+            } else if (session?.user) {
+                // Token refresh etc
+                setUser(session.user);
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
+    const isAdmin = profile?.is_admin || false;
 
     const getFlag = (lang: string | null) => {
         if (!lang) return "🌐";
@@ -45,7 +81,9 @@ export async function SiteHeader() {
                     LearnCI
                 </Link>
                 <nav className="flex items-center gap-4">
-                    {user ? (
+                    {loading ? (
+                        <div className="w-20 h-8 bg-muted animate-pulse rounded" />
+                    ) : user ? (
                         <>
                             {isAdmin && (
                                 <Link href="/admin">
@@ -63,12 +101,12 @@ export async function SiteHeader() {
 
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/50 rounded-full border border-border/50">
                                 <span className="text-xl leading-none" role="img" aria-label="Current Language">
-                                    {getFlag(currentLanguage)}
+                                    {getFlag(profile?.current_language)}
                                 </span>
                             </div>
 
-                            {profileName && (
-                                <Link href={`/u/${profileName}`}>
+                            {profile?.name && (
+                                <Link href={`/u/${profile.name}`}>
                                     <Button variant="ghost" size="icon" title="Your Profile">
                                         <UserIcon className="h-5 w-5" />
                                     </Button>

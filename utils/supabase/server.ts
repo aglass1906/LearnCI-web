@@ -12,10 +12,10 @@ export async function createClient() {
                 getAll() {
                     return cookieStore.getAll()
                 },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
                     try {
                         cookiesToSet.forEach(
-                            ({ name, value, options }: { name: string; value: string; options: CookieOptions }) =>
+                            ({ name, value, options }: { name: string; value: string; options?: CookieOptions }) =>
                                 cookieStore.set(name, value, options)
                         )
                     } catch {
@@ -39,7 +39,7 @@ export async function createAdminClient() {
                 getAll() {
                     return []
                 },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: any[]) {
                     // Do nothing
                 },
             },
