@@ -456,6 +456,7 @@ export default function AdminUsers() {
     const [users, setUsers] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     // Dialog states
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -483,8 +484,9 @@ export default function AdminUsers() {
             if (!response.ok) throw new Error("Failed to fetch users");
             const data = await response.json();
             setUsers(data);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error fetching users:", error);
+            setFetchError(error.message || "Failed to load users");
         } finally {
             setLoading(false);
         }
@@ -613,6 +615,12 @@ export default function AdminUsers() {
                     Create User
                 </Button>
             </div>
+
+            {fetchError && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-md border border-red-200 dark:bg-red-950/20 dark:border-red-900">
+                    Error: {fetchError}
+                </div>
+            )}
 
             <Card>
                 <CardHeader>
