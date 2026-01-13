@@ -17,7 +17,7 @@ export default function MobilePortal() {
     const supabase = createClient();
 
     // Mindset state
-    const [rating, setRating] = useState(5);
+    const [rating, setRating] = useState<number | null>(null);
     const [mindsetNote, setMindsetNote] = useState("");
     const [mindsetStatus, setMindsetStatus] = useState<string | null>(null);
 
@@ -29,6 +29,7 @@ export default function MobilePortal() {
 
     // Latest check-in state
     const [latestCheckIn, setLatestCheckIn] = useState<any>(null);
+    const [todaysCheckInId, setTodaysCheckInId] = useState<string | null>(null);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -54,6 +55,34 @@ export default function MobilePortal() {
                     .limit(1)
                     .single();
                 setLatestCheckIn(checkInData);
+
+                // Check if it's from today
+                if (checkInData) {
+                    const checkInDate = new Date(checkInData.date).toDateString();
+                    const today = new Date().toDateString();
+                    if (checkInDate === today) {
+                        setTodaysCheckInId(checkInData.id);
+
+                        // Try to map sentiment back to rating
+                        const reverseSentimentMap: { [key: string]: number } = {
+                            "Struggling": 1,
+                            "Need improvements": 2,
+                            "Okay": 3,
+                            "Good progress": 4,
+                            "Feeling great!": 5
+                        };
+
+                        const savedRating = reverseSentimentMap[checkInData.progress_sentiment];
+                        if (savedRating) {
+                            setRating(savedRating);
+                        } else {
+                            // Custom note
+                            setMindsetNote(checkInData.progress_sentiment);
+                            // Leave rating null or maybe try to infer? 
+                            // For now, let user start with null rating if custom note.
+                        }
+                    }
+                }
             }
             setLoading(false);
         };
@@ -73,23 +102,45 @@ export default function MobilePortal() {
             5: "Feeling great!"
         };
 
-        const { error } = await supabase.from("coaching_check_ins").insert({
-            id: crypto.randomUUID(),  // Generate UUID for id column
-            user_id: user.id,
-            date: new Date().toISOString(),
-            hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
-            activity_ratings: {},  // Empty for web-submitted check-ins
-            progress_sentiment: mindsetNote || sentimentMap[rating] || "No note",
-            next_cycle_plan: "Continue learning",  // Default value
-            notes: ""
-        });
+        const sentiment = (rating && sentimentMap[rating]) ? sentimentMap[rating] : mindsetNote || "No note";
+
+        let error;
+
+        if (todaysCheckInId) {
+            // Update existing
+            const { error: updateError } = await supabase
+                .from("coaching_check_ins")
+                .update({
+                    progress_sentiment: sentiment,
+                    hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
+                    // Only update what changes. Date remains original check-in time? 
+                    // Or update to now? User might want "latest" thought. Let's update date too?
+                    // Actually, if we update date, it stays "today".
+                })
+                .eq("id", todaysCheckInId);
+            error = updateError;
+        } else {
+            // Create new
+            const { error: insertError } = await supabase.from("coaching_check_ins").insert({
+                id: crypto.randomUUID(),
+                user_id: user.id,
+                date: new Date().toISOString(),
+                hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
+                activity_ratings: {},
+                progress_sentiment: sentiment,
+                next_cycle_plan: "Continue learning",
+                notes: ""
+            });
+            error = insertError;
+        }
 
         if (error) {
             console.error("Mindset save error:", error);
             setMindsetStatus("Error saving.");
         } else {
-            setMindsetStatus("Mindset saved! 🧠");
-            setMindsetNote("");
+            setMindsetStatus(todaysCheckInId ? "Mindset updated! 🧠" : "Mindset saved! 🧠");
+            // Don't clear note if updated, so they see it.
+            if (!todaysCheckInId) setMindsetNote("");
         }
         setTimeout(() => setMindsetStatus(null), 3000);
     };
@@ -252,7 +303,7 @@ export default function MobilePortal() {
                             </div>
 
                             <Button type="submit" className="w-full h-12 text-lg gap-2 bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/25 transition-all rounded-xl">
-                                <Send className="h-5 w-5" /> Save Mindset
+                                <Send className="h-5 w-5" /> {todaysCheckInId ? "Update Mindset" : "Save Mindset"}
                             </Button>
 
                             {mindsetStatus && (
