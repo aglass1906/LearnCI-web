@@ -10,7 +10,7 @@ export default function AdminLayout({
     return (
         <div className="flex min-h-screen bg-slate-100 dark:bg-zinc-950">
             {/* Sidebar */}
-            <aside className="w-64 bg-white dark:bg-zinc-900 border-r flex flex-col fixed inset-y-0">
+            <aside className="w-64 bg-white dark:bg-zinc-900 dark:text-zinc-50 border-r flex flex-col fixed inset-y-0">
                 <div className="h-16 flex items-center px-6 border-b">
                     <span className="font-bold text-xl">Admin Panel</span>
                 </div>
