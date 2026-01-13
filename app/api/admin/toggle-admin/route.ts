@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient, createAdminClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the target user's admin status
-    const { error } = await supabase
+    const adminSupabase = await createAdminClient();
+    const { error } = await adminSupabase
         .from("profiles")
         .update({ is_admin: isAdmin })
         .eq("user_id", userId);
