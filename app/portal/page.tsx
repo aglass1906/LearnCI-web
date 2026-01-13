@@ -77,7 +77,7 @@ export default function MobilePortal() {
                             setRating(savedRating);
                         } else {
                             // Custom note
-                            setMindsetNote(checkInData.progress_sentiment);
+                            setMindsetNote(checkInData.progress_sentiment || "");
                             // Leave rating null or maybe try to infer? 
                             // For now, let user start with null rating if custom note.
                         }
@@ -207,6 +207,7 @@ export default function MobilePortal() {
                 {latestCheckIn && (() => {
                     // Map sentiment to mood icon
                     const getMoodFromSentiment = (sentiment: string) => {
+                        if (!sentiment) return { label: "Unknown", icon: Cloud, color: "text-gray-400" };
                         const lowerSentiment = sentiment.toLowerCase();
                         if (lowerSentiment.includes("struggling") || lowerSentiment.includes("bad")) {
                             return { label: "Struggling", icon: CloudRain, color: "text-gray-500" };
