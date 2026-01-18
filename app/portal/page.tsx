@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Send, LogOut, Smartphone, Ear, MonitorPlay, BookOpen, Mic, CloudRain, Cloud, CloudSun, Sun, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { InputRoadmap } from "@/components/InputRoadmap";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
@@ -256,6 +257,21 @@ export default function MobilePortal() {
                         </Card>
                     );
                 })()}
+
+                {/* Input Roadmap */}
+                <Card className="border-t-4 border-t-green-500 shadow-xl shadow-green-500/5 hover:shadow-green-500/10 transition-shadow">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2">
+                            <span className="text-2xl">🗺️</span> Input Roadmap
+                        </CardTitle>
+                        <CardDescription>
+                            {profile ? `${Math.floor(((profile.total_minutes || 0) + ((profile.starting_hours || 0) * 60)) / 60)}h Total Input` : "Track your listening hours"}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <InputRoadmap totalMinutes={(profile?.total_minutes || 0) + ((profile?.starting_hours || 0) * 60)} />
+                    </CardContent>
+                </Card>
 
                 {/* 1. Mindset Check */}
                 <Card className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5 hover:shadow-purple-500/10 transition-shadow">
