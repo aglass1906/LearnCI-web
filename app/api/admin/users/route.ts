@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
             const authUser = authMap.get(profile.user_id);
             return {
                 ...profile,
-                email: authUser?.email || profile.email, // Prefer auth email, fallback to profile
+                email: authUser?.email, // Source of truth is auth.users
                 is_banned: authUser?.banned_until ? new Date(authUser.banned_until) > new Date() : false,
                 banned_until: authUser?.banned_until,
                 last_sign_in_at: authUser?.last_sign_in_at,
