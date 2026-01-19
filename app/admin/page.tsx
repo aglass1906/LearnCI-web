@@ -2,16 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
 import { Users, MessageSquare, Clock, Smartphone, Ear, MonitorPlay, BookOpen, Mic } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const getActivityIcon = (type: string) => {
-    switch (type) {
-        case "Listening": return Ear;
-        case "Watching Videos": return MonitorPlay;
-        case "Reading": return BookOpen;
-        case "Speaking": return Mic;
-        default: return Smartphone;
-    }
-};
+import { getActivityConfig } from "@/utils/activity-types";
 
 export default async function AdminDashboard() {
     const supabase = await createClient();
@@ -78,12 +69,13 @@ export default async function AdminDashboard() {
                     <TabsContent value="activities" className="space-y-4 mt-4">
                         {recentActivities && recentActivities.length > 0 ? (
                             recentActivities.map((item: any) => {
-                                const Icon = getActivityIcon(item.activity_type);
+                                const config = getActivityConfig(item.activity_type);
+                                const Icon = config.icon;
                                 return (
                                     <Card key={item.id} className="border-l-4 border-l-blue-500">
                                         <CardContent className="p-4 flex items-center gap-4">
-                                            <div className={`p-3 rounded-full ${"bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"}`}>
-                                                <Icon className="h-5 w-5" />
+                                            <div className={`p-3 rounded-full ${config.bg} ${config.color.replace('text-', 'text-opacity-100 ')}`}>
+                                                <Icon className={`h-5 w-5 ${config.color}`} />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex justify-between">

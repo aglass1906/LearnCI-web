@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/utils/supabase/client";
-import { Send, LogOut, Smartphone, Ear, MonitorPlay, BookOpen, Mic, CloudRain, Cloud, CloudSun, Sun, Sparkles } from "lucide-react";
+import { Send, LogOut, Clock, CloudRain, Cloud, CloudSun, Sun, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { InputRoadmap } from "@/components/InputRoadmap";
+import { ACTIVITY_TYPES } from "@/utils/activity-types";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
@@ -150,13 +151,17 @@ export default function MobilePortal() {
         e.preventDefault();
         if (!user) return;
 
+        const formData = new FormData(e.target as HTMLFormElement);
+        const dateVal = formData.get("activityDate") as string;
+        const languageVal = formData.get("language") as string;
+
         const { error } = await supabase.from("user_activities").insert({
             user_id: user.id,
             activity_type: selectedActivity,
             minutes: parseInt(minutes) || 0,
             comment: activityNote,
-            language: profile?.current_language || "Spanish", // Default if missing
-            date: new Date().toISOString()
+            language: languageVal || profile?.current_language || "Spanish",
+            date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString()
         });
 
         if (error) {
@@ -342,51 +347,79 @@ export default function MobilePortal() {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleActivitySubmit} className="space-y-6">
+
+                            {/* Activity Type */}
                             <div className="space-y-3">
                                 <Label className="text-base font-semibold">Activity Type</Label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {[
-                                        { id: "App Learning", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-900" },
-                                        { id: "Listening", icon: Ear, color: "text-green-500", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-900" },
-                                        { id: "Watching Videos", icon: MonitorPlay, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-900" },
-                                        { id: "Reading", icon: BookOpen, color: "text-cyan-500", bg: "bg-cyan-50 dark:bg-cyan-950/30", border: "border-cyan-200 dark:border-cyan-900" },
-                                        { id: "Speaking", icon: Mic, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30", border: "border-pink-200 dark:border-pink-900" },
-                                    ].map((activity) => (
-                                        <div
-                                            key={activity.id}
-                                            onClick={() => setSelectedActivity(activity.id)}
-                                            className={`cursor-pointer rounded-xl border-2 p-3 flex flex-col items-center gap-2 transition-all ${selectedActivity === activity.id
-                                                ? `${activity.bg} ${activity.border} ring-2 ring-blue-500 ring-offset-2`
-                                                : "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                                                }`}
-                                        >
-                                            <activity.icon className={`h-6 w-6 ${activity.color}`} />
-                                            <span className="text-xs font-semibold text-center">{activity.id}</span>
+                                <div className="relative">
+                                    <select
+                                        value={selectedActivity}
+                                        onChange={(e) => setSelectedActivity(e.target.value)}
+                                        className="w-full h-12 pl-4 pr-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                    >
+                                        {ACTIVITY_TYPES.map((type) => (
+                                            <option key={type.id} value={type.id}>{type.id}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                                        <div className="bg-slate-200 dark:bg-slate-800 p-1 rounded">
+                                            <Clock className="h-4 w-4" />
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
                             </div>
 
+                            {/* Date & Time */}
+                            <div className="space-y-3">
+                                <Label className="text-base font-semibold">Date</Label>
+                                <Input
+                                    type="datetime-local"
+                                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500 block w-full"
+                                    defaultValue={new Date().toISOString().slice(0, 16)}
+                                    // Note: Real implementation would manage date state properly, simplified for now
+                                    name="activityDate"
+                                />
+                            </div>
+
+                            {/* Duration & Language */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-3">
                                     <Label className="text-base font-semibold">Minutes</Label>
                                     <Input
                                         type="number"
-                                        placeholder="30"
+                                        placeholder="15"
                                         value={minutes}
                                         onChange={(e) => setMinutes(e.target.value)}
                                         className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <Label className="text-base font-semibold">Note</Label>
-                                    <Input
-                                        placeholder="Details..."
-                                        value={activityNote}
-                                        onChange={(e) => setActivityNote(e.target.value)}
-                                        className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
-                                    />
+                                    <Label className="text-base font-semibold">Language</Label>
+                                    <select
+                                        name="language"
+                                        defaultValue={profile?.current_language || "Spanish"}
+                                        className="w-full h-12 pl-4 pr-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                    >
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="Korean">Korean</option>
+                                        <option value="French">French</option>
+                                        <option value="German">German</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Chinese">Chinese</option>
+                                    </select>
                                 </div>
+                            </div>
+
+                            {/* Note */}
+                            <div className="space-y-3">
+                                <Label className="text-base font-semibold">Note (Optional)</Label>
+                                <Input
+                                    placeholder="Details..."
+                                    value={activityNote}
+                                    onChange={(e) => setActivityNote(e.target.value)}
+                                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
+                                />
                             </div>
 
                             <Button type="submit" className="w-full h-12 text-lg gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 transition-all rounded-xl">
