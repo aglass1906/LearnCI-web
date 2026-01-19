@@ -452,6 +452,178 @@ function EditUserDialog({ open, onOpenChange, user, onUserUpdated }: EditUserDia
 
 
 
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Copy, Eye } from "lucide-react";
+
+interface UserDetailsSheetProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    userId: string | null;
+}
+
+function UserDetailsSheet({ open, onOpenChange, userId }: UserDetailsSheetProps) {
+    const [data, setData] = useState<{ profile: any; auth: any } | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (open && userId) {
+            fetchUserDetails();
+        } else {
+            setData(null);
+            setError("");
+        }
+    }, [open, userId]);
+
+    const fetchUserDetails = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await fetch(`/api/admin/users/${userId}`);
+            if (!response.ok) throw new Error("Failed to fetch user details");
+            const result = await response.json();
+            setData(result);
+        } catch (err: any) {
+            console.error("Error fetching details:", err);
+            setError(err.message || "Failed to load details");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!userId) return null;
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        // Could invoke a toast here
+    };
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleString();
+    };
+
+    const DataRow = ({ label, value, copyable = false }: { label: string; value: any; copyable?: boolean }) => (
+        <div className="flex flex-col py-2 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+            <span className="text-xs font-medium text-muted-foreground uppercase mb-1">{label}</span>
+            <div className="flex items-center justify-between group">
+                <span className="text-sm break-all font-mono">{typeof value === 'object' ? JSON.stringify(value) : (value?.toString() || "N/A")}</span>
+                {copyable && value && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => copyToClipboard(value.toString())}
+                    >
+                        <Copy className="h-3 w-3" />
+                    </Button>
+                )}
+            </div>
+        </div>
+    );
+
+    const JsonBlock = ({ data }: { data: any }) => (
+        <pre className="bg-gray-100 dark:bg-zinc-900 p-2 rounded-md text-xs overflow-auto max-h-[300px]">
+            {JSON.stringify(data, null, 2)}
+        </pre>
+    );
+
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+                <SheetHeader>
+                    <SheetTitle>User Details</SheetTitle>
+                    <SheetDescription>
+                        Comprehensive data from Auth and Profile tables.
+                    </SheetDescription>
+                </SheetHeader>
+
+                <div className="mt-6 h-full pb-10">
+                    {loading ? (
+                        <div className="flex items-center justify-center h-40">Loading details...</div>
+                    ) : error ? (
+                        <div className="text-red-500 p-4 border border-red-200 rounded">{error}</div>
+                    ) : data ? (
+                        <Tabs defaultValue="profile" className="h-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="profile">Profile Data</TabsTrigger>
+                                <TabsTrigger value="auth">Auth Data</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="profile" className="h-[calc(100vh-200px)]">
+                                <ScrollArea className="h-full pr-4">
+                                    <div className="space-y-4 pt-4">
+                                        {data.profile ? (
+                                            <>
+                                                <DataRow label="Name" value={data.profile.username || data.profile.name} copyable />
+                                                <DataRow label="Display Name" value={data.profile.display_name} />
+                                                <DataRow label="Profile ID" value={data.profile.id} copyable />
+                                                <DataRow label="User ID" value={data.profile.user_id} copyable />
+                                                <DataRow label="Current Language" value={data.profile.current_language} />
+                                                <DataRow label="Current Level" value={data.profile.current_level} />
+                                                <DataRow label="Total Minutes" value={data.profile.total_minutes} />
+                                                <DataRow label="Is Admin" value={data.profile.is_admin} />
+                                                <DataRow label="Is Banned" value={data.profile.is_banned} />
+                                                <div className="pt-4">
+                                                    <span className="text-xs font-medium text-muted-foreground uppercase mb-2 block">Full Profile Object</span>
+                                                    <JsonBlock data={data.profile} />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-10 text-muted-foreground">No Profile Record Found</div>
+                                        )}
+                                    </div>
+                                </ScrollArea>
+                            </TabsContent>
+
+                            <TabsContent value="auth" className="h-[calc(100vh-200px)]">
+                                <ScrollArea className="h-full pr-4">
+                                    <div className="space-y-4 pt-4">
+                                        <DataRow label="Email" value={data.auth.email} copyable />
+                                        <DataRow label="Auth ID" value={data.auth.id} copyable />
+                                        <DataRow label="Created At" value={formatDate(data.auth.created_at)} />
+                                        <DataRow label="Last Sign In" value={formatDate(data.auth.last_sign_in_at)} />
+                                        <DataRow label="Banned Until" value={formatDate(data.auth.banned_until)} />
+                                        <DataRow label="Phone" value={data.auth.phone} />
+
+                                        <div className="pt-4">
+                                            <span className="text-xs font-medium text-muted-foreground uppercase mb-2 block">Providers / Identities</span>
+                                            {data.auth.identities?.map((id: any) => (
+                                                <div key={id.identity_id} className="mb-2 p-2 px-3 bg-gray-50 dark:bg-zinc-800 rounded flex justify-between items-center">
+                                                    <span className="capitalize text-sm font-medium">{id.provider}</span>
+                                                    <span className="text-xs text-muted-foreground">{id.created_at ? new Date(id.created_at).toLocaleDateString() : ''}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <span className="text-xs font-medium text-muted-foreground uppercase mb-2 block">User Metadata</span>
+                                            <JsonBlock data={data.auth.user_metadata} />
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <span className="text-xs font-medium text-muted-foreground uppercase mb-2 block">App Metadata</span>
+                                            <JsonBlock data={data.auth.app_metadata} />
+                                        </div>
+                                    </div>
+                                </ScrollArea>
+                            </TabsContent>
+                        </Tabs>
+                    ) : null}
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+}
+
 export default function AdminUsers() {
     const [users, setUsers] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -463,6 +635,7 @@ export default function AdminUsers() {
     const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
 
     // Selection states
     const [selectedUser, setSelectedUser] = useState<any | null>(null);
@@ -684,6 +857,10 @@ export default function AdminUsers() {
                                                         <Pencil className="mr-2 h-4 w-4" />
                                                         Edit Details
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => { setSelectedUser(user); setDetailsOpen(true); }}>
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        View Details
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => { setSelectedUser(user); setPasswordDialogOpen(true); }}>
                                                         <Key className="mr-2 h-4 w-4" />
                                                         Change Password
@@ -739,6 +916,12 @@ export default function AdminUsers() {
                 onOpenChange={setEditDialogOpen}
                 user={selectedUser}
                 onUserUpdated={fetchData}
+            />
+
+            <UserDetailsSheet
+                open={detailsOpen}
+                onOpenChange={setDetailsOpen}
+                userId={selectedUser?.user_id}
             />
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
