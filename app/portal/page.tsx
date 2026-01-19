@@ -5,11 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/utils/supabase/client";
-import { Send, LogOut, Clock, CloudRain, Cloud, CloudSun, Sun, Sparkles } from "lucide-react";
+import { Send, LogOut, CloudRain, Cloud, CloudSun, Sun, Sparkles, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { InputRoadmap } from "@/components/InputRoadmap";
-import { ACTIVITY_TYPES } from "@/utils/activity-types";
+import { TodaysActivities } from "@/components/TodaysActivities";
+import { LogActivityForm } from "@/components/LogActivityForm";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
@@ -23,15 +25,13 @@ export default function MobilePortal() {
     const [mindsetNote, setMindsetNote] = useState("");
     const [mindsetStatus, setMindsetStatus] = useState<string | null>(null);
 
-    // Activity state
-    const [selectedActivity, setSelectedActivity] = useState("App Learning");
-    const [minutes, setMinutes] = useState("");
-    const [activityNote, setActivityNote] = useState("");
-    const [activityStatus, setActivityStatus] = useState<string | null>(null);
-
     // Latest check-in state
     const [latestCheckIn, setLatestCheckIn] = useState<any>(null);
     const [todaysCheckInId, setTodaysCheckInId] = useState<string | null>(null);
+
+    // Activity & UI State
+    const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+    const [activityRefreshTrigger, setActivityRefreshTrigger] = useState(0);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -80,8 +80,6 @@ export default function MobilePortal() {
                         } else {
                             // Custom note
                             setMindsetNote(checkInData.progress_sentiment || "");
-                            // Leave rating null or maybe try to infer? 
-                            // For now, let user start with null rating if custom note.
                         }
                     }
                 }
@@ -115,9 +113,6 @@ export default function MobilePortal() {
                 .update({
                     progress_sentiment: sentiment,
                     hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
-                    // Only update what changes. Date remains original check-in time? 
-                    // Or update to now? User might want "latest" thought. Let's update date too?
-                    // Actually, if we update date, it stays "today".
                 })
                 .eq("id", todaysCheckInId);
             error = updateError;
@@ -141,43 +136,19 @@ export default function MobilePortal() {
             setMindsetStatus("Error saving.");
         } else {
             setMindsetStatus(todaysCheckInId ? "Mindset updated! 🧠" : "Mindset saved! 🧠");
-            // Don't clear note if updated, so they see it.
             if (!todaysCheckInId) setMindsetNote("");
         }
         setTimeout(() => setMindsetStatus(null), 3000);
     };
 
-    const handleActivitySubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-
-        const formData = new FormData(e.target as HTMLFormElement);
-        const dateVal = formData.get("activityDate") as string;
-        const languageVal = formData.get("language") as string;
-
-        const { error } = await supabase.from("user_activities").insert({
-            user_id: user.id,
-            activity_type: selectedActivity,
-            minutes: parseInt(minutes) || 0,
-            comment: activityNote,
-            language: languageVal || profile?.current_language || "Spanish",
-            date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString()
-        });
-
-        if (error) {
-            console.error("Activity Save Error:", error);
-            setActivityStatus("Error saving.");
-        } else {
-            setActivityStatus("Activity logged! ⏱️");
-            setMinutes("");
-            setActivityNote("");
-        }
-        setTimeout(() => setActivityStatus(null), 3000);
-    };
-
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push("/");
+    };
+
+    const handleActivitySuccess = () => {
+        setIsLogSheetOpen(false);
+        setActivityRefreshTrigger(prev => prev + 1); // Trigger data refresh
     };
 
     if (loading) return <div className="p-8 text-center text-muted-foreground">Loading portal...</div>;
@@ -278,6 +249,23 @@ export default function MobilePortal() {
                     </CardContent>
                 </Card>
 
+                {/* Today's Activities (New Component) */}
+                <Card className="border-t-4 border-t-blue-500 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2">
+                            <span className="text-2xl">📅</span> Today's Activities
+                        </CardTitle>
+                        <CardDescription>Your daily immersion summary.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <TodaysActivities
+                            userId={user?.id}
+                            onAddClick={() => setIsLogSheetOpen(true)}
+                            refreshTrigger={activityRefreshTrigger}
+                        />
+                    </CardContent>
+                </Card>
+
                 {/* 1. Mindset Check */}
                 <Card className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5 hover:shadow-purple-500/10 transition-shadow">
                     <CardHeader className="pb-4">
@@ -337,104 +325,6 @@ export default function MobilePortal() {
                     </CardContent>
                 </Card>
 
-                {/* 2. Log Activity */}
-                <Card className="border-t-4 border-t-blue-500 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-2">
-                            <span className="text-2xl">⏱️</span> Log Activity
-                        </CardTitle>
-                        <CardDescription>Track your immersion time.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleActivitySubmit} className="space-y-6">
-
-                            {/* Activity Type */}
-                            <div className="space-y-3">
-                                <Label className="text-base font-semibold">Activity Type</Label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedActivity}
-                                        onChange={(e) => setSelectedActivity(e.target.value)}
-                                        className="w-full h-12 pl-4 pr-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 transition-all outline-none"
-                                    >
-                                        {ACTIVITY_TYPES.map((type) => (
-                                            <option key={type.id} value={type.id}>{type.id}</option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                                        <div className="bg-slate-200 dark:bg-slate-800 p-1 rounded">
-                                            <Clock className="h-4 w-4" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Date & Time */}
-                            <div className="space-y-3">
-                                <Label className="text-base font-semibold">Date</Label>
-                                <Input
-                                    type="datetime-local"
-                                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500 block w-full"
-                                    defaultValue={new Date().toISOString().slice(0, 16)}
-                                    // Note: Real implementation would manage date state properly, simplified for now
-                                    name="activityDate"
-                                />
-                            </div>
-
-                            {/* Duration & Language */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-3">
-                                    <Label className="text-base font-semibold">Minutes</Label>
-                                    <Input
-                                        type="number"
-                                        placeholder="15"
-                                        value={minutes}
-                                        onChange={(e) => setMinutes(e.target.value)}
-                                        className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <Label className="text-base font-semibold">Language</Label>
-                                    <select
-                                        name="language"
-                                        defaultValue={profile?.current_language || "Spanish"}
-                                        className="w-full h-12 pl-4 pr-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 transition-all outline-none"
-                                    >
-                                        <option value="Spanish">Spanish</option>
-                                        <option value="Japanese">Japanese</option>
-                                        <option value="Korean">Korean</option>
-                                        <option value="French">French</option>
-                                        <option value="German">German</option>
-                                        <option value="Italian">Italian</option>
-                                        <option value="Chinese">Chinese</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Note */}
-                            <div className="space-y-3">
-                                <Label className="text-base font-semibold">Note (Optional)</Label>
-                                <Input
-                                    placeholder="Details..."
-                                    value={activityNote}
-                                    onChange={(e) => setActivityNote(e.target.value)}
-                                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
-                                />
-                            </div>
-
-                            <Button type="submit" className="w-full h-12 text-lg gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 transition-all rounded-xl">
-                                <Send className="h-5 w-5" /> Log Activity
-                            </Button>
-
-                            {activityStatus && (
-                                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 rounded-lg text-center text-sm font-medium animate-in fade-in">
-                                    {activityStatus}
-                                </div>
-                            )}
-                        </form>
-                    </CardContent>
-                </Card>
-
                 {/* Links */}
                 <div className="grid grid-cols-2 gap-4">
                     <Button
@@ -455,6 +345,25 @@ export default function MobilePortal() {
                     </Button>
                 </div>
             </div>
+
+            {/* Log Activity Sheet */}
+            <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
+                    <SheetHeader className="mb-6">
+                        <SheetTitle className="flex items-center gap-2 text-2xl">
+                            ⏱️ Log Activity
+                        </SheetTitle>
+                        <SheetDescription>
+                            What input did you get today?
+                        </SheetDescription>
+                    </SheetHeader>
+                    <LogActivityForm
+                        userId={user?.id}
+                        profile={profile}
+                        onSuccess={handleActivitySuccess}
+                    />
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }
