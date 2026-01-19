@@ -2,144 +2,100 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { createClient } from "@/utils/supabase/client";
-import { Send, LogOut, CloudRain, Cloud, CloudSun, Sun, Sparkles, Plus } from "lucide-react";
+import { LogOut, CloudRain, Cloud, CloudSun, Sun, Sparkles, ChevronRight, Trophy, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { InputRoadmap } from "@/components/InputRoadmap";
 import { TodaysActivities } from "@/components/TodaysActivities";
 import { LogActivityForm } from "@/components/LogActivityForm";
+import { MindsetForm } from "@/components/MindsetForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
+    const [nextMilestone, setNextMilestone] = useState<number>(25);
+    const [currentHours, setCurrentHours] = useState<number>(0);
+
     const router = useRouter();
     const supabase = createClient();
 
-    // Mindset state
-    const [rating, setRating] = useState<number | null>(null);
-    const [mindsetNote, setMindsetNote] = useState("");
-    const [mindsetStatus, setMindsetStatus] = useState<string | null>(null);
-
     // Latest check-in state
     const [latestCheckIn, setLatestCheckIn] = useState<any>(null);
-    const [todaysCheckInId, setTodaysCheckInId] = useState<string | null>(null);
+    const [todaysCheckIn, setTodaysCheckIn] = useState<any>(null);
 
-    // Activity & UI State
+    // UI State
     const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+    const [isMindsetSheetOpen, setIsMindsetSheetOpen] = useState(false);
     const [activityRefreshTrigger, setActivityRefreshTrigger] = useState(0);
 
-    useEffect(() => {
-        const checkUser = async () => {
+    const checkUser = async () => {
+        try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 router.push("/login");
             } else {
                 setUser(session.user);
-                // Fetch profile for language
-                const { data: profileData } = await supabase
+                // Fetch profile
+                const { data: profileData, error: profileError } = await supabase
                     .from("profiles")
                     .select("*")
                     .eq("user_id", session.user.id)
                     .single();
+
+                if (profileError) console.error("Profile fetch error:", profileError);
                 setProfile(profileData);
 
-                // Fetch latest check-in
-                const { data: checkInData } = await supabase
-                    .from("coaching_check_ins")
+                if (profileData) {
+                    const totalMins = (profileData.total_minutes || 0) + ((profileData.starting_hours || 0) * 60);
+                    const hrs = totalMins / 60;
+                    setCurrentHours(hrs);
+                    // Calculate next 25h milestone
+                    const next = (Math.floor(hrs / 25) + 1) * 25;
+                    setNextMilestone(next);
+                }
+
+                // Fetch latest check-in from daily_feedback
+                const { data: checkInData, error: checkInError } = await supabase
+                    .from("daily_feedback")
                     .select("*")
                     .eq("user_id", session.user.id)
                     .order("date", { ascending: false })
                     .limit(1)
                     .single();
+
+                // Ignore PGRST116 (no rows)
+                if (checkInError && checkInError.code !== 'PGRST116') {
+                    console.error("Check-in fetch error:", checkInError);
+                }
+
                 setLatestCheckIn(checkInData);
 
-                // Check if it's from today
+                // Check if it's from today (local date check simplified)
                 if (checkInData) {
+                    // Assuming date is stored as ISO string in daily_feedback
                     const checkInDate = new Date(checkInData.date).toDateString();
                     const today = new Date().toDateString();
                     if (checkInDate === today) {
-                        setTodaysCheckInId(checkInData.id);
-
-                        // Try to map sentiment back to rating
-                        const reverseSentimentMap: { [key: string]: number } = {
-                            "Struggling": 1,
-                            "Need improvements": 2,
-                            "Okay": 3,
-                            "Good progress": 4,
-                            "Feeling great!": 5
-                        };
-
-                        const savedRating = reverseSentimentMap[checkInData.progress_sentiment];
-                        if (savedRating) {
-                            setRating(savedRating);
-                        } else {
-                            // Custom note
-                            setMindsetNote(checkInData.progress_sentiment || "");
-                        }
+                        setTodaysCheckIn(checkInData);
+                    } else {
+                        setTodaysCheckIn(null);
                     }
                 }
             }
+        } catch (error) {
+            console.error("Critical error in checkUser:", error);
+        } finally {
             setLoading(false);
-        };
-        checkUser();
-    }, [router, supabase.auth]);
-
-    const handleMindsetSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user || !profile) return;
-
-        // Map web mood rating (1-5) to sentiment text
-        const sentimentMap: { [key: number]: string } = {
-            1: "Struggling",
-            2: "Need improvements",
-            3: "Okay",
-            4: "Good progress",
-            5: "Feeling great!"
-        };
-
-        const sentiment = (rating && sentimentMap[rating]) ? sentimentMap[rating] : mindsetNote || "No note";
-
-        let error;
-
-        if (todaysCheckInId) {
-            // Update existing
-            const { error: updateError } = await supabase
-                .from("coaching_check_ins")
-                .update({
-                    progress_sentiment: sentiment,
-                    hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
-                })
-                .eq("id", todaysCheckInId);
-            error = updateError;
-        } else {
-            // Create new
-            const { error: insertError } = await supabase.from("coaching_check_ins").insert({
-                id: crypto.randomUUID(),
-                user_id: user.id,
-                date: new Date().toISOString(),
-                hours_milestone: Math.floor((profile.total_minutes || 0) / 60),
-                activity_ratings: {},
-                progress_sentiment: sentiment,
-                next_cycle_plan: "Continue learning",
-                notes: ""
-            });
-            error = insertError;
         }
-
-        if (error) {
-            console.error("Mindset save error:", error);
-            setMindsetStatus("Error saving.");
-        } else {
-            setMindsetStatus(todaysCheckInId ? "Mindset updated! 🧠" : "Mindset saved! 🧠");
-            if (!todaysCheckInId) setMindsetNote("");
-        }
-        setTimeout(() => setMindsetStatus(null), 3000);
     };
+
+    useEffect(() => {
+        checkUser();
+    }, []);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -149,9 +105,27 @@ export default function MobilePortal() {
     const handleActivitySuccess = () => {
         setIsLogSheetOpen(false);
         setActivityRefreshTrigger(prev => prev + 1); // Trigger data refresh
+        checkUser(); // Refresh hours
+    };
+
+    const handleMindsetSuccess = () => {
+        setIsMindsetSheetOpen(false);
+        checkUser(); // Refresh check-in status
+    };
+
+    const getMoodIcon = (rating: number) => {
+        if (rating === 1) return { label: "Bad", icon: CloudRain, color: "text-gray-500", bg: "bg-gray-100" };
+        if (rating === 2) return { label: "Struggling", icon: Cloud, color: "text-blue-500", bg: "bg-blue-100" };
+        if (rating === 3) return { label: "Good", icon: CloudSun, color: "text-orange-500", bg: "bg-orange-100" };
+        if (rating === 4) return { label: "Great", icon: Sun, color: "text-yellow-500", bg: "bg-yellow-100" };
+        if (rating === 5) return { label: "Amazing", icon: Sparkles, color: "text-yellow-400", bg: "bg-yellow-100" };
+        return { label: "Unknown", icon: Cloud, color: "text-gray-400", bg: "bg-gray-100" };
     };
 
     if (loading) return <div className="p-8 text-center text-muted-foreground">Loading portal...</div>;
+
+    const hoursUntilMilestone = Math.max(0, nextMilestone - currentHours);
+    const milestoneProgress = ((25 - hoursUntilMilestone) / 25) * 100;
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 p-4 pb-20 relative overflow-hidden">
@@ -180,60 +154,6 @@ export default function MobilePortal() {
 
             <div className="space-y-6 max-w-md mx-auto relative z-10">
 
-                {/* Latest Check-in Display */}
-                {latestCheckIn && (() => {
-                    // Map sentiment to mood icon
-                    const getMoodFromSentiment = (sentiment: string) => {
-                        if (!sentiment) return { label: "Unknown", icon: Cloud, color: "text-gray-400" };
-                        const lowerSentiment = sentiment.toLowerCase();
-                        if (lowerSentiment.includes("struggling") || lowerSentiment.includes("bad")) {
-                            return { label: "Struggling", icon: CloudRain, color: "text-gray-500" };
-                        } else if (lowerSentiment.includes("need improvement") || lowerSentiment.includes("okay")) {
-                            return { label: "Need Improvement", icon: Cloud, color: "text-blue-500" };
-                        } else if (lowerSentiment.includes("good") || lowerSentiment.includes("progress")) {
-                            return { label: "Good Progress", icon: CloudSun, color: "text-orange-500" };
-                        } else if (lowerSentiment.includes("great")) {
-                            return { label: "Great", icon: Sun, color: "text-yellow-500" };
-                        } else {
-                            return { label: "Feeling Great", icon: Sparkles, color: "text-yellow-400" };
-                        }
-                    };
-
-                    const mood = getMoodFromSentiment(latestCheckIn.progress_sentiment);
-                    const MoodIcon = mood.icon;
-
-                    return (
-                        <Card className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-300 dark:border-indigo-700">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                    📊 Latest Check-in
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-muted-foreground">Mood:</span>
-                                    <div className="flex items-center gap-2">
-                                        <MoodIcon className={`h-5 w-5 ${mood.color}`} />
-                                        <span className="font-semibold">{mood.label}</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Note:</span>
-                                    <span className="font-semibold text-right max-w-[200px] truncate">{latestCheckIn.progress_sentiment}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Hours:</span>
-                                    <span className="font-semibold">{latestCheckIn.hours_milestone}h</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Date:</span>
-                                    <span className="font-semibold">{new Date(latestCheckIn.date).toLocaleDateString()}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })()}
-
                 {/* Input Roadmap */}
                 <Card className="border-t-4 border-t-green-500 shadow-xl shadow-green-500/5 hover:shadow-green-500/10 transition-shadow">
                     <CardHeader className="pb-2">
@@ -249,7 +169,7 @@ export default function MobilePortal() {
                     </CardContent>
                 </Card>
 
-                {/* Today's Activities (New Component) */}
+                {/* Today's Activities */}
                 <Card className="border-t-4 border-t-blue-500 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow">
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2">
@@ -266,104 +186,140 @@ export default function MobilePortal() {
                     </CardContent>
                 </Card>
 
-                {/* 1. Mindset Check */}
-                <Card className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5 hover:shadow-purple-500/10 transition-shadow">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-2">
-                            <span className="text-2xl">🧠</span> Mindset Check
-                        </CardTitle>
-                        <CardDescription>How are you feeling about your progress?</CardDescription>
+                {/* Milestone Progress */}
+                <Card className="border-t-4 border-t-yellow-500 shadow-xl shadow-yellow-500/5 hover:shadow-yellow-500/10 transition-shadow">
+                    <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                            <CardTitle className="flex items-center gap-2">
+                                <span className="text-2xl">🎯</span> Next Coaching
+                            </CardTitle>
+                            <span className="text-xs font-bold px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                                {nextMilestone}h Milestone
+                            </span>
+                        </div>
+                        <CardDescription>
+                            Unlock your next coaching session in {hoursUntilMilestone.toFixed(1)} hours.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleMindsetSubmit} className="space-y-6">
-                            <div className="space-y-3">
-                                <Label className="text-base font-semibold">Mood Rating</Label>
-                                <div className="grid grid-cols-5 gap-2">
-                                    {[
-                                        { val: 1, label: "Bad", icon: CloudRain, color: "text-gray-500", active: "bg-gray-500 text-white ring-gray-500" },
-                                        { val: 2, label: "Struggling", icon: Cloud, color: "text-blue-500", active: "bg-blue-500 text-white ring-blue-500" },
-                                        { val: 3, label: "Good", icon: CloudSun, color: "text-orange-500", active: "bg-orange-500 text-white ring-orange-500" },
-                                        { val: 4, label: "Great", icon: Sun, color: "text-yellow-500", active: "bg-yellow-500 text-white ring-yellow-500" },
-                                        { val: 5, label: "Amazing", icon: Sparkles, color: "text-yellow-400", active: "bg-yellow-400 text-white ring-yellow-400" },
-                                    ].map((mood) => (
-                                        <button
-                                            key={mood.val}
-                                            type="button"
-                                            onClick={() => setRating(mood.val)}
-                                            className={`h-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${rating === mood.val
-                                                ? `${mood.active} scale-110 shadow-lg ring-2 ring-offset-2`
-                                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105"
-                                                }`}
-                                        >
-                                            <mood.icon className={`h-6 w-6 ${rating === mood.val ? "text-white" : mood.color}`} />
-                                            <span className="text-[10px] font-bold uppercase tracking-wide">{mood.label}</span>
-                                        </button>
-                                    ))}
-                                </div>
+                        <div className="space-y-2">
+                            <Progress value={Math.max(5, milestoneProgress)} className="h-3" />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>{Math.floor(currentHours)} hours</span>
+                                <span>{nextMilestone} hours</span>
                             </div>
-
-                            <div className="space-y-3">
-                                <Label className="text-base font-semibold">Quick Thought</Label>
-                                <Input
-                                    placeholder="I feel confident because..."
-                                    value={mindsetNote}
-                                    onChange={(e) => setMindsetNote(e.target.value)}
-                                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-purple-500"
-                                />
-                            </div>
-
-                            <Button type="submit" className="w-full h-12 text-lg gap-2 bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/25 transition-all rounded-xl">
-                                <Send className="h-5 w-5" /> {todaysCheckInId ? "Update Mindset" : "Save Mindset"}
-                            </Button>
-
-                            {mindsetStatus && (
-                                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 rounded-lg text-center text-sm font-medium animate-in fade-in">
-                                    {mindsetStatus}
+                            {hoursUntilMilestone <= 0 && (
+                                <div className="mt-2 p-2 bg-green-100 text-green-700 text-sm font-bold rounded-lg text-center flex items-center justify-center gap-2 animate-pulse">
+                                    <Lock className="h-4 w-4" /> Ready to Unlock!
                                 </div>
                             )}
-                        </form>
+                        </div>
                     </CardContent>
                 </Card>
 
-                {/* Links */}
-                <div className="grid grid-cols-2 gap-4">
-                    <Button
-                        variant="outline"
-                        className="h-32 flex-col gap-3 rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all group"
-                        onClick={() => router.push("/leaderboard")}
+                {/* Coaching / Mindset Check */}
+                {todaysCheckIn ? (
+                    // IF LOGGED TODAY: Show Summary + Link to History
+                    <Card
+                        className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all cursor-pointer group"
+                        onClick={() => router.push("/portal/check-in-history")}
                     >
-                        <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🏆</span>
-                        <span className="font-semibold">Leaderboard</span>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="h-32 flex-col gap-3 rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all group"
-                        onClick={() => router.push("/")}
-                    >
-                        <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🏠</span>
-                        <span className="font-semibold">Home</span>
-                    </Button>
-                </div>
-            </div>
+                        <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    <span className="text-2xl">🧠</span> Today's Mindset
+                                </CardTitle>
+                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                            </div>
+                            <CardDescription>You've checked in for today.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-4 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-100 dark:border-purple-900/50">
+                                {(() => {
+                                    const { icon: Icon, color, bg } = getMoodIcon(todaysCheckIn.rating);
+                                    return (
+                                        <div className={`p-3 rounded-full ${bg} ${color}`}>
+                                            <Icon className="h-6 w-6" />
+                                        </div>
+                                    );
+                                })()}
+                                <div>
+                                    <div className="font-bold text-lg">{getMoodIcon(todaysCheckIn.rating).label}</div>
+                                    {todaysCheckIn.note && (
+                                        <div className="text-sm text-muted-foreground line-clamp-1 italic">
+                                            "{todaysCheckIn.note}"
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="mt-3 text-xs text-center text-muted-foreground font-medium">
+                                Tap to view history & edit
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    // IF NOT LOGGED: Show "Check In" Call to Action
+                    <Card className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center gap-2">
+                                <span className="text-2xl">🧠</span> Mindset Check
+                            </CardTitle>
+                            <CardDescription>How are you feeling about your progress?</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button
+                                onClick={() => setIsMindsetSheetOpen(true)}
+                                className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg shadow-purple-500/25 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                                Start Daily Check-in <ChevronRight className="ml-2 h-5 w-5" />
+                            </Button>
+                            <div className="mt-4 flex justify-between px-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer" onClick={() => setIsMindsetSheetOpen(true)}>
+                                {[CloudRain, Cloud, CloudSun, Sun, Sparkles].map((Icon, i) => (
+                                    <Icon key={i} className="h-6 w-6" />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
-            {/* Log Activity Sheet */}
-            <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
-                <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
-                    <SheetHeader className="mb-6">
-                        <SheetTitle className="flex items-center gap-2 text-2xl">
-                            ⏱️ Log Activity
-                        </SheetTitle>
-                        <SheetDescription>
-                            What input did you get today?
-                        </SheetDescription>
-                    </SheetHeader>
-                    <LogActivityForm
-                        userId={user?.id}
-                        profile={profile}
-                        onSuccess={handleActivitySuccess}
-                    />
-                </SheetContent>
-            </Sheet>
+                {/* ... previous content (Sheet components usually here, need to ensure they are preserved or re-added) */}
+                {/* Log Activity Sheet */}
+                <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
+                    <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
+                        <SheetHeader className="mb-6">
+                            <SheetTitle className="flex items-center gap-2 text-2xl">
+                                ⏱️ Log Activity
+                            </SheetTitle>
+                            <SheetDescription>
+                                What input did you get today?
+                            </SheetDescription>
+                        </SheetHeader>
+                        <LogActivityForm
+                            userId={user?.id}
+                            profile={profile}
+                            onSuccess={handleActivitySuccess}
+                        />
+                    </SheetContent>
+                </Sheet>
+
+                {/* Mindset Sheet */}
+                <Sheet open={isMindsetSheetOpen} onOpenChange={setIsMindsetSheetOpen}>
+                    <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
+                        <SheetHeader className="mb-6">
+                            <SheetTitle className="flex items-center gap-2 text-2xl">
+                                🧠 Daily Check-in
+                            </SheetTitle>
+                            <SheetDescription>
+                                Log your mood and progress notes.
+                            </SheetDescription>
+                        </SheetHeader>
+                        <MindsetForm
+                            userId={user?.id}
+                            onSuccess={handleMindsetSuccess}
+                        />
+                    </SheetContent>
+                </Sheet>
+            </div>
         </div>
     );
 }
