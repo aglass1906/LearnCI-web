@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function AdminFeedback() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: feedback } = await supabase
         .from("daily_feedback")

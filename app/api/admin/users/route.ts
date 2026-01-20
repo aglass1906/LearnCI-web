@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
 
         // 4. Merge data
         // Create a map of auth data for quick lookup
-        const authMap = new Map(authUsers.map(u => [u.id, u]));
+        const authMap = new Map<string, any>((authUsers || []).map(u => [u.id, u]));
 
-        const enrichedUsers = profiles.map(profile => {
+        const enrichedUsers = (profiles || []).map(profile => {
             const authUser = authMap.get(profile.user_id);
             return {
                 ...profile,

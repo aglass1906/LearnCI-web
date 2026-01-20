@@ -38,7 +38,7 @@ export function SiteHeader() {
 
         initUser();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session?.user) {
                 setUser(session.user);
                 await fetchProfile(session.user);
@@ -52,7 +52,7 @@ export function SiteHeader() {
         });
 
         return () => {
-            subscription.unsubscribe();
+            data.subscription.unsubscribe();
         };
     }, []);
 

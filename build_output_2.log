@@ -1,0 +1,23 @@
+
+> learnci-web@0.1.0 build
+> next build
+
+node:internal/modules/package_json_reader:116
+  const parsed = modulesBinding.readPackageJSON(
+                                ^
+
+Error: Invalid package config /Users/alanglass/Documents/dev/_AI/LearnCI-web/node_modules/next/dist/compiled/cross-spawn/package.json.
+    at Object.read (node:internal/modules/package_json_reader:116:33)
+    at _readPackage (node:internal/modules/cjs/loader:489:55)
+    at tryPackage (node:internal/modules/cjs/loader:510:36)
+    at Module._findPath (node:internal/modules/cjs/loader:792:18)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1405:27)
+    at /Users/alanglass/Documents/dev/_AI/LearnCI-web/node_modules/next/dist/server/require-hook.js:57:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14) {
+  code: 'ERR_INVALID_PACKAGE_CONFIG'
+}
+
+Node.js v25.2.1
