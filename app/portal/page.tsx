@@ -12,6 +12,9 @@ import { TodaysActivities } from "@/components/TodaysActivities";
 import { LogActivityForm } from "@/components/LogActivityForm";
 import { MindsetForm } from "@/components/MindsetForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Settings } from "lucide-react";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
@@ -111,6 +114,20 @@ export default function MobilePortal() {
     const handleMindsetSuccess = () => {
         setIsMindsetSheetOpen(false);
         checkUser(); // Refresh check-in status
+    };
+
+    const updateVoiceGender = async (gender: string) => {
+        if (!user) return;
+        setProfile((prev: any) => ({ ...prev, tts_voice_gender: gender }));
+        const { error } = await supabase
+            .from("profiles")
+            .update({ tts_voice_gender: gender })
+            .eq("user_id", user.id);
+        
+        if (error) {
+            console.error("Error updating voice gender:", error);
+            checkUser(); // Revert on error
+        }
     };
 
     const getMoodIcon = (rating: number) => {
