@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -23,7 +23,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MindsetForm } from "@/components/MindsetForm";
-import { ArrowLeft, Plus, Pencil, Trash2, Calendar, CloudRain, Cloud, CloudSun, Sun, Sparkles, Loader2, Trophy, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Calendar, CloudRain, Cloud, CloudSun, Sun, Sparkles, Loader2, Trophy, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function CoachingHistoryPage() {
@@ -43,7 +43,7 @@ export default function CoachingHistoryPage() {
     // Delete State
     const [deleteItem, setDeleteItem] = useState<any>(null);
 
-    const fetchHistory = async () => {
+    const fetchHistory = useCallback(async () => {
         setLoading(true);
         try {
             const { data: { session } } = await supabase.auth.getSession();
@@ -77,11 +77,11 @@ export default function CoachingHistoryPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [supabase, router]);
 
     useEffect(() => {
         fetchHistory();
-    }, []);
+    }, [fetchHistory]);
 
     const handleEdit = (item: any) => {
         setEditingItem(item);
@@ -180,7 +180,7 @@ export default function CoachingHistoryPage() {
                                             </div>
                                             {item.note && (
                                                 <div className="mt-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                                                    "{item.note}"
+                                                    &quot;{item.note}&quot;
                                                 </div>
                                             )}
                                         </CardContent>
@@ -232,7 +232,7 @@ export default function CoachingHistoryPage() {
                                             )}
                                             {item.notes && (
                                                 <div className="text-sm text-muted-foreground italic border-t pt-2 mt-2">
-                                                    "{item.notes}"
+                                                    &quot;{item.notes}&quot;
                                                 </div>
                                             )}
                                         </div>
