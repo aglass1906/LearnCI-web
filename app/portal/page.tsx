@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { createClient } from "@/utils/supabase/client";
 import { LogOut, CloudRain, Cloud, CloudSun, Sun, Sparkles, ChevronRight, Trophy, Lock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { InputRoadmap } from "@/components/InputRoadmap";
 import { TodaysActivities } from "@/components/TodaysActivities";
@@ -32,7 +32,7 @@ export default function MobilePortal() {
     const [isMindsetSheetOpen, setIsMindsetSheetOpen] = useState(false);
     const [activityRefreshTrigger, setActivityRefreshTrigger] = useState(0);
 
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
@@ -91,11 +91,11 @@ export default function MobilePortal() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [supabase.auth, supabase, router]);
 
     useEffect(() => {
         checkUser();
-    }, []);
+    }, [checkUser]);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -173,7 +173,7 @@ export default function MobilePortal() {
                 <Card className="border-t-4 border-t-blue-500 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow">
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2">
-                            <span className="text-2xl">📅</span> Today's Activities
+                            <span className="text-2xl">📅</span> Today&apos;s Activities
                         </CardTitle>
                         <CardDescription>Your daily immersion summary.</CardDescription>
                     </CardHeader>
@@ -227,11 +227,11 @@ export default function MobilePortal() {
                         <CardHeader className="pb-2">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="flex items-center gap-2">
-                                    <span className="text-2xl">🧠</span> Today's Mindset
+                                    <span className="text-2xl">🧠</span> Today&apos;s Mindset
                                 </CardTitle>
                                 <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                             </div>
-                            <CardDescription>You've checked in for today.</CardDescription>
+                            <CardDescription>You&apos;ve checked in for today.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-4 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-100 dark:border-purple-900/50">
@@ -247,13 +247,13 @@ export default function MobilePortal() {
                                     <div className="font-bold text-lg">{getMoodIcon(todaysCheckIn.rating).label}</div>
                                     {todaysCheckIn.note && (
                                         <div className="text-sm text-muted-foreground line-clamp-1 italic">
-                                            "{todaysCheckIn.note}"
+                                            &quot;{todaysCheckIn.note}&quot;
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="mt-3 text-xs text-center text-muted-foreground font-medium">
-                                Tap to view history & edit
+                                Tap to view history &amp; edit
                             </div>
                         </CardContent>
                     </Card>

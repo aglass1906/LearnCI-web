@@ -17,7 +17,6 @@ interface LogActivityFormProps {
 
 export function LogActivityForm({ userId, profile, onSuccess }: LogActivityFormProps) {
     const supabase = createClient();
-    const router = useRouter();
 
     const [selectedActivity, setSelectedActivity] = useState("App Learning");
     const [minutes, setMinutes] = useState("");
