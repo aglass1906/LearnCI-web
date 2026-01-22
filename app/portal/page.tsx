@@ -123,7 +123,7 @@ export default function MobilePortal() {
             .from("profiles")
             .update({ tts_voice_gender: gender })
             .eq("user_id", user.id);
-        
+
         if (error) {
             console.error("Error updating voice gender:", error);
             checkUser(); // Revert on error
@@ -148,7 +148,7 @@ export default function MobilePortal() {
         <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 p-4 pb-20 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-primary/20 via-primary/5 to-transparent -z-10" />
 
-            <header className="flex items-center justify-between mb-8 pt-4">
+            <header className="flex items-center justify-between mb-8 pt-4 max-w-5xl mx-auto">
                 <div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Learner Portal</h1>
                     {profile ? (
@@ -169,7 +169,7 @@ export default function MobilePortal() {
                 </Button>
             </header>
 
-            <div className="space-y-6 max-w-md mx-auto relative z-10">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto relative z-10">
 
                 {/* Input Roadmap */}
                 <Card className="border-t-4 border-t-green-500 shadow-xl shadow-green-500/5 hover:shadow-green-500/10 transition-shadow">
