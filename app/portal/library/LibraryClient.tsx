@@ -22,6 +22,11 @@ interface Resource {
     language: string;
 }
 
+interface LibraryClientProps {
+    initialResources: Resource[] | null;
+}
+
+
 export default function LibraryClient({ initialResources }: LibraryClientProps) {
     const [resources] = useState<Resource[]>(initialResources || []);
     const [activeTab, setActiveTab] = useState("all");
