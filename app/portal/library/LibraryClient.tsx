@@ -84,20 +84,23 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredResources.map((resource) => (
                         <Card key={resource.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-all group">
-                            <div className="relative h-48 w-full bg-muted">
+                            <div className="relative h-48 w-full bg-slate-900 flex items-center justify-center">
                                 {resource.cover_image_url ? (
-                                    <Image
-                                        src={resource.cover_image_url}
-                                        alt={resource.title}
-                                        fill
-                                        className="object-cover transition-transform group-hover:scale-105"
-                                    />
+                                    <div className="relative h-full w-full p-2">
+                                        <Image
+                                            src={resource.cover_image_url}
+                                            alt={resource.title}
+                                            fill
+                                            style={{ objectFit: "contain" }}
+                                            className="transition-transform group-hover:scale-105"
+                                        />
+                                    </div>
                                 ) : (
-                                    <div className="flex items-center justify-center h-full bg-slate-100 dark:bg-slate-800">
+                                    <div className="flex items-center justify-center h-full w-full bg-slate-100 dark:bg-slate-800">
                                         {getTypeIcon(resource.type)}
                                     </div>
                                 )}
-                                <Badge className="absolute top-2 right-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90">
+                                <Badge className="absolute top-2 right-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 z-10">
                                     {getTypeIcon(resource.type)}
                                     <span className="ml-1 capitalize">{resource.type}</span>
                                 </Badge>

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LayoutDashboard, Users, MessageSquare, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, LogOut, ExternalLink, BookOpen } from "lucide-react";
 
 export default function AdminLayout({
     children,
@@ -31,6 +31,12 @@ export default function AdminLayout({
                         <Button variant="ghost" className="w-full justify-start gap-2">
                             <MessageSquare className="h-4 w-4" />
                             Feedback
+                        </Button>
+                    </Link>
+                    <Link href="/admin/library">
+                        <Button variant="ghost" className="w-full justify-start gap-2">
+                            <BookOpen className="h-4 w-4" />
+                            Library
                         </Button>
                     </Link>
                 </nav>
