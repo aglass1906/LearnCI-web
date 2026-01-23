@@ -5,10 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Search, Plus } from "lucide-react";
+import { Edit, Trash2, Search, Plus, X } from "lucide-react";
 import EditResourceDialog from "./EditResourceDialog";
 import { deleteResource } from "./actions";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,15 +45,45 @@ export default function LibraryManager({ initialResources }: { initialResources:
         setResources(initialResources);
     }, [initialResources]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedLanguage, setSelectedLanguage] = useState("all");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
 
-    const filteredResources = resources.filter(resource =>
-        resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        resource.author.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // derived constants
+    const allTags = Array.from(new Set(resources.flatMap(r => r.tags || []))).sort();
+    const languages = [
+        { code: "es", label: "Spanish" },
+        { code: "ja", label: "Japanese" },
+        { code: "ko", label: "Korean" },
+        { code: "fr", label: "French" },
+    ];
+
+    const toggleTag = (tag: string) => {
+        setSelectedTags(prev =>
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+        );
+    };
+
+    const clearFilters = () => {
+        setSearchTerm("");
+        setSelectedLanguage("all");
+        setSelectedTags([]);
+    };
+
+    const hasActiveFilters = searchTerm || selectedLanguage !== "all" || selectedTags.length > 0;
+
+    const filteredResources = resources.filter(resource => {
+        const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            resource.author.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesLanguage = selectedLanguage === "all" || resource.language === selectedLanguage;
+        const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => resource.tags?.includes(tag));
+
+        return matchesSearch && matchesLanguage && matchesTags;
+    });
 
     const handleDeleteClick = (resource: Resource) => {
         setResourceToDelete(resource);
@@ -91,20 +122,57 @@ export default function LibraryManager({ initialResources }: { initialResources:
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <div className="relative w-72">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search resources..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8"
-                    />
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-center gap-4">
+                    <div className="flex flex-1 gap-2">
+                        <div className="relative flex-1 max-w-sm">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search by title or author..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-8"
+                            />
+                        </div>
+                        <div className="w-[180px]">
+                            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Language" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Languages</SelectItem>
+                                    {languages.map(lang => (
+                                        <SelectItem key={lang.code} value={lang.code}>{lang.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {hasActiveFilters && (
+                            <Button variant="ghost" size="icon" onClick={clearFilters} title="Clear Filters">
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                    <Button onClick={handleCreateClick} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Resource
+                    </Button>
                 </div>
-                <Button onClick={handleCreateClick} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Resource
-                </Button>
+
+                {allTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {allTags.map(tag => (
+                            <Badge
+                                key={tag}
+                                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                                className="cursor-pointer hover:bg-secondary/80 transition-colors"
+                                onClick={() => toggleTag(tag)}
+                            >
+                                #{tag}
+                            </Badge>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="border rounded-md">

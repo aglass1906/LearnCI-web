@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star } from "lucide-react";
+import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Search, X } from "lucide-react";
 import Image from "next/image";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 interface Resource {
     id: string;
@@ -30,10 +32,43 @@ interface LibraryClientProps {
 export default function LibraryClient({ initialResources }: LibraryClientProps) {
     const [resources] = useState<Resource[]>(initialResources || []);
     const [activeTab, setActiveTab] = useState("all");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedLanguage, setSelectedLanguage] = useState("all");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-    const filteredResources = activeTab === "all"
-        ? resources
-        : resources.filter(r => r.type.toLowerCase() === activeTab.toLowerCase());
+    // derived constants
+    const allTags = Array.from(new Set(resources.flatMap(r => r.tags || []))).sort();
+    const languages = [
+        { code: "es", label: "Spanish" },
+        { code: "ja", label: "Japanese" },
+        { code: "ko", label: "Korean" },
+        { code: "fr", label: "French" },
+    ];
+
+    const toggleTag = (tag: string) => {
+        setSelectedTags(prev =>
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+        );
+    };
+
+    const clearFilters = () => {
+        setSearchTerm("");
+        setSelectedLanguage("all");
+        setSelectedTags([]);
+        setActiveTab("all");
+    };
+
+    const hasActiveFilters = searchTerm || selectedLanguage !== "all" || selectedTags.length > 0 || activeTab !== "all";
+
+    const filteredResources = resources.filter(resource => {
+        const matchesTab = activeTab === "all" || resource.type.toLowerCase() === activeTab.toLowerCase();
+        const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            resource.author.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesLanguage = selectedLanguage === "all" || resource.language === selectedLanguage;
+        const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => resource.tags?.includes(tag));
+
+        return matchesTab && matchesSearch && matchesLanguage && matchesTags;
+    });
 
     const getTypeIcon = (type: string) => {
         switch (type.toLowerCase()) {
@@ -62,7 +97,54 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                 <p className="text-muted-foreground">Curated resources to supercharge your learning.</p>
             </div>
 
-            <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+            <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-1 gap-2">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search by title or author..."
+                                className="pl-9"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="w-[180px]">
+                            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Language" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Languages</SelectItem>
+                                    {languages.map(lang => (
+                                        <SelectItem key={lang.code} value={lang.code}>{lang.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {hasActiveFilters && (
+                            <Button variant="ghost" size="icon" onClick={clearFilters} title="Clear Filters">
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                    {allTags.map(tag => (
+                        <Badge
+                            key={tag}
+                            variant={selectedTags.includes(tag) ? "default" : "outline"}
+                            className="cursor-pointer hover:bg-secondary/80 transition-colors"
+                            onClick={() => toggleTag(tag)}
+                        >
+                            #{tag}
+                        </Badge>
+                    ))}
+                </div>
+            </div>
+
+            <Tabs defaultValue="all" value={activeTab} className="w-full" onValueChange={setActiveTab}>
                 <TabsList className="mb-6 flex flex-wrap h-auto gap-2 bg-transparent p-0 justify-start">
                     <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-background">
                         All Resources
