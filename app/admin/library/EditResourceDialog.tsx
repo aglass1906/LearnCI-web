@@ -132,7 +132,7 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
                 <DialogHeader>
                     <DialogTitle>{resource ? "Edit Resource" : "Create Resource"}</DialogTitle>
                     <DialogDescription>
-                        Make changes to the library resource here. Click save when you're done.
+                        Make changes to the library resource here. Click save when you&apos;re done.
                     </DialogDescription>
                 </DialogHeader>
 

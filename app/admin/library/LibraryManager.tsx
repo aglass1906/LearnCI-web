@@ -240,7 +240,7 @@ export default function LibraryManager({ initialResources }: { initialResources:
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete the resource
-                            "{resourceToDelete?.title}".
+                            &quot;{resourceToDelete?.title}&quot;.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

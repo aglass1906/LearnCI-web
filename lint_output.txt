@@ -1,0 +1,81 @@
+
+> learnci-web@0.1.0 lint
+> eslint
+
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/admin/library/EditResourceDialog.tsx
+  118:18  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+  135:87  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/admin/library/LibraryManager.tsx
+  243:29  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  243:55  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/admin/library/actions.ts
+  10:17  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/admin/page.tsx
+  3:39  warning  'Smartphone' is defined but never used   @typescript-eslint/no-unused-vars
+  3:51  warning  'Ear' is defined but never used          @typescript-eslint/no-unused-vars
+  3:56  warning  'MonitorPlay' is defined but never used  @typescript-eslint/no-unused-vars
+  3:69  warning  'BookOpen' is defined but never used     @typescript-eslint/no-unused-vars
+  3:79  warning  'Mic' is defined but never used          @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/admin/users/page.tsx
+   14:42  warning  'ShieldOff' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  484:8   warning  React Hook useEffect has a missing dependency: 'fetchUserDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  670:8   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/api/admin/change-password/route.ts
+  42:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/api/admin/users/route.ts
+  6:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/auth/signout/route.ts
+  1:10  warning  'createClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/leaderboard/page.tsx
+  1:41  warning  'CardTitle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/portal/activities/page.tsx
+  8:29  warning  'Cloud' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/portal/library/LibraryClient.tsx
+  8:10  warning  'Loader2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/portal/page.tsx
+    7:75  warning  'Trophy' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+   15:10  warning  'RadioGroup' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+   15:22  warning  'RadioGroupItem' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+   16:10  warning  'Label' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+   17:10  warning  'Settings' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   30:12  warning  'latestCheckIn' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
+   97:8   warning  React Hook useCallback has an unnecessary dependency: 'supabase.auth'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  119:11  warning  'updateVoiceGender' is assigned a value but never used                                                                   @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/app/portal/profile/page.tsx
+   6:39  warning  'Globe' is defined but never used  @typescript-eslint/no-unused-vars
+  79:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/components/LogActivityForm.tsx
+  10:10  warning  'useRouter' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/components/TodaysActivities.tsx
+  17:12  warning  'loading' is assigned a value but never used                                                                        @typescript-eslint/no-unused-vars
+  22:8   warning  React Hook useEffect has a missing dependency: 'fetchActivities'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/components/site-header.tsx
+  57:8  warning  React Hook useEffect has missing dependencies: 'fetchProfile' and 'supabase.auth'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/hooks/use-toast.ts
+  21:7  warning  'actionTypes' is assigned a value but only used as a type  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/middleware.ts
+  20:58  warning  'options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/alanglass/Documents/dev/_AI/LearnCI-web/utils/supabase/server.ts
+  42:24  warning  'cookiesToSet' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 36 problems (3 errors, 33 warnings)
+
