@@ -33,6 +33,10 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'd3t3ozftmdmh3i.cloudfront.net',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.squarespace-cdn.com',
             }
         ],
     },
