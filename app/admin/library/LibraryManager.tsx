@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Search, Plus, X } from "lucide-react";
+import { Edit, Trash2, Search, Plus, X, Copy, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Eye } from "lucide-react";
 import EditResourceDialog from "./EditResourceDialog";
-import { deleteResource } from "./actions";
+import { deleteResource, createResource } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -29,6 +30,7 @@ interface Resource {
     description: string;
     cover_image_url: string;
     main_url: string;
+    resource_links: { type: string; url: string; label: string; order: number; isActive: boolean }[];
     difficulty: string;
     tags: string[];
     avg_rating: number;
@@ -46,7 +48,14 @@ export default function LibraryManager({ initialResources }: { initialResources:
     }, [initialResources]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedLanguage, setSelectedLanguage] = useState("all");
+    const [selectedType, setSelectedType] = useState("all");
+    const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+    const [selectedStatus, setSelectedStatus] = useState("all");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [sortConfig, setSortConfig] = useState<{ key: keyof Resource; direction: 'asc' | 'desc' }>({
+        key: 'title',
+        direction: 'asc',
+    });
 
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -61,6 +70,9 @@ export default function LibraryManager({ initialResources }: { initialResources:
         { code: "ko", label: "Korean" },
         { code: "fr", label: "French" },
     ];
+    const types = ["vocab", "grammar", "reading", "listening", "speaking"]; // Add other types as needed
+    const difficulties = ["A0", "A1", "A2", "B1", "B2", "C1", "C2"];
+    const statuses = ["draft", "published", "archived"];
 
     const toggleTag = (tag: string) => {
         setSelectedTags(prev =>
@@ -71,19 +83,46 @@ export default function LibraryManager({ initialResources }: { initialResources:
     const clearFilters = () => {
         setSearchTerm("");
         setSelectedLanguage("all");
+        setSelectedType("all");
+        setSelectedDifficulty("all");
+        setSelectedStatus("all");
         setSelectedTags([]);
+        setSortConfig({ key: 'title', direction: 'asc' });
     };
 
-    const hasActiveFilters = searchTerm || selectedLanguage !== "all" || selectedTags.length > 0;
+    const hasActiveFilters = searchTerm || selectedLanguage !== "all" || selectedType !== "all" || selectedDifficulty !== "all" || selectedStatus !== "all" || selectedTags.length > 0;
 
     const filteredResources = resources.filter(resource => {
         const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             resource.author.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesLanguage = selectedLanguage === "all" || resource.language === selectedLanguage;
+        const matchesType = selectedType === "all" || resource.type === selectedType;
+        const matchesDifficulty = selectedDifficulty === "all" || resource.difficulty === selectedDifficulty;
+        const matchesStatus = selectedStatus === "all" || resource.status === selectedStatus;
         const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => resource.tags?.includes(tag));
 
-        return matchesSearch && matchesLanguage && matchesTags;
+        return matchesSearch && matchesLanguage && matchesType && matchesDifficulty && matchesStatus && matchesTags;
     });
+
+    const sortedResources = [...filteredResources].sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (aValue < bValue) {
+            return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+            return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    const handleSort = (key: keyof Resource) => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
+        }));
+    };
 
     const handleDeleteClick = (resource: Resource) => {
         setResourceToDelete(resource);
@@ -120,6 +159,33 @@ export default function LibraryManager({ initialResources }: { initialResources:
         setIsDialogOpen(true);
     };
 
+    const handleDuplicateClick = async (resource: Resource) => {
+        const { id, ...resourceData } = resource;
+        // Ensure resource_links is defined
+        const links = resource.resource_links || [];
+        const newResource = {
+            ...resourceData,
+            title: `Copy of ${resource.title}`,
+            status: 'draft',
+            resource_links: [...links] // Clone array
+        };
+
+        const result = await createResource(newResource);
+
+        if (result.error) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to duplicate resource: " + result.error,
+            });
+        } else {
+            toast({
+                title: "Success",
+                description: "Resource duplicated successfully.",
+            });
+        }
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-col gap-4">
@@ -143,6 +209,45 @@ export default function LibraryManager({ initialResources }: { initialResources:
                                     <SelectItem value="all">All Languages</SelectItem>
                                     {languages.map(lang => (
                                         <SelectItem key={lang.code} value={lang.code}>{lang.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="w-[140px]">
+                            <Select value={selectedType} onValueChange={setSelectedType}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Types</SelectItem>
+                                    {types.map(t => (
+                                        <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="w-[140px]">
+                            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Difficulty" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Difficulties</SelectItem>
+                                    {difficulties.map(d => (
+                                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="w-[140px]">
+                            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Statuses</SelectItem>
+                                    {statuses.map(s => (
+                                        <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -179,17 +284,57 @@ export default function LibraryManager({ initialResources }: { initialResources:
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Difficulty</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Language</TableHead>
+                            <TableHead className="w-[300px]">
+                                <Button variant="ghost" onClick={() => handleSort('title')} className="h-8 -ml-4">
+                                    Title
+                                    {sortConfig.key === 'title' && (
+                                        sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />
+                                    )}
+                                    {sortConfig.key !== 'title' && <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />}
+                                </Button>
+                            </TableHead>
+                            <TableHead>
+                                <Button variant="ghost" onClick={() => handleSort('type')} className="h-8 -ml-4">
+                                    Type
+                                    {sortConfig.key === 'type' && (
+                                        sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />
+                                    )}
+                                    {sortConfig.key !== 'type' && <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />}
+                                </Button>
+                            </TableHead>
+                            <TableHead>
+                                <Button variant="ghost" onClick={() => handleSort('difficulty')} className="h-8 -ml-4">
+                                    Difficulty
+                                    {sortConfig.key === 'difficulty' && (
+                                        sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />
+                                    )}
+                                    {sortConfig.key !== 'difficulty' && <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />}
+                                </Button>
+                            </TableHead>
+                            <TableHead>
+                                <Button variant="ghost" onClick={() => handleSort('status')} className="h-8 -ml-4">
+                                    Status
+                                    {sortConfig.key === 'status' && (
+                                        sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />
+                                    )}
+                                    {sortConfig.key !== 'status' && <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />}
+                                </Button>
+                            </TableHead>
+                            <TableHead>
+                                <Button variant="ghost" onClick={() => handleSort('language')} className="h-8 -ml-4">
+                                    Language
+                                    {sortConfig.key === 'language' && (
+                                        sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />
+                                    )}
+                                    {sortConfig.key !== 'language' && <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />}
+                                </Button>
+                            </TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredResources.length > 0 ? (
-                            filteredResources.map((resource) => (
+                        {sortedResources.length > 0 ? (
+                            sortedResources.map((resource) => (
                                 <TableRow key={resource.id}>
                                     <TableCell className="font-medium">
                                         <div>{resource.title}</div>
@@ -207,8 +352,16 @@ export default function LibraryManager({ initialResources }: { initialResources:
                                     <TableCell className="capitalize">{resource.language}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" asChild title="Preview Details">
+                                                <Link href={`/admin/library/${resource.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
                                             <Button variant="ghost" size="icon" onClick={() => handleEditClick(resource)}>
                                                 <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => handleDuplicateClick(resource)} title="Duplicate">
+                                                <Copy className="h-4 w-4" />
                                             </Button>
                                             <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeleteClick(resource)}>
                                                 <Trash2 className="h-4 w-4" />

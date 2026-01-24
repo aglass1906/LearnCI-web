@@ -10,7 +10,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { updateResource, createResource } from "./actions";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
+
+interface ResourceLink {
+    type: string;
+    url: string;
+    label: string;
+    order: number;
+    isActive: boolean;
+}
 
 interface Resource {
     id: string;
@@ -20,6 +28,7 @@ interface Resource {
     description: string;
     cover_image_url: string;
     main_url: string;
+    resource_links: ResourceLink[];
     difficulty: string;
     tags: string[];
     avg_rating: number;
@@ -46,6 +55,7 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
             description: "",
             cover_image_url: "",
             main_url: "",
+            resource_links: [],
             difficulty: "beginner",
             tags: [],
             language: "es",
@@ -68,6 +78,7 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
             description: "",
             cover_image_url: "",
             main_url: "",
+            resource_links: [],
             difficulty: "beginner",
             tags: [],
             language: "es",
@@ -79,6 +90,32 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
 
     const handleChange = (key: keyof Resource, value: any) => {
         setFormData(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleLinkChange = (index: number, key: keyof ResourceLink, value: any) => {
+        const newLinks = [...(formData.resource_links || [])];
+        newLinks[index] = { ...newLinks[index], [key]: value };
+        setFormData(prev => ({
+            ...prev,
+            resource_links: newLinks,
+            main_url: index === 0 && key === 'url' ? value : prev.main_url // Sync first link to main_url
+        }));
+    };
+
+    const addLink = () => {
+        setFormData(prev => ({
+            ...prev,
+            resource_links: [...(prev.resource_links || []), { type: "website", url: "", label: "", order: 0, isActive: true }]
+        }));
+    };
+
+    const removeLink = (index: number) => {
+        const newLinks = [...(formData.resource_links || [])].filter((_, i) => i !== index);
+        setFormData(prev => ({
+            ...prev,
+            resource_links: newLinks,
+            main_url: index === 0 && newLinks.length > 0 ? newLinks[0].url : (newLinks.length === 0 ? "" : prev.main_url)
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -241,12 +278,89 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="main_url">Main URL</Label>
-                        <Input
-                            id="main_url"
-                            value={formData.main_url || ""}
-                            onChange={(e) => handleChange("main_url", e.target.value)}
-                        />
+                        <div className="flex items-center justify-between">
+                            <Label>Resource Links</Label>
+                            <Button type="button" variant="outline" size="sm" onClick={addLink}>
+                                <Plus className="h-4 w-4 mr-1" /> Add Link
+                            </Button>
+                        </div>
+                        <div className="space-y-3">
+                            {formData.resource_links?.map((link, index) => (
+                                <div key={index} className="flex gap-2 items-start p-3 border rounded-md bg-slate-50 dark:bg-slate-900">
+                                    <div className="grid gap-2 flex-1">
+                                        <div className="flex gap-2">
+                                            <div className="w-[120px]">
+                                                <Select
+                                                    value={link.type}
+                                                    onValueChange={(value) => handleLinkChange(index, "type", value)}
+                                                >
+                                                    <SelectTrigger className="h-8">
+                                                        <SelectValue placeholder="Type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="website">Website</SelectItem>
+                                                        <SelectItem value="youtube">YouTube</SelectItem>
+                                                        <SelectItem value="spotify">Spotify</SelectItem>
+                                                        <SelectItem value="apple_podcasts">Apple Podcasts</SelectItem>
+                                                        <SelectItem value="pdf">PDF</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="flex-1">
+                                                <Input
+                                                    className="h-8"
+                                                    placeholder="URL"
+                                                    value={link.url}
+                                                    onChange={(e) => handleLinkChange(index, "url", e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <Input
+                                                    className="h-8"
+                                                    placeholder="Label (e.g. 'Watch on YouTube')"
+                                                    value={link.label}
+                                                    onChange={(e) => handleLinkChange(index, "label", e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="w-[80px]">
+                                                <Input
+                                                    className="h-8"
+                                                    type="number"
+                                                    placeholder="Order"
+                                                    value={link.order || 0}
+                                                    onChange={(e) => handleLinkChange(index, "order", parseInt(e.target.value))}
+                                                    title="Sort Order"
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-2 border px-2 rounded-md h-8 bg-background">
+                                                <Checkbox
+                                                    id={`link-active-${index}`}
+                                                    checked={link.isActive !== false} // Default to true if undefined
+                                                    onCheckedChange={(checked) => handleLinkChange(index, "isActive", checked)}
+                                                />
+                                                <Label htmlFor={`link-active-${index}`} className="text-xs cursor-pointer">Active</Label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-red-500 hover:text-red-700 h-8 w-8"
+                                        onClick={() => removeLink(index)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                            {(!formData.resource_links || formData.resource_links.length === 0) && (
+                                <div className="text-sm text-muted-foreground text-center py-2 border border-dashed rounded-md">
+                                    No links added yet.
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-2">

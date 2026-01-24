@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Search, X } from "lucide-react";
+import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Search, X, Music, FileText } from "lucide-react";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ interface Resource {
     description: string;
     cover_image_url: string;
     main_url: string;
+    resource_links: { type: string; url: string; label: string; order: number; isActive: boolean }[];
     difficulty: string;
     tags: string[];
     avg_rating: number;
@@ -72,12 +73,26 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
 
     const getTypeIcon = (type: string) => {
         switch (type.toLowerCase()) {
-            case "podcast": return <Headphones className="h-4 w-4" />;
+            case "podcast":
+            case "apple_podcasts":
+            case "spotify": return <Headphones className="h-4 w-4" />;
             case "video":
             case "youtube": return <MonitorPlay className="h-4 w-4" />;
             case "book": return <Book className="h-4 w-4" />;
             case "website": return <Globe className="h-4 w-4" />;
+            case "pdf": return <FileText className="h-4 w-4" />;
             default: return <Book className="h-4 w-4" />;
+        }
+    };
+
+    const getLinkIcon = (type: string) => {
+        switch (type.toLowerCase()) {
+            case "youtube": return <MonitorPlay className="h-3 w-3" />;
+            case "spotify":
+            case "apple_podcasts": return <Headphones className="h-3 w-3" />;
+            case "pdf": return <FileText className="h-3 w-3" />;
+            case "website": return <Globe className="h-3 w-3" />;
+            default: return <ExternalLink className="h-3 w-3" />;
         }
     };
 
@@ -190,7 +205,7 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
 
                             <CardHeader className="pb-2">
                                 <div className="flex justify-between items-start gap-2">
-                                    <CardTitle className="line-clamp-1 text-lg">{resource.title}</CardTitle>
+                                    <CardTitle className="text-lg leading-tight">{resource.title}</CardTitle>
                                     <Badge variant="outline" className="shrink-0">{resource.difficulty}</Badge>
                                 </div>
                                 <CardDescription className="font-medium text-primary">
@@ -217,11 +232,27 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                                         <Star className="h-4 w-4 fill-current" />
                                         <span>{resource.avg_rating}</span>
                                     </div>
-                                    <Button size="sm" variant="ghost" className="gap-1 hover:text-primary" asChild>
-                                        <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                            Open <ExternalLink className="h-3 w-3" />
-                                        </a>
-                                    </Button>
+                                    <div className="flex flex-wrap gap-2 justify-end">
+                                        {resource.resource_links && resource.resource_links.length > 0 ? (
+                                            resource.resource_links
+                                                .filter(link => link.isActive !== false) // Default to true
+                                                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                                                .map((link, idx) => (
+                                                    <Button key={idx} size="sm" variant="ghost" className="gap-1 hover:text-primary h-8 px-2" asChild title={link.label || link.type}>
+                                                        <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                                            {getLinkIcon(link.type)}
+                                                            <span className="ml-1 hidden sm:inline-block truncate max-w-[100px] text-xs font-normal opacity-90">{link.label || "Open"}</span>
+                                                        </a>
+                                                    </Button>
+                                                ))
+                                        ) : (
+                                            <Button size="sm" variant="ghost" className="gap-1 hover:text-primary" asChild>
+                                                <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
+                                                    Open <ExternalLink className="h-3 w-3" />
+                                                </a>
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </CardFooter>
                         </Card>
