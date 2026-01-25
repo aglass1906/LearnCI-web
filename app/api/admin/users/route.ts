@@ -1,10 +1,12 @@
 import { createClient, createAdminClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     // 1. Authorization Check
     const { data: { user } } = await supabase.auth.getUser();

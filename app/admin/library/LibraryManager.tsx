@@ -337,7 +337,9 @@ export default function LibraryManager({ initialResources }: { initialResources:
                             sortedResources.map((resource) => (
                                 <TableRow key={resource.id}>
                                     <TableCell className="font-medium">
-                                        <div>{resource.title}</div>
+                                        <Link href={`/admin/library/${resource.id}`} className="hover:underline hover:text-primary transition-colors block py-1">
+                                            {resource.title}
+                                        </Link>
                                         <div className="text-sm text-muted-foreground">{resource.author}</div>
                                     </TableCell>
                                     <TableCell className="capitalize">{resource.type}</TableCell>

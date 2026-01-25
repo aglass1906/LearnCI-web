@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Search, X, Music, FileText } from "lucide-react";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -181,7 +182,7 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredResources.map((resource) => (
                         <Card key={resource.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-all group">
-                            <div className="relative h-48 w-full bg-slate-900 flex items-center justify-center">
+                            <Link href={`/portal/library/${resource.id}`} className="block relative h-48 w-full bg-slate-900 flex items-center justify-center cursor-pointer">
                                 {resource.cover_image_url ? (
                                     <div className="relative h-full w-full p-2">
                                         <Image
@@ -197,15 +198,17 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                                         {getTypeIcon(resource.type)}
                                     </div>
                                 )}
-                                <Badge className="absolute top-2 right-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 z-10">
+                                <Badge className="absolute top-2 right-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 z-10 pointer-events-none">
                                     {getTypeIcon(resource.type)}
                                     <span className="ml-1 capitalize">{resource.type}</span>
                                 </Badge>
-                            </div>
+                            </Link>
 
                             <CardHeader className="pb-2">
                                 <div className="flex justify-between items-start gap-2">
-                                    <CardTitle className="text-lg leading-tight">{resource.title}</CardTitle>
+                                    <Link href={`/portal/library/${resource.id}`} className="hover:text-primary transition-colors">
+                                        <CardTitle className="text-lg leading-tight">{resource.title}</CardTitle>
+                                    </Link>
                                     <Badge variant="outline" className="shrink-0">{resource.difficulty}</Badge>
                                 </div>
                                 <CardDescription className="font-medium text-primary">
@@ -233,22 +236,11 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                                         <span>{resource.avg_rating}</span>
                                     </div>
                                     <div className="flex flex-wrap gap-2 justify-end">
-                                        {resource.resource_links && resource.resource_links.length > 0 ? (
-                                            resource.resource_links
-                                                .filter(link => link.isActive !== false) // Default to true
-                                                .sort((a, b) => (a.order || 0) - (b.order || 0))
-                                                .map((link, idx) => (
-                                                    <Button key={idx} size="sm" variant="ghost" className="gap-1 hover:text-primary h-8 px-2" asChild title={link.label || link.type}>
-                                                        <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                                            {getLinkIcon(link.type)}
-                                                            <span className="ml-1 hidden sm:inline-block truncate max-w-[100px] text-xs font-normal opacity-90">{link.label || "Open"}</span>
-                                                        </a>
-                                                    </Button>
-                                                ))
-                                        ) : (
-                                            <Button size="sm" variant="ghost" className="gap-1 hover:text-primary" asChild>
+                                        {resource.main_url && (
+                                            <Button size="sm" variant="secondary" className="gap-1 hover:text-primary h-8 px-3" asChild title="Open Creator Page">
                                                 <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                                    Open <ExternalLink className="h-3 w-3" />
+                                                    <ExternalLink className="h-3 w-3" />
+                                                    <span className="ml-1 hidden sm:inline-block text-xs font-normal">Open Creator Page</span>
                                                 </a>
                                             </Button>
                                         )}

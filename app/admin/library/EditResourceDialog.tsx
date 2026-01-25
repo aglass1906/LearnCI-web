@@ -98,7 +98,6 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
         setFormData(prev => ({
             ...prev,
             resource_links: newLinks,
-            main_url: index === 0 && key === 'url' ? value : prev.main_url // Sync first link to main_url
         }));
     };
 
@@ -114,7 +113,6 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
         setFormData(prev => ({
             ...prev,
             resource_links: newLinks,
-            main_url: index === 0 && newLinks.length > 0 ? newLinks[0].url : (newLinks.length === 0 ? "" : prev.main_url)
         }));
     };
 
@@ -275,6 +273,18 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
                                 </SelectContent>
                             </Select>
                         </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label>Main URL (Primary)</Label>
+                        </div>
+                        <Input
+                            aria-label="Main URL"
+                            value={formData.main_url || ""}
+                            onChange={(e) => handleChange("main_url", e.target.value)}
+                            placeholder="Primary link (e.g., https://example.com) - displayed first"
+                        />
                     </div>
 
                     <div className="space-y-2">

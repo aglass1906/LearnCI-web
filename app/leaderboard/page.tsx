@@ -1,10 +1,14 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
-import { Medal, Trophy } from "lucide-react";
+import { Trophy, Medal, Crown } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 export default async function Leaderboard() {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     const { data: leaders } = await supabase
         .from("profiles")

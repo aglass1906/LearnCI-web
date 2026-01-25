@@ -1,8 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import LibraryManager from "./LibraryManager";
+import { cookies } from "next/headers";
 
 export default async function AdminLibraryPage() {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     const { data: resources, error } = await supabase
         .from("learning_resources")

@@ -1,8 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
 
+import { cookies } from "next/headers";
+
 export default async function AdminFeedback() {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     const { data: feedback } = await supabase
         .from("daily_feedback")

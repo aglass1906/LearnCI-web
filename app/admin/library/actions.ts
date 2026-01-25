@@ -2,9 +2,11 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export async function updateResource(id: string, data: any) {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     // Remove id from data if present to avoid "Modifying the identity column" errors
     const { id: _, ...updateData } = data;
@@ -28,7 +30,8 @@ export async function updateResource(id: string, data: any) {
 }
 
 export async function createResource(data: any) {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     console.log("[createResource] Creating resource with data:", data);
 
@@ -49,7 +52,8 @@ export async function createResource(data: any) {
 
 
 export async function deleteResource(id: string) {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     const { error } = await supabase
         .from("learning_resources")

@@ -25,6 +25,7 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
         .from("learning_resources")
         .select("*")
         .eq("id", id)
+        .eq("status", "published") // Ensure only published resources are visible
         .single();
 
     if (error || !resource) {
@@ -60,23 +61,22 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
     const resourceLinks: ResourceLink[] = resource.resource_links || [];
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto pb-10">
+        <div className="space-y-6 max-w-5xl mx-auto pb-10 pt-6">
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link href="/admin/library">
+                    <Link href="/portal/library">
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Resource Details</h1>
-                    <p className="text-muted-foreground text-sm">Preview and manage resource content</p>
+                    <h1 className="text-2xl font-bold tracking-tight">Back to Library</h1>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card className="overflow-hidden border-2">
+                    <Card className="overflow-hidden border-2 shadow-sm">
                         <div className="relative h-64 w-full bg-slate-900 flex items-center justify-center">
                             {resource.cover_image_url ? (
                                 <div className="relative h-full w-full p-4">
@@ -119,80 +119,82 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                         <CardContent className="space-y-6">
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Description</h3>
-                                <p className="text-lg leading-relaxed whitespace-pre-line">{resource.description}</p>
+                                <p className="text-lg leading-relaxed whitespace-pre-line text-foreground/90">{resource.description}</p>
                             </div>
 
-                            <div>
-                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Topics</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {resource.tags?.map((tag: string) => (
-                                        <Badge key={tag} variant="secondary" className="px-3 py-1 text-sm">
-                                            #{tag}
-                                        </Badge>
-                                    ))}
+                            {resource.tags && resource.tags.length > 0 && (
+                                <div>
+                                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Topics</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {resource.tags.map((tag: string) => (
+                                            <Badge key={tag} variant="secondary" className="px-3 py-1 text-sm pointer-events-none">
+                                                #{tag}
+                                            </Badge>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Sidebar / Links */}
                 <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Access Resource</CardTitle>
+                    <Card className="shadow-sm border-2">
+                        <CardHeader className="bg-muted/30 pb-4">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <ExternalLink className="h-5 w-5 text-primary" />
+                                Start Learning
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-4 pt-6">
                             <div className="grid gap-3">
                                 {resource.main_url && (
                                     <Button
-                                        variant="outline"
-                                        className="h-auto py-4 justify-start gap-4 w-full group hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+                                        size="lg"
+                                        className="h-auto py-4 justify-start gap-4 w-full shadow-md hover:shadow-lg transition-all text-left"
                                         asChild
                                     >
                                         <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                            <div className="p-2 bg-primary/10 rounded-full group-hover:bg-background transition-colors text-primary">
-                                                <ExternalLink className="h-5 w-5" />
+                                            <div className="p-2 bg-primary-foreground/10 rounded-full">
+                                                <ExternalLink className="h-6 w-6" />
                                             </div>
                                             <div className="flex flex-col items-start overflow-hidden flex-1">
-                                                <span className="font-medium truncate text-left">Open Creator Page</span>
-                                                <span className="text-xs text-muted-foreground">Primary URL</span>
+                                                <span className="font-bold text-lg truncate text-left">Open Creator Page</span>
+                                                <span className="text-sm opacity-90 font-normal">Main Link</span>
                                             </div>
-                                            <ExternalLink className="ml-auto h-4 w-4 opacity-50 group-hover:opacity-100" />
+                                            <ExternalLink className="ml-auto h-5 w-5 opacity-70" />
                                         </a>
                                     </Button>
                                 )}
 
                                 {resourceLinks
-                                    .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort by order
+                                    .filter(link => link.isActive !== false) // Only show active links in portal
+                                    .sort((a, b) => (a.order || 0) - (b.order || 0))
                                     .map((link, idx) => (
                                         <Button
                                             key={idx}
                                             variant="outline"
-                                            className={`h-auto py-4 justify-start gap-4 w-full group hover:border-primary/50 hover:bg-primary/5 transition-all ${link.isActive === false ? 'opacity-50' : ''}`}
+                                            size="lg"
+                                            className="h-auto py-3 justify-start gap-4 w-full hover:bg-secondary/50 transition-all"
                                             asChild
                                         >
                                             <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                                <div className="p-2 bg-secondary rounded-full group-hover:bg-background transition-colors">
+                                                <div className="p-2 bg-secondary rounded-full">
                                                     {getLinkIcon(link.type, "h-5 w-5")}
                                                 </div>
                                                 <div className="flex flex-col items-start overflow-hidden flex-1">
-                                                    <div className="flex items-center gap-2 w-full">
-                                                        <span className="font-medium truncate text-left">{link.label || "Open Resource"}</span>
-                                                        {link.isActive === false && (
-                                                            <Badge variant="outline" className="text-[10px] h-4 px-1 py-0">Inactive</Badge>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-xs text-muted-foreground capitalize">{link.type.replace('_', ' ')} (Order: {link.order || 0})</span>
+                                                    <span className="font-semibold truncate text-left">{link.label || "Alternative Link"}</span>
+                                                    <span className="text-xs text-muted-foreground capitalize">{link.type.replace('_', ' ')}</span>
                                                 </div>
-                                                <ExternalLink className="ml-auto h-4 w-4 opacity-50 group-hover:opacity-100" />
+                                                <ExternalLink className="ml-auto h-4 w-4 opacity-50" />
                                             </a>
                                         </Button>
                                     ))}
 
-                                {!resource.main_url && resourceLinks.length === 0 && (
+                                {!resource.main_url && resourceLinks.filter(l => l.isActive !== false).length === 0 && (
                                     <div className="text-center py-6 text-muted-foreground bg-secondary/20 rounded-lg border border-dashed">
-                                        <p>No links available</p>
+                                        <p>No accessible links available currently.</p>
                                     </div>
                                 )}
                             </div>
@@ -200,32 +202,24 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                     </Card>
 
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Metadata</CardTitle>
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-base">Details</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <dl className="space-y-4 text-sm">
-                                <div className="flex justify-between py-2 border-b">
-                                    <dt className="text-muted-foreground">Status</dt>
-                                    <dd>
-                                        <Badge variant={resource.status === 'published' ? 'default' : 'secondary'}>
-                                            {resource.status}
-                                        </Badge>
-                                    </dd>
-                                </div>
+                            <dl className="space-y-3 text-sm">
                                 <div className="flex justify-between py-2 border-b">
                                     <dt className="text-muted-foreground">Language</dt>
                                     <dd className="font-medium uppercase">{resource.language}</dd>
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <dt className="text-muted-foreground">Created</dt>
-                                    <dd className="font-medium">
-                                        {new Date(resource.created_at).toLocaleDateString()}
+                                    <dt className="text-muted-foreground">Level</dt>
+                                    <dd>
+                                        <Badge variant="outline">{resource.difficulty}</Badge>
                                     </dd>
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <dt className="text-muted-foreground">Featured</dt>
-                                    <dd className="font-medium">{resource.is_featured ? "Yes" : "No"}</dd>
+                                    <dt className="text-muted-foreground">Format</dt>
+                                    <dd className="capitalize">{resource.type}</dd>
                                 </div>
                             </dl>
                         </CardContent>

@@ -4,11 +4,13 @@ import { createClient } from "@/utils/supabase/server";
 import { Clock, GraduationCap, Languages, Trophy, User } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 
 export default async function PublicProfile({ params }: { params: Promise<{ username: string }> }) {
     const { username } = await params;
     const decodedName = decodeURIComponent(username);
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     // Fetch user profile by name (username)
     const { data: profile, error } = await supabase

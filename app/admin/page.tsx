@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 import { Users, MessageSquare, Clock, Smartphone, Ear, MonitorPlay, BookOpen, Mic } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getActivityConfig } from "@/utils/activity-types";
 
 export default async function AdminDashboard() {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
     // Parallel data fetching
     const [
