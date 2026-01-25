@@ -3,12 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
 import { CheckCircle2, ChevronRight, Smartphone, Zap } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 export default async function Home() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/portal");
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

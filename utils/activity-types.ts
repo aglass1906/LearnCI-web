@@ -47,9 +47,9 @@ export const ACTIVITY_TYPES = [
     {
         id: "Reading",
         icon: BookOpen,
-        color: "text-cyan-500",
-        bg: "bg-cyan-50 dark:bg-cyan-950/30",
-        border: "border-cyan-200 dark:border-cyan-900"
+        color: "text-violet-500",
+        bg: "bg-violet-50 dark:bg-violet-950/30",
+        border: "border-violet-200 dark:border-violet-900"
     },
     {
         id: "CrossTalk",
