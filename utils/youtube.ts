@@ -135,6 +135,37 @@ export function extractPlaylistId(input: string): string | null {
 }
 
 /**
+ * Extracts a Video ID from a URL or String.
+ */
+export function extractVideoId(input: string): string | null {
+    if (!input) return null;
+
+    // Raw ID - usually 11 chars
+    if (input.length === 11 && !input.includes("/") && !input.includes(".")) {
+        return input;
+    }
+
+    // URL parsing
+    try {
+        if (input.includes("youtube.com") || input.includes("youtu.be")) {
+            const url = new URL(input);
+            if (input.includes("youtu.be")) {
+                return url.pathname.slice(1);
+            }
+            if (url.searchParams.get("v")) {
+                return url.searchParams.get("v");
+            }
+            // Embed URL
+            if (url.pathname.startsWith("/embed/")) {
+                return url.pathname.split("/")[2];
+            }
+        }
+    } catch (e) { }
+
+    return null;
+}
+
+/**
  * Step 1: Get the Channel Details AND 'uploads' playlist ID in one call.
  * Costs 1 Quota unit.
  */

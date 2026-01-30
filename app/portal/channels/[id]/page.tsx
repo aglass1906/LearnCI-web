@@ -2,6 +2,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ExternalImage } from '@/components/ExternalImage';
 import { getChannelDetails, getPlaylistItems, getPlaylistDetails } from '@/utils/youtube';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 
@@ -68,7 +69,7 @@ export default async function ChannelVideosPage({ params }: { params: Promise<Pa
                         {/* Channel Thumbnail */}
                         {channelDetails?.thumbnailUrl && (
                             <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-border shrink-0">
-                                <Image
+                                <ExternalImage
                                     src={channelDetails.thumbnailUrl}
                                     alt={channelTitle}
                                     fill
@@ -105,14 +106,13 @@ export default async function ChannelVideosPage({ params }: { params: Promise<Pa
                 {videos.map((video) => (
                     <a
                         key={video.id}
-                        href={`https://www.youtube.com/watch?v=${video.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={`/portal/watch/${video.id}`}
+                        // Internal link, no target=_blank
                         className="group relative block bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
                     >
                         {/* Thumbnail */}
                         <div className="aspect-video relative overflow-hidden bg-muted">
-                            <Image
+                            <ExternalImage
                                 src={video.thumbnailUrl}
                                 alt={video.title}
                                 fill

@@ -44,6 +44,18 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
+                hostname: '**.cloudfront.net',
+            },
+            {
+                protocol: 'https',
+                hostname: 'lh3.googleusercontent.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'www.spanishobsessed.com',
+            },
+            {
+                protocol: 'https',
                 hostname: 'i.ytimg.com',
             }
         ],

@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Loader2, MonitorPlay, Headphones, Globe, Book, FileText, ExternalLink, Star } from "lucide-react";
 import Image from "next/image";
+import { ExternalImage } from "@/components/ExternalImage";
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { extractChannelId, extractPlaylistId } from "@/utils/youtube";
+import { extractChannelId, extractPlaylistId, extractVideoId } from "@/utils/youtube";
 
 interface Favorite {
     id: string; // The database ID (UUID)
@@ -94,13 +95,20 @@ export default function FavoritesPage() {
                     {favorites.map((fav) => (
                         <Card key={fav.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-all group relative">
                             {(() => {
-                                const isChannel = fav.type.toLowerCase() === 'channel' || fav.type.toLowerCase() === 'youtube';
-                                const channelId = isChannel ? extractChannelId(fav.consumption_url) : null;
-                                const playlistId = isChannel ? extractPlaylistId(fav.consumption_url) : null;
+                                const isYoutubeType = fav.type.toLowerCase() === 'youtube';
+                                const isChannelType = fav.type.toLowerCase() === 'channel';
 
-                                // Prioritize routing: Playlist -> Channel -> External
-                                const targetId = playlistId || channelId;
+                                const channelId = (isYoutubeType || isChannelType) ? extractChannelId(fav.consumption_url) : null;
+                                const playlistId = (isYoutubeType || isChannelType) ? extractPlaylistId(fav.consumption_url) : null;
+                                const videoId = isYoutubeType ? extractVideoId(fav.consumption_url) : null;
+
+                                // Prioritize routing: Video -> Playlist -> Channel -> External
+                                const targetId = videoId || playlistId || channelId;
                                 const isInternal = !!targetId;
+
+                                const internalHref = videoId ? `/portal/watch/${videoId}` :
+                                    (playlistId || channelId) ? `/portal/channels/${targetId}` :
+                                        '#'; // Should not happen if isInternal is true
 
                                 return (
                                     <>
@@ -131,12 +139,17 @@ export default function FavoritesPage() {
                                                     <>
                                                         {fav.image_url ? (
                                                             <div className="relative h-full w-full p-2">
-                                                                <Image
+                                                                <ExternalImage
                                                                     src={fav.image_url}
                                                                     alt={fav.title}
                                                                     fill
                                                                     style={{ objectFit: "contain" }}
                                                                     className="transition-transform group-hover:scale-105"
+                                                                    customFallback={
+                                                                        <div className="flex items-center justify-center h-full w-full bg-slate-100 dark:bg-slate-800">
+                                                                            {getTypeIcon(fav.type)}
+                                                                        </div>
+                                                                    }
                                                                 />
                                                             </div>
                                                         ) : (
@@ -154,7 +167,7 @@ export default function FavoritesPage() {
                                                 if (isInternal) {
                                                     return (
                                                         <Link
-                                                            href={`/portal/channels/${targetId}`}
+                                                            href={internalHref}
                                                             className="block relative h-48 w-full bg-slate-900 flex items-center justify-center cursor-pointer"
                                                         >
                                                             {content}
@@ -179,7 +192,7 @@ export default function FavoritesPage() {
                                         <CardHeader className="pb-2">
                                             <CardTitle className="text-lg leading-tight line-clamp-2 hover:text-primary transition-colors">
                                                 {isInternal ? (
-                                                    <Link href={`/portal/channels/${targetId}`}>
+                                                    <Link href={internalHref}>
                                                         {fav.title}
                                                     </Link>
                                                 ) : (
@@ -200,14 +213,14 @@ export default function FavoritesPage() {
                                             {isInternal ? (
                                                 <>
                                                     <Button size="sm" variant="default" className="w-full gap-2" asChild>
-                                                        <Link href={`/portal/channels/${targetId}`}>
-                                                            <MonitorPlay className="h-4 w-4" /> View Videos
+                                                        <Link href={internalHref}>
+                                                            <MonitorPlay className="h-4 w-4" /> View {videoId ? "Video" : "Videos"}
                                                         </Link>
                                                     </Button>
                                                     <Button size="sm" variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild>
                                                         <a href={fav.consumption_url} target="_blank" rel="noopener noreferrer">
                                                             <ExternalLink className="h-4 w-4" />
-                                                            {playlistId ? "Open Playlist" : "Open Channel"}
+                                                            {playlistId ? "Open Playlist" : (videoId ? "Open Video" : "Open Channel")}
                                                         </a>
                                                     </Button>
                                                 </>

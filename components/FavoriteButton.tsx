@@ -100,9 +100,11 @@ export function FavoriteButton({ resource, initialIsFavorited = false, onToggle,
 
         } catch (error) {
             console.error("Favorite toggle error:", error);
+            // @ts-ignore
+            const errorMessage = error?.message || "Please try again.";
             toast({
                 title: "Error",
-                description: "Failed to update favorites. Please try again.",
+                description: `Failed to update favorites: ${errorMessage}`,
                 variant: "destructive",
             });
             setIsFavorited(!newState); // Revert
