@@ -160,16 +160,20 @@ export default function WatchPage({ params }: PageProps) {
             } catch (err) {
                 console.error("Failed to save progress:", err);
                 return false; // Failed save
-            } finally {
-                // Clear the ref if it's strictly equal to this promise
-                if (savePromiseRef.current === promise) {
-                    savePromiseRef.current = null;
-                }
             }
         })();
 
-        savePromiseRef.current = promise as Promise<boolean>;
-        return promise as Promise<boolean>;
+        savePromiseRef.current = promise;
+
+        // Attach cleanup to the promise
+        // We don't return the result of finally chain to keep the type matching and avoid confusion
+        promise.finally(() => {
+            if (savePromiseRef.current === promise) {
+                savePromiseRef.current = null;
+            }
+        });
+
+        return promise;
     };
 
     return (
