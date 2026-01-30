@@ -12,6 +12,7 @@ import {
     Menu,
     User,
     LogOut,
+    Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -37,6 +38,11 @@ const sidebarLinks = [
         title: "Library",
         href: "/portal/library",
         icon: Library,
+    },
+    {
+        title: "Favorites",
+        href: "/portal/favorites",
+        icon: Heart,
     },
     {
         title: "Learning",

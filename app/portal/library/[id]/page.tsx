@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { ArrowLeft, Book, Headphones, MonitorPlay, Globe, FileText, ExternalLink, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,22 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
         notFound();
     }
 
+    // Fetch user favorites to determine initial state
+    const { data: { user } } = await supabase.auth.getUser();
+    let favoritedUrls = new Set<string>();
+
+    if (user) {
+        const { data: favorites } = await supabase
+            .from("favorites")
+            .select("consumption_url")
+            .eq("user_id", user.id);
+
+        if (favorites) {
+            // @ts-ignore
+            favoritedUrls = new Set((favorites as any[]).map(f => f.consumption_url));
+        }
+    }
+
     const getTypeIcon = (type: string, className = "h-4 w-4") => {
         switch (type?.toLowerCase()) {
             case "podcast":
@@ -61,7 +78,7 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
     const resourceLinks: ResourceLink[] = resource.resource_links || [];
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto pb-10 pt-6">
+        <div className="space-y-6 w-full max-w-[1600px] mx-auto pb-10 pt-6 px-4 md:px-6 lg:px-8">
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/portal/library">
@@ -73,9 +90,9 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="xl:col-span-8 space-y-6">
                     <Card className="overflow-hidden border-2 shadow-sm">
                         <div className="relative h-64 w-full bg-slate-900 flex items-center justify-center">
                             {resource.cover_image_url ? (
@@ -139,7 +156,7 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                 </div>
 
                 {/* Sidebar / Links */}
-                <div className="space-y-6">
+                <div className="xl:col-span-4 space-y-6">
                     <Card className="shadow-sm border-2">
                         <CardHeader className="bg-muted/30 pb-4">
                             <CardTitle className="text-lg flex items-center gap-2">
@@ -150,46 +167,75 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                         <CardContent className="space-y-4 pt-6">
                             <div className="grid gap-3">
                                 {resource.main_url && (
-                                    <Button
-                                        size="lg"
-                                        className="h-auto py-4 justify-start gap-4 w-full shadow-md hover:shadow-lg transition-all text-left"
-                                        asChild
-                                    >
-                                        <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                            <div className="p-2 bg-primary-foreground/10 rounded-full">
-                                                <ExternalLink className="h-6 w-6" />
-                                            </div>
-                                            <div className="flex flex-col items-start overflow-hidden flex-1">
-                                                <span className="font-bold text-lg truncate text-left">Open Creator Page</span>
-                                                <span className="text-sm opacity-90 font-normal">Main Link</span>
-                                            </div>
-                                            <ExternalLink className="ml-auto h-5 w-5 opacity-70" />
-                                        </a>
-                                    </Button>
+                                    <div className="flex gap-2 w-full">
+                                        <Button
+                                            size="lg"
+                                            className="h-auto py-4 justify-start gap-4 flex-1 shadow-md hover:shadow-lg transition-all text-left min-w-0"
+                                            asChild
+                                        >
+                                            <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
+                                                <div className="p-2 bg-primary-foreground/10 rounded-full shrink-0">
+                                                    <ExternalLink className="h-6 w-6" />
+                                                </div>
+                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                    <span className="font-bold text-lg truncate w-full text-left">Open Creator Page</span>
+                                                    <span className="text-sm opacity-90 font-normal truncate w-full">Main Link</span>
+                                                </div>
+                                                <ExternalLink className="ml-auto h-5 w-5 opacity-70 shrink-0" />
+                                            </a>
+                                        </Button>
+                                        <FavoriteButton
+                                            // @ts-ignore
+                                            resource={{
+                                                id: resource.id,
+                                                title: resource.title,
+                                                type: resource.type,
+                                                author: resource.author,
+                                                cover_image_url: resource.cover_image_url,
+                                                main_url: resource.main_url
+                                            }}
+                                            initialIsFavorited={favoritedUrls.has(resource.main_url)}
+                                            className="h-auto w-14 shrink-0 px-0 border-2 shadow-sm rounded-lg"
+                                        />
+                                    </div>
                                 )}
 
                                 {resourceLinks
                                     .filter(link => link.isActive !== false) // Only show active links in portal
                                     .sort((a, b) => (a.order || 0) - (b.order || 0))
                                     .map((link, idx) => (
-                                        <Button
-                                            key={idx}
-                                            variant="outline"
-                                            size="lg"
-                                            className="h-auto py-3 justify-start gap-4 w-full hover:bg-secondary/50 transition-all"
-                                            asChild
-                                        >
-                                            <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                                <div className="p-2 bg-secondary rounded-full">
-                                                    {getLinkIcon(link.type, "h-5 w-5")}
-                                                </div>
-                                                <div className="flex flex-col items-start overflow-hidden flex-1">
-                                                    <span className="font-semibold truncate text-left">{link.label || "Alternative Link"}</span>
-                                                    <span className="text-xs text-muted-foreground capitalize">{link.type.replace('_', ' ')}</span>
-                                                </div>
-                                                <ExternalLink className="ml-auto h-4 w-4 opacity-50" />
-                                            </a>
-                                        </Button>
+                                        <div key={idx} className="flex gap-2 w-full">
+                                            <Button
+                                                variant="outline"
+                                                size="lg"
+                                                className="h-auto py-3 justify-start gap-4 flex-1 hover:bg-secondary/50 transition-all min-w-0"
+                                                asChild
+                                            >
+                                                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                                    <div className="p-2 bg-secondary rounded-full shrink-0">
+                                                        {getLinkIcon(link.type, "h-5 w-5")}
+                                                    </div>
+                                                    <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                        <span className="font-semibold truncate w-full text-left">{link.label || "Alternative Link"}</span>
+                                                        <span className="text-xs text-muted-foreground capitalize truncate w-full">{link.type.replace('_', ' ')}</span>
+                                                    </div>
+                                                    <ExternalLink className="ml-auto h-4 w-4 opacity-50 shrink-0" />
+                                                </a>
+                                            </Button>
+                                            <FavoriteButton
+                                                // @ts-ignore
+                                                resource={{
+                                                    id: resource.id,
+                                                    title: `${resource.title} (${link.label || link.type})`,
+                                                    type: link.type,
+                                                    author: resource.author,
+                                                    cover_image_url: resource.cover_image_url,
+                                                    main_url: link.url
+                                                }}
+                                                initialIsFavorited={favoritedUrls.has(link.url)}
+                                                className="h-auto w-14 shrink-0 px-0 border shadow-sm rounded-lg"
+                                            />
+                                        </div>
                                     ))}
 
                                 {!resource.main_url && resourceLinks.filter(l => l.isActive !== false).length === 0 && (

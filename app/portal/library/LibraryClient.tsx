@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Sear
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { createClient } from "@/utils/supabase/client";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 interface Resource {
     id: string;
@@ -30,13 +32,36 @@ interface LibraryClientProps {
     initialResources: Resource[] | null;
 }
 
-
 export default function LibraryClient({ initialResources }: LibraryClientProps) {
     const [resources] = useState<Resource[]>(initialResources || []);
     const [activeTab, setActiveTab] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedLanguage, setSelectedLanguage] = useState("all");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // Favorites State
+    const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
+    const supabase = createClient();
+
+    // Fetch Favorites on Mount
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data, error } = await supabase
+                .from("favorites")
+                .select("consumption_url")
+                .eq("user_id", user.id);
+
+            if (data) {
+                // Store consumption_urls in a Set for O(1) lookup
+                // Explicitly cast or trust the type from the query builder
+                setUserFavorites(new Set((data as { consumption_url: string }[]).map(f => f.consumption_url)));
+            }
+        };
+        fetchFavorites();
+    }, []);
 
     // derived constants
     const allTags = Array.from(new Set(resources.flatMap(r => r.tags || []))).sort();
@@ -96,15 +121,6 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
             default: return <ExternalLink className="h-3 w-3" />;
         }
     };
-
-
-    // if (loading) {
-    //     return (
-    //         <div className="flex justify-center p-8">
-    //             <Loader2 className="animate-spin text-muted-foreground" />
-    //         </div>
-    //     );
-    // }
 
     return (
         <div className="space-y-6 pb-20 max-w-6xl mx-auto">
@@ -181,7 +197,16 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredResources.map((resource) => (
-                        <Card key={resource.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-all group">
+                        <Card key={resource.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-all group relative">
+                            {/* Favorite Button Absolute */}
+                            <div className="absolute top-2 right-2 z-20">
+                                <FavoriteButton
+                                    resource={resource}
+                                    initialIsFavorited={userFavorites.has(resource.main_url || resource.id)}
+                                    className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background rounded-full h-8 w-8"
+                                />
+                            </div>
+
                             <Link href={`/portal/library/${resource.id}`} className="block relative h-48 w-full bg-slate-900 flex items-center justify-center cursor-pointer">
                                 {resource.cover_image_url ? (
                                     <div className="relative h-full w-full p-2">
@@ -198,7 +223,7 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                                         {getTypeIcon(resource.type)}
                                     </div>
                                 )}
-                                <Badge className="absolute top-2 right-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 z-10 pointer-events-none">
+                                <Badge className="absolute top-2 left-2 bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 z-10 pointer-events-none">
                                     {getTypeIcon(resource.type)}
                                     <span className="ml-1 capitalize">{resource.type}</span>
                                 </Badge>

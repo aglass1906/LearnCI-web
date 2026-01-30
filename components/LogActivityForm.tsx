@@ -61,6 +61,8 @@ export function LogActivityForm({ userId, profile, initialData, onSuccess }: Log
             // Update existing
             const { error: updateError } = await supabase
                 .from("user_activities")
+                // @ts-ignore
+                // @ts-ignore
                 .update(payload)
                 .eq("id", initialData.id);
             error = updateError;
@@ -68,6 +70,7 @@ export function LogActivityForm({ userId, profile, initialData, onSuccess }: Log
             // Insert new
             const { error: insertError } = await supabase
                 .from("user_activities")
+                // @ts-ignore
                 .insert(payload);
             error = insertError;
         }

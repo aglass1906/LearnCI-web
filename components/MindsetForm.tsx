@@ -63,6 +63,7 @@ export function MindsetForm({ userId, checkIn, onSuccess }: MindsetFormProps) {
             // Update
             const { error: updateError } = await supabase
                 .from("daily_feedback")
+                // @ts-ignore
                 .update(payload)
                 .eq("id", checkIn.id);
             error = updateError;
@@ -70,6 +71,7 @@ export function MindsetForm({ userId, checkIn, onSuccess }: MindsetFormProps) {
             // Insert
             const { error: insertError } = await supabase
                 .from("daily_feedback")
+                // @ts-ignore
                 .insert({
                     id: crypto.randomUUID(),
                     user_id: userId,
