@@ -2,7 +2,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getChannelDetails, getPlaylistItems } from '@/utils/youtube';
+import { getChannelDetails, getPlaylistItems, getPlaylistDetails } from '@/utils/youtube';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 
 interface Params {
@@ -16,22 +16,41 @@ export default async function ChannelVideosPage({ params }: { params: Promise<Pa
     const resolvedParams = await params;
     const rawId = resolvedParams.id;
     // Decode in case it's %40handle
-    const channelId = decodeURIComponent(rawId);
+    const id = decodeURIComponent(rawId);
 
-    console.log(`[ChannelPage] Rendering for ID: ${channelId} (Raw: ${rawId})`);
+    console.log(`[ChannelPage] Rendering for ID: ${id} (Raw: ${rawId})`);
 
-    // Fetch Channel Details First (includes Uploads ID and Thumbnail)
-    const channelDetails = await getChannelDetails(channelId);
+    const isPlaylist = id.startsWith("PL");
 
-    // Fetch videos if available
-    const videos = channelDetails ? await getPlaylistItems(channelDetails.uploadsPlaylistId) : [];
+    let channelDetails;
+    let videos: import("@/utils/youtube").YouTubeVideo[] = [];
 
-    const channelTitle = channelDetails?.title || "Channel Videos";
+    if (isPlaylist) {
+        // Fetch Playlist Details
+        channelDetails = await getPlaylistDetails(id);
+        if (channelDetails) {
+            videos = await getPlaylistItems(id);
+        }
+    } else {
+        // Fetch Channel Details First (includes Uploads ID and Thumbnail)
+        channelDetails = await getChannelDetails(id);
+        // Fetch videos from Uploads playlist
+        if (channelDetails) {
+            videos = await getPlaylistItems(channelDetails.uploadsPlaylistId);
+        }
+    }
+
+    const channelTitle = channelDetails?.title || (isPlaylist ? "Playlist Videos" : "Channel Videos");
 
     // Construct External URL
-    const externalUrl = channelId.startsWith('@')
-        ? `https://www.youtube.com/${channelId}`
-        : `https://www.youtube.com/channel/${channelId}`;
+    let externalUrl = `https://www.youtube.com/`;
+    if (isPlaylist) {
+        externalUrl += `playlist?list=${id}`;
+    } else if (id.startsWith('@')) {
+        externalUrl += `${id}`;
+    } else {
+        externalUrl += `channel/${id}`;
+    }
 
     return (
         <div className="container mx-auto px-4 py-8">

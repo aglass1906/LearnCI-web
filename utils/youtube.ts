@@ -110,6 +110,31 @@ export function extractChannelId(input: string): string | null {
 }
 
 /**
+ * Extracts a Playlist ID (PL...) from a URL or String.
+ */
+export function extractPlaylistId(input: string): string | null {
+    if (!input) return null;
+
+    // Raw ID
+    if (input.startsWith("PL") && input.length > 10 && !input.includes("/")) {
+        return input;
+    }
+
+    // URL look for ?list=PL... or &list=PL...
+    try {
+        if (input.includes("youtube.com") || input.includes("youtu.be")) {
+            const url = new URL(input);
+            const listId = url.searchParams.get("list");
+            if (listId && listId.startsWith("PL")) {
+                return listId;
+            }
+        }
+    } catch (e) { }
+
+    return null;
+}
+
+/**
  * Step 1: Get the Channel Details AND 'uploads' playlist ID in one call.
  * Costs 1 Quota unit.
  */
@@ -211,6 +236,34 @@ export async function getPlaylistItems(playlistId: string, maxResults = 50): Pro
     } catch (error) {
         console.error("Error fetching playlist items:", error);
         return [];
+    }
+}
+
+/**
+ * Fetches basic details for a Playlist (Title, Thumbnail, Author)
+ */
+export async function getPlaylistDetails(playlistId: string): Promise<YouTubeChannelDetails | null> {
+    if (!API_KEY) return null;
+
+    const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${API_KEY}`;
+
+    try {
+        const res = await fetch(url, { next: { revalidate: 3600 } });
+        const data = await res.json();
+
+        if (!data.items || data.items.length === 0) return null;
+
+        const snippet = data.items[0].snippet;
+        return {
+            id: playlistId,
+            title: snippet.title,
+            description: snippet.description,
+            thumbnailUrl: snippet.thumbnails?.high?.url || snippet.thumbnails?.medium?.url,
+            uploadsPlaylistId: playlistId // For compatibility, returning itself as the "uploads" list
+        };
+    } catch (error) {
+        console.error("Error fetching playlist details:", error);
+        return null;
     }
 }
 

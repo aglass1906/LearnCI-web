@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Loader2, MonitorPlay, Headphones, Globe, Book, FileText, ExternalLink, Star } from "lucide-react";
 import Image from "next/image";
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { extractChannelId } from "@/utils/youtube";
+import { extractChannelId, extractPlaylistId } from "@/utils/youtube";
 
 interface Favorite {
     id: string; // The database ID (UUID)
@@ -96,6 +96,11 @@ export default function FavoritesPage() {
                             {(() => {
                                 const isChannel = fav.type.toLowerCase() === 'channel' || fav.type.toLowerCase() === 'youtube';
                                 const channelId = isChannel ? extractChannelId(fav.consumption_url) : null;
+                                const playlistId = isChannel ? extractPlaylistId(fav.consumption_url) : null;
+
+                                // Prioritize routing: Playlist -> Channel -> External
+                                const targetId = playlistId || channelId;
+                                const isInternal = !!targetId;
 
                                 return (
                                     <>
@@ -146,10 +151,10 @@ export default function FavoritesPage() {
                                                     </>
                                                 );
 
-                                                if (channelId) {
+                                                if (isInternal) {
                                                     return (
                                                         <Link
-                                                            href={`/portal/channels/${channelId}`}
+                                                            href={`/portal/channels/${targetId}`}
                                                             className="block relative h-48 w-full bg-slate-900 flex items-center justify-center cursor-pointer"
                                                         >
                                                             {content}
@@ -173,8 +178,8 @@ export default function FavoritesPage() {
                                         {/* Card Content */}
                                         <CardHeader className="pb-2">
                                             <CardTitle className="text-lg leading-tight line-clamp-2 hover:text-primary transition-colors">
-                                                {channelId ? (
-                                                    <Link href={`/portal/channels/${channelId}`}>
+                                                {isInternal ? (
+                                                    <Link href={`/portal/channels/${targetId}`}>
                                                         {fav.title}
                                                     </Link>
                                                 ) : (
@@ -192,16 +197,17 @@ export default function FavoritesPage() {
 
                                         {/* Card Footer */}
                                         <CardFooter className="pt-2 mt-auto border-t bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-2 p-4">
-                                            {channelId ? (
+                                            {isInternal ? (
                                                 <>
                                                     <Button size="sm" variant="default" className="w-full gap-2" asChild>
-                                                        <Link href={`/portal/channels/${channelId}`}>
+                                                        <Link href={`/portal/channels/${targetId}`}>
                                                             <MonitorPlay className="h-4 w-4" /> View Videos
                                                         </Link>
                                                     </Button>
                                                     <Button size="sm" variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild>
                                                         <a href={fav.consumption_url} target="_blank" rel="noopener noreferrer">
-                                                            <ExternalLink className="h-4 w-4" /> Open Channel
+                                                            <ExternalLink className="h-4 w-4" />
+                                                            {playlistId ? "Open Playlist" : "Open Channel"}
                                                         </a>
                                                     </Button>
                                                 </>
