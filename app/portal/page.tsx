@@ -49,18 +49,48 @@ export default function MobilePortal() {
                     .eq("user_id", session.user.id)
                     .single();
 
-                if (profileError) console.error("Profile fetch error:", profileError);
-                // Cast to any to avoid strict inference issues during build when types are in flux
-                setProfile(profileData as any);
+                if (profileError) {
+                    // Check if error is "no rows found" (PGRST116)
+                    if (profileError.code === 'PGRST116') {
+                        console.log("No profile found. Creating defaults...");
+                        // Attempt to create a default profile
+                        const { data: newProfile, error: createError } = await supabase
+                            .from("profiles")
+                            .insert({
+                                id: session.user.id, // Assuming 1:1 mapping for ID
+                                user_id: session.user.id,
+                                total_minutes: 0,
+                                current_level: 'A1',
+                                updated_at: new Date().toISOString()
+                            })
+                            .select()
+                            .single();
 
-                if (profileData) {
-                    const data = profileData as any;
-                    const totalMins = (data.total_minutes || 0) + ((data.starting_hours || 0) * 60);
-                    const hrs = totalMins / 60;
-                    setCurrentHours(hrs);
-                    // Calculate next 25h milestone
-                    const next = (Math.floor(hrs / 25) + 1) * 25;
-                    setNextMilestone(next);
+                        if (createError) {
+                            console.error("Failed to auto-create profile:", createError);
+                        } else {
+                            console.log("Profile auto-created:", newProfile);
+                            setProfile(newProfile as any);
+                            // Initial setup for creating milestone vars
+                            setCurrentHours(0);
+                            setNextMilestone(25);
+                        }
+                    } else {
+                        console.error("Profile fetch error:", profileError);
+                    }
+                } else {
+                    // Cast to any to avoid strict inference issues during build when types are in flux
+                    setProfile(profileData as any);
+
+                    if (profileData) {
+                        const data = profileData as any;
+                        const totalMins = (data.total_minutes || 0) + ((data.starting_hours || 0) * 60);
+                        const hrs = totalMins / 60;
+                        setCurrentHours(hrs);
+                        // Calculate next 25h milestone
+                        const next = (Math.floor(hrs / 25) + 1) * 25;
+                        setNextMilestone(next);
+                    }
                 }
 
                 // Fetch latest check-in from daily_feedback
