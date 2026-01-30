@@ -3,15 +3,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
-import { User as UserIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
-
-"use client";
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/client";
 import { User as UserIcon, LogOut, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
