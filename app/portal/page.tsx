@@ -62,7 +62,7 @@ export default function MobilePortal() {
                                 total_minutes: 0,
                                 current_level: 'A1',
                                 updated_at: new Date().toISOString()
-                            })
+                            } as any)
                             .select()
                             .single();
 
