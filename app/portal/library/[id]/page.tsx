@@ -70,6 +70,7 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
             case "spotify":
             case "apple_podcasts": return <Headphones className={className} />;
             case "pdf": return <FileText className={className} />;
+            case "webscan":
             case "website": return <Globe className={className} />;
             default: return <ExternalLink className={className} />;
         }

@@ -313,6 +313,7 @@ export default function EditResourceDialog({ resource, open, onOpenChange, onSuc
                                                         <SelectItem value="spotify">Spotify</SelectItem>
                                                         <SelectItem value="apple_podcasts">Apple Podcasts</SelectItem>
                                                         <SelectItem value="pdf">PDF</SelectItem>
+                                                        <SelectItem value="webscan">WebScan</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>

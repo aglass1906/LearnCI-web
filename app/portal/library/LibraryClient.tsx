@@ -117,6 +117,7 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
             case "spotify":
             case "apple_podcasts": return <Headphones className="h-3 w-3" />;
             case "pdf": return <FileText className="h-3 w-3" />;
+            case "webscan":
             case "website": return <Globe className="h-3 w-3" />;
             default: return <ExternalLink className="h-3 w-3" />;
         }

@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { ArrowLeft, Book, Headphones, MonitorPlay, Globe, FileText, ExternalLink, Star } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,12 +80,10 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                         <div className="relative h-64 w-full bg-slate-900 flex items-center justify-center">
                             {resource.cover_image_url ? (
                                 <div className="relative h-full w-full p-4">
-                                    <Image
+                                    <img
                                         src={resource.cover_image_url}
                                         alt={resource.title}
-                                        fill
-                                        style={{ objectFit: "contain" }}
-                                        className="drop-shadow-xl"
+                                        className="h-full w-full object-contain drop-shadow-xl"
                                     />
                                 </div>
                             ) : (
