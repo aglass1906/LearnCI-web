@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const { toast } = useToast();
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);

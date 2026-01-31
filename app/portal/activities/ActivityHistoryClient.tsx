@@ -42,7 +42,7 @@ interface ActivityHistoryClientProps {
 }
 
 export default function ActivityHistoryClient({ initialActivities, userId, profile }: ActivityHistoryClientProps) {
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const [activities, setActivities] = useState(initialActivities); // Local state for immediate updates
     const [timeRange, setTimeRange] = useState("today"); // today, 7d, 30d, all
     const [typeFilter, setTypeFilter] = useState("all");

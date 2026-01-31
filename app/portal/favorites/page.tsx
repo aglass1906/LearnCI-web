@@ -25,7 +25,7 @@ interface Favorite {
 export default function FavoritesPage() {
     const [favorites, setFavorites] = useState<Favorite[]>([]);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     useEffect(() => {
         const fetchFavorites = async () => {

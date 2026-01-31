@@ -41,7 +41,7 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
 
     // Favorites State
     const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     // Fetch Favorites on Mount
     useEffect(() => {

@@ -24,7 +24,7 @@ export default function WatchPage({ params }: PageProps) {
     const accumulatedSecondsRef = useRef(0);
     const lastSaveRef = useRef(0); // Minutes saved so far
     const savePromiseRef = useRef<Promise<boolean> | null>(null); // Track in-flight save
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const router = useRouter();
 
     // Cleanup on unmount

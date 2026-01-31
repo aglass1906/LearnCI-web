@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 
 export default function CoachingHistoryPage() {
     const router = useRouter();
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const [loading, setLoading] = useState(true);
 
     // Data

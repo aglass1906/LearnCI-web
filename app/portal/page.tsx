@@ -24,7 +24,7 @@ export default function MobilePortal() {
     const [currentHours, setCurrentHours] = useState<number>(0);
 
     const router = useRouter();
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     // Latest check-in state
     const [latestCheckIn, setLatestCheckIn] = useState<any>(null);

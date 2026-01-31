@@ -642,7 +642,7 @@ export default function AdminUsers() {
     const [processingId, setProcessingId] = useState<string | null>(null);
 
     const router = useRouter();
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     const fetchData = async () => {
         const { data: { user } } = await supabase.auth.getUser();
