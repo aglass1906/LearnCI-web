@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
                 banned_until: authUser?.banned_until,
                 last_sign_in_at: authUser?.last_sign_in_at,
                 created_at: authUser?.created_at,
-                auth_id: authUser?.id // Should match user_id
+                auth_id: authUser?.id, // Should match user_id
+                email_confirmed_at: authUser?.email_confirmed_at
             };
         });
 

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MoreVertical, Key, Ban, Shield, ShieldOff, Trash, UserPlus, Pencil } from "lucide-react";
+import { MoreVertical, Key, Ban, Shield, ShieldOff, Trash, UserPlus, Pencil, MailCheck } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -742,6 +742,62 @@ export default function AdminUsers() {
         }
     };
 
+    const handleVerifyEmail = async (user: any) => {
+        if (!confirm(`Are you sure you want to manually verify the email for ${user.email}?`)) return;
+
+        setProcessingId(user.user_id);
+
+        try {
+            const response = await fetch("/api/admin/verify-user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: user.user_id })
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                alert(error || "Failed to verify email");
+            } else {
+                alert("Email verified successfully");
+                // Optimistic update or refetch
+                setUsers(prev => prev.map(u =>
+                    u.user_id === user.user_id ? { ...u, email_confirmed_at: new Date().toISOString() } : u
+                ));
+            }
+        } catch (error) {
+            console.error("Error verifying email:", error);
+            alert("Failed to verify email");
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const handleResendEmail = async (user: any) => {
+        if (!confirm(`Are you sure you want to resend the verification email to ${user.email}?`)) return;
+
+        setProcessingId(user.user_id);
+
+        try {
+            const response = await fetch("/api/admin/resend-verification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: user.email })
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                alert(error || "Failed to resend email");
+            } else {
+                alert("Verification email resent successfully");
+            }
+        } catch (error) {
+            console.error("Error resending email:", error);
+            alert("Failed to resend email");
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
     const confirmDelete = (user: any) => {
         setSelectedUser(user);
         setDeleteDialogOpen(true);
@@ -807,6 +863,7 @@ export default function AdminUsers() {
                                     <th className="px-6 py-3">User</th>
                                     <th className="px-6 py-3">Role</th>
                                     <th className="px-6 py-3">Status</th>
+                                    <th className="px-6 py-3">Verified</th>
                                     <th className="px-6 py-3">Stats</th>
                                     <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
@@ -838,6 +895,13 @@ export default function AdminUsers() {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
+                                            {user.email_confirmed_at ? (
+                                                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100">Verified</Badge>
+                                            ) : (
+                                                <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400">Unverified</Badge>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
                                             <div className="text-xs space-y-1">
                                                 <div>{user.current_language || "-"} ({user.current_level || "-"})</div>
                                                 <div>{(user.total_minutes / 60).toFixed(1)} hrs</div>
@@ -865,6 +929,18 @@ export default function AdminUsers() {
                                                         <Key className="mr-2 h-4 w-4" />
                                                         Change Password
                                                     </DropdownMenuItem>
+                                                    {!user.email_confirmed_at && (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => handleVerifyEmail(user)}>
+                                                                <MailCheck className="mr-2 h-4 w-4" />
+                                                                Verify Email
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleResendEmail(user)}>
+                                                                <MailCheck className="mr-2 h-4 w-4" />
+                                                                Resend Verification Email
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem onClick={() => handleSuspendToggle(user)} disabled={user.user_id === currentUserId}>
                                                         {user.is_banned ? (
