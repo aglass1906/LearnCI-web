@@ -34,9 +34,13 @@ export async function POST(request: NextRequest) {
 
         // 2. Resend Verification Email
         // Type 'signup' is for email verification
+        // Ensure we redirect to the verified page on success
         const { error: authError } = await adminSupabase.auth.resend({
             email,
-            type: 'signup'
+            type: 'signup',
+            options: {
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://learn-ci-web.vercel.app'}/auth/callback?next=/auth/verified`
+            }
         });
 
         if (authError) {
