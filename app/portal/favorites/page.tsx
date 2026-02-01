@@ -102,13 +102,18 @@ export default function FavoritesPage() {
                                 const playlistId = (isYoutubeType || isChannelType) ? extractPlaylistId(fav.consumption_url) : null;
                                 const videoId = isYoutubeType ? extractVideoId(fav.consumption_url) : null;
 
-                                // Prioritize routing: Video -> Playlist -> Channel -> External
+                                // Check for generic web tracking candidates
+                                const isWeb = !videoId && !channelId && !playlistId &&
+                                    (['website', 'webscan', 'article', 'web'].includes(fav.type.toLowerCase()) || fav.consumption_url.startsWith('http'));
+
+                                // Prioritize routing: Video -> Playlist -> Channel -> Web Tracker -> External
                                 const targetId = videoId || playlistId || channelId;
-                                const isInternal = !!targetId;
+                                const isInternal = !!targetId || isWeb;
 
                                 const internalHref = videoId ? `/portal/watch/${videoId}` :
                                     (playlistId || channelId) ? `/portal/channels/${targetId}` :
-                                        '#'; // Should not happen if isInternal is true
+                                        isWeb ? `/portal/web?url=${encodeURIComponent(fav.consumption_url)}&title=${encodeURIComponent(fav.title)}` :
+                                            '#'; // Should not happen if isInternal is true
 
                                 return (
                                     <>
@@ -214,13 +219,13 @@ export default function FavoritesPage() {
                                                 <>
                                                     <Button size="sm" variant="default" className="w-full gap-2" asChild>
                                                         <Link href={internalHref}>
-                                                            <MonitorPlay className="h-4 w-4" /> View {videoId ? "Video" : "Videos"}
+                                                            <MonitorPlay className="h-4 w-4" /> {videoId ? "View Video" : (isWeb ? "Track Session" : "View Videos")}
                                                         </Link>
                                                     </Button>
                                                     <Button size="sm" variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild>
                                                         <a href={fav.consumption_url} target="_blank" rel="noopener noreferrer">
                                                             <ExternalLink className="h-4 w-4" />
-                                                            {playlistId ? "Open Playlist" : (videoId ? "Open Video" : "Open Channel")}
+                                                            {playlistId ? "Open Playlist" : (videoId ? "Open Video" : isWeb ? "Open Page" : "Open Channel")}
                                                         </a>
                                                     </Button>
                                                 </>

@@ -140,7 +140,7 @@ export default function WatchPage({ params }: PageProps) {
 
                 const { error } = await supabase.from("user_activities").insert({
                     user_id: session.user.id,
-                    activity_type: "YouTube",
+                    activity_type: "Watching Videos",
                     minutes: minutesToSave,
                     comment: activityComment,
                     date: new Date().toISOString(),

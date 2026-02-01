@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Loader2, Book, Headphones, MonitorPlay, Globe, ExternalLink, Star, Search, X, Music, FileText } from "lucide-react";
-import Image from "next/image";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { extractVideoId } from "@/utils/youtube";
 
 interface Resource {
     id: string;
@@ -211,12 +212,10 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                             <Link href={`/portal/library/${resource.id}`} className="block relative h-48 w-full bg-slate-900 flex items-center justify-center cursor-pointer">
                                 {resource.cover_image_url ? (
                                     <div className="relative h-full w-full p-2">
-                                        <Image
+                                        <img
                                             src={resource.cover_image_url}
                                             alt={resource.title}
-                                            fill
-                                            style={{ objectFit: "contain" }}
-                                            className="transition-transform group-hover:scale-105"
+                                            className="h-full w-full object-contain transition-transform group-hover:scale-105"
                                         />
                                     </div>
                                 ) : (
@@ -263,11 +262,18 @@ export default function LibraryClient({ initialResources }: LibraryClientProps) 
                                     </div>
                                     <div className="flex flex-wrap gap-2 justify-end">
                                         {resource.main_url && (
-                                            <Button size="sm" variant="secondary" className="gap-1 hover:text-primary h-8 px-3" asChild title="Open Creator Page">
-                                                <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                                    <ExternalLink className="h-3 w-3" />
-                                                    <span className="ml-1 hidden sm:inline-block text-xs font-normal">Open Creator Page</span>
-                                                </a>
+                                            <Button size="sm" variant="secondary" className="gap-1 hover:text-primary h-8 px-3" asChild title={extractVideoId(resource.main_url) ? "Watch Video" : "Open Creator Page"}>
+                                                {extractVideoId(resource.main_url) ? (
+                                                    <Link href={`/portal/watch/${extractVideoId(resource.main_url)}`}>
+                                                        <MonitorPlay className="h-3 w-3" />
+                                                        <span className="ml-1 hidden sm:inline-block text-xs font-normal">Watch</span>
+                                                    </Link>
+                                                ) : (
+                                                    <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
+                                                        <ExternalLink className="h-3 w-3" />
+                                                        <span className="ml-1 hidden sm:inline-block text-xs font-normal">Open Creator Page</span>
+                                                    </a>
+                                                )}
                                             </Button>
                                         )}
                                     </div>

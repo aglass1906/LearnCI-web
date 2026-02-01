@@ -1,8 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { ArrowLeft, Book, Headphones, MonitorPlay, Globe, FileText, ExternalLink, Star } from "lucide-react";
+import { ArrowLeft, Book, Headphones, MonitorPlay, Globe, FileText, ExternalLink, Star, Timer } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { extractVideoId } from "@/utils/youtube";
+
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,12 +99,10 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                         <div className="relative h-64 w-full bg-slate-900 flex items-center justify-center">
                             {resource.cover_image_url ? (
                                 <div className="relative h-full w-full p-4">
-                                    <Image
+                                    <img
                                         src={resource.cover_image_url}
                                         alt={resource.title}
-                                        fill
-                                        style={{ objectFit: "contain" }}
-                                        className="drop-shadow-xl"
+                                        className="h-full w-full object-contain drop-shadow-xl"
                                     />
                                 </div>
                             ) : (
@@ -174,16 +173,64 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                                             className="h-auto py-4 justify-start gap-4 flex-1 shadow-md hover:shadow-lg transition-all text-left min-w-0"
                                             asChild
                                         >
-                                            <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
-                                                <div className="p-2 bg-primary-foreground/10 rounded-full shrink-0">
-                                                    <ExternalLink className="h-6 w-6" />
-                                                </div>
-                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
-                                                    <span className="font-bold text-lg truncate w-full text-left">Open Creator Page</span>
-                                                    <span className="text-sm opacity-90 font-normal truncate w-full">Main Link</span>
-                                                </div>
-                                                <ExternalLink className="ml-auto h-5 w-5 opacity-70 shrink-0" />
-                                            </a>
+                                            <Button
+                                                size="lg"
+                                                className="h-auto py-4 justify-start gap-4 flex-1 shadow-md hover:shadow-lg transition-all text-left min-w-0"
+                                                asChild
+                                            >
+                                                {(() => {
+                                                    const videoId = extractVideoId(resource.main_url || "");
+                                                    if (videoId) {
+                                                        return (
+                                                            <Link href={`/portal/watch/${videoId}`}>
+                                                                <div className="p-2 bg-primary-foreground/10 rounded-full shrink-0">
+                                                                    <MonitorPlay className="h-6 w-6" />
+                                                                </div>
+                                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                    <span className="font-bold text-lg truncate w-full text-left">Watch Video</span>
+                                                                    <span className="text-sm opacity-90 font-normal truncate w-full">Tracking Enabled</span>
+                                                                </div>
+                                                                <MonitorPlay className="ml-auto h-5 w-5 opacity-70 shrink-0" />
+                                                            </Link>
+                                                        );
+                                                    }
+
+                                                    // Check for generic web tracking candidates (website, webscan, article)
+                                                    // We generally want to track EVERYTHING if we can, but let's stick to the requested types or all?
+                                                    // User asked "webscan or webpage items".
+                                                    const shouldTrack = !videoId && resource.main_url;
+                                                    // Actually, let's track everything that is a main content url unless it's a direct file download?
+                                                    // Even file downloads can be tracked as "reading time" (PDFs).
+
+                                                    if (shouldTrack) {
+                                                        return (
+                                                            <Link href={`/portal/web?url=${encodeURIComponent(resource.main_url)}&title=${encodeURIComponent(resource.title)}`}>
+                                                                <div className="p-2 bg-primary-foreground/10 rounded-full shrink-0">
+                                                                    <Globe className="h-6 w-6" />
+                                                                </div>
+                                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                    <span className="font-bold text-lg truncate w-full text-left">Open & Track</span>
+                                                                    <span className="text-sm opacity-90 font-normal truncate w-full">Session Timer</span>
+                                                                </div>
+                                                                <Timer className="ml-auto h-5 w-5 opacity-70 shrink-0" />
+                                                            </Link>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <a href={resource.main_url} target="_blank" rel="noopener noreferrer">
+                                                            <div className="p-2 bg-primary-foreground/10 rounded-full shrink-0">
+                                                                <ExternalLink className="h-6 w-6" />
+                                                            </div>
+                                                            <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                <span className="font-bold text-lg truncate w-full text-left">Open Creator Page</span>
+                                                                <span className="text-sm opacity-90 font-normal truncate w-full">Main Link</span>
+                                                            </div>
+                                                            <ExternalLink className="ml-auto h-5 w-5 opacity-70 shrink-0" />
+                                                        </a>
+                                                    );
+                                                })()}
+                                            </Button>
                                         </Button>
                                         <FavoriteButton
                                             // @ts-ignore
@@ -212,16 +259,61 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                                                 className="h-auto py-3 justify-start gap-4 flex-1 hover:bg-secondary/50 transition-all min-w-0"
                                                 asChild
                                             >
-                                                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                                    <div className="p-2 bg-secondary rounded-full shrink-0">
-                                                        {getLinkIcon(link.type, "h-5 w-5")}
-                                                    </div>
-                                                    <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
-                                                        <span className="font-semibold truncate w-full text-left">{link.label || "Alternative Link"}</span>
-                                                        <span className="text-xs text-muted-foreground capitalize truncate w-full">{link.type.replace('_', ' ')}</span>
-                                                    </div>
-                                                    <ExternalLink className="ml-auto h-4 w-4 opacity-50 shrink-0" />
-                                                </a>
+                                                {(() => {
+                                                    const videoId = extractVideoId(link.url);
+                                                    if (videoId) {
+                                                        return (
+                                                            <Link href={`/portal/watch/${videoId}`}>
+                                                                <div className="p-2 bg-secondary rounded-full shrink-0">
+                                                                    {getLinkIcon(link.type, "h-5 w-5")}
+                                                                </div>
+                                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                    <span className="font-semibold truncate w-full text-left">{link.label || "Alternative Link"}</span>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className="text-xs text-muted-foreground capitalize truncate">{link.type.replace('_', ' ')}</span>
+                                                                        <span className="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 px-1.5 py-0.5 rounded-sm font-medium">Tracking</span>
+                                                                    </div>
+                                                                </div>
+                                                                <MonitorPlay className="ml-auto h-4 w-4 opacity-50 shrink-0" />
+                                                            </Link>
+                                                        );
+                                                    }
+
+                                                    // Tracking for other types
+                                                    // If it is a web type or simply exists
+                                                    const isWeb = ['website', 'webscan', 'article', 'web'].includes(link.type.toLowerCase()) || link.url.startsWith('http');
+
+                                                    if (isWeb) {
+                                                        return (
+                                                            <Link href={`/portal/web?url=${encodeURIComponent(link.url)}&title=${encodeURIComponent(resource.title + (link.label ? ` (${link.label})` : ""))}`}>
+                                                                <div className="p-2 bg-secondary rounded-full shrink-0">
+                                                                    {getLinkIcon(link.type, "h-5 w-5")}
+                                                                </div>
+                                                                <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                    <span className="font-semibold truncate w-full text-left">{link.label || "Alternative Link"}</span>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className="text-xs text-muted-foreground capitalize truncate">{link.type.replace('_', ' ')}</span>
+                                                                        <span className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 px-1.5 py-0.5 rounded-sm font-medium">Tracking</span>
+                                                                    </div>
+                                                                </div>
+                                                                <Timer className="ml-auto h-4 w-4 opacity-50 shrink-0" />
+                                                            </Link>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                                            <div className="p-2 bg-secondary rounded-full shrink-0">
+                                                                {getLinkIcon(link.type, "h-5 w-5")}
+                                                            </div>
+                                                            <div className="flex flex-col items-start overflow-hidden flex-1 min-w-0">
+                                                                <span className="font-semibold truncate w-full text-left">{link.label || "Alternative Link"}</span>
+                                                                <span className="text-xs text-muted-foreground capitalize truncate w-full">{link.type.replace('_', ' ')}</span>
+                                                            </div>
+                                                            <ExternalLink className="ml-auto h-4 w-4 opacity-50 shrink-0" />
+                                                        </a>
+                                                    );
+                                                })()}
                                             </Button>
                                             <FavoriteButton
                                                 // @ts-ignore

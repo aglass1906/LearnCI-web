@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getActivityConfig } from "@/utils/activity-types";
+import { getActivityConfig, ACTIVITY_TYPES } from "@/utils/activity-types";
 import { Calendar, Filter, BarChart3, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -151,10 +151,9 @@ export default function ActivityHistoryClient({ initialActivities, userId, profi
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Activities</SelectItem>
-                            <SelectItem value="Listening">Listening</SelectItem>
-                            <SelectItem value="Reading">Reading</SelectItem>
-                            <SelectItem value="Speaking">Speaking</SelectItem>
-                            <SelectItem value="Watch">Watch</SelectItem>
+                            {ACTIVITY_TYPES.map(type => (
+                                <SelectItem key={type.id} value={type.id}>{type.id}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
