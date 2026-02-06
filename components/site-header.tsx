@@ -99,7 +99,9 @@ export function SiteHeader() {
         if (lower.includes("italian")) return "🇮🇹";
         if (lower.includes("chinese")) return "🇨🇳";
         if (lower.includes("portuguese")) return "🇧🇷";
+        if (lower.includes("portuguese")) return "🇧🇷";
         if (lower.includes("russian")) return "🇷🇺";
+        if (lower.includes("vietnamese")) return "🇻🇳";
         return "🌐";
     };
 
