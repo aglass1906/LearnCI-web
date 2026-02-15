@@ -39,6 +39,12 @@ export default function AdminLayout({
                             Library
                         </Button>
                     </Link>
+                    <Link href="/admin/stories">
+                        <Button variant="ghost" className="w-full justify-start gap-2">
+                            <BookOpen className="h-4 w-4" />
+                            Stories
+                        </Button>
+                    </Link>
                 </nav>
                 <div className="p-4 border-t space-y-2">
                     <Link href="/" target="_blank">
