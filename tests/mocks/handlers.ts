@@ -57,4 +57,26 @@ export const handlers = [
 
         return new HttpResponse(null, { status: 404 })
     }),
+
+    // Mock Supabase Auth
+    http.post('*/auth/v1/token', ({ request }) => {
+        return HttpResponse.json({
+            access_token: 'mock_access_token',
+            token_type: 'bearer',
+            expires_in: 3600,
+            refresh_token: 'mock_refresh_token',
+            user: {
+                id: 'mock_user_id',
+                email: 'test@example.com',
+            },
+        })
+    }),
+
+    // Mock Supabase Database (e.g., fetching decks)
+    http.get('*/rest/v1/decks', () => {
+        return HttpResponse.json([
+            { id: 'deck_1', title: 'Spanish Basics', description: 'Beginner words' },
+            { id: 'deck_2', title: 'Travel Phrases', description: 'Essential travel talk' },
+        ])
+    }),
 ]
