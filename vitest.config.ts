@@ -9,6 +9,16 @@ export default defineConfig({
         setupFiles: ['./tests/setup.ts'],
         globals: true,
         exclude: [...configDefaults.exclude, '**/tests/e2e/**'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            exclude: [
+                'node_modules/**',
+                'tests/**',
+                '**/*.d.ts',
+                '.next/**',
+            ],
+        },
     },
     resolve: {
         alias: {
