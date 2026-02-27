@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Upload, Download, Trash2, Save, Eye, EyeOff } from "lucide-react";
+import { ChevronLeft, Upload, Download, Trash2, Save, Eye, EyeOff, Video, HelpCircle } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { adminUpdateStory } from "./actions";
 import { useRouter } from "next/navigation";
 
 interface Story {
@@ -23,6 +24,10 @@ interface Story {
     level: number;
     remote_cover_path: string | null;
     remote_audio_path: string | null;
+    comprehension_questions_json: string | null;
+    video_gen_prompt: string | null;
+    video_style: string | null;
+    remote_video_path: string | null;
     created_at: string;
     is_public: boolean;
     user_id: string;
@@ -33,8 +38,10 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
     const [isSaving, setIsSaving] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
     const [uploadingAudio, setUploadingAudio] = useState(false);
+    const [uploadingVideo, setUploadingVideo] = useState(false);
     const coverInputRef = useRef<HTMLInputElement>(null);
     const audioInputRef = useRef<HTMLInputElement>(null);
+    const videoInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
     const router = useRouter();
 
@@ -57,29 +64,34 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         ? supabase.storage.from("audio-stories").getPublicUrl(story.remote_audio_path).data.publicUrl
         : null;
 
-    // Save story metadata
+    // Derive video URL from storage path, or use legacy full URL as-is
+    const videoUrl = story.remote_video_path
+        ? story.remote_video_path.startsWith("https://")
+            ? story.remote_video_path  // Legacy: already a full public URL
+            : supabase.storage.from("story_videos").getPublicUrl(story.remote_video_path).data.publicUrl
+        : null;
+
+    // Save story metadata — uses server action (service-role) to bypass RLS
     const saveStory = async () => {
         setIsSaving(true);
 
-        const { error } = await supabase
-            .from("stories")
-            // @ts-ignore
-            .update({
+        try {
+            await adminUpdateStory(story.id, {
                 title: story.title,
                 target_text: story.target_text,
                 native_text: story.native_text,
                 language: story.language,
                 level: story.level,
                 is_public: story.is_public,
-            })
-            .eq("id", story.id);
-
-        setIsSaving(false);
-
-        if (error) {
-            alert("Error saving story: " + error.message);
-        } else {
+                video_gen_prompt: story.video_gen_prompt,
+                video_style: story.video_style,
+                comprehension_questions_json: story.comprehension_questions_json,
+            });
             alert("Story saved successfully!");
+        } catch (error: any) {
+            alert("Error saving story: " + error.message);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -187,6 +199,80 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         }
     };
 
+    // Upload video file
+    const uploadVideo = async (file: File) => {
+        setUploadingVideo(true);
+
+        try {
+            // Get storage path (not public URL) — standard format: {storyID}/{timestamp}_{style}.mp4
+            const fileExt = file.name.split(".").pop();
+            const storagePath = `${story.id}/${Date.now()}_upload.${fileExt}`;
+
+            // Upload to storage
+            const { error: uploadError } = await supabase.storage
+                .from("story_videos")
+                .upload(storagePath, file, {
+                    contentType: file.type,
+                    upsert: true,
+                });
+
+            if (uploadError) throw uploadError;
+
+            // Store the storage PATH in the DB via server action (bypasses RLS)
+            await adminUpdateStory(story.id, { remote_video_path: storagePath });
+
+            setStory({ ...story, remote_video_path: storagePath });
+            router.refresh();
+        } catch (error: any) {
+            alert("Error uploading video: " + error.message);
+        } finally {
+            setUploadingVideo(false);
+        }
+    };
+
+    // Delete video
+    const deleteVideo = async () => {
+        if (!confirm("Delete video? This will remove it from storage and clear the reference.")) return;
+
+        const currentPath = story.remote_video_path;
+
+        // Clear local state first so the video player unmounts before losing its src
+        setStory({ ...story, remote_video_path: null });
+
+        try {
+            // 1. Clear the DB reference via server action (bypasses RLS)
+            await adminUpdateStory(story.id, { remote_video_path: null });
+
+            // 2. Delete the file from storage if we have a path (not a legacy URL)
+            if (currentPath && !currentPath.startsWith("https://")) {
+                await supabase.storage
+                    .from("story_videos")
+                    .remove([currentPath]);
+            }
+
+            router.refresh();
+        } catch (error: any) {
+            alert("Error deleting video: " + error.message);
+            // Restore on failure
+            setStory({ ...story, remote_video_path: currentPath });
+        }
+    };
+
+    // Parse comprehension questions
+    let quizQuestions: any[] = [];
+    try {
+        if (story.comprehension_questions_json) {
+            const parsed = JSON.parse(story.comprehension_questions_json);
+            if (Array.isArray(parsed)) {
+                quizQuestions = parsed;
+            } else if (parsed && typeof parsed === 'object' && (parsed as any).questions) {
+                quizQuestions = (parsed as any).questions;
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing quiz questions:", e);
+    }
+
     return (
         <div className="p-6 max-w-5xl mx-auto">
             {/* Header */}
@@ -238,7 +324,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {coverUrl ? (
-                                <div className="relative w-full h-64 rounded-lg overflow-hidden">
+                                <div className="relative w-full h-64 rounded-lg overflow-hidden border bg-muted/20">
                                     <Image
                                         src={coverUrl}
                                         alt="Cover"
@@ -247,8 +333,8 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                                     />
                                 </div>
                             ) : (
-                                <div className="w-full h-64 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center">
-                                    <span className="text-6xl">📚</span>
+                                <div className="w-full h-64 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center border">
+                                    <span className="text-6xl text-white/50">📚</span>
                                 </div>
                             )}
 
@@ -267,23 +353,39 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                                     variant="outline"
                                     onClick={() => coverInputRef.current?.click()}
                                     disabled={uploadingCover}
-                                    className="flex-1"
+                                    className="flex-1 text-xs"
                                 >
-                                    <Upload className="h-4 w-4 mr-2" />
+                                    <Upload className="h-3.5 w-3.5 mr-2" />
                                     {uploadingCover ? "Uploading..." : "Upload New"}
                                 </Button>
                                 {coverUrl && (
                                     <>
-                                        <Button variant="outline" asChild>
+                                        <Button variant="outline" size="icon" asChild>
                                             <a href={coverUrl} download>
                                                 <Download className="h-4 w-4" />
                                             </a>
                                         </Button>
-                                        <Button variant="outline" onClick={deleteCover}>
+                                        <Button variant="outline" size="icon" onClick={deleteCover}>
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </>
                                 )}
+                            </div>
+
+                            <div className="pt-4 border-t border-dashed">
+                                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Storage Debug</h4>
+                                <div className="space-y-1 text-[9px] font-mono bg-muted/30 p-2 rounded border text-muted-foreground">
+                                    <div className="flex justify-between">
+                                        <span>Bucket:</span>
+                                        <span className="text-foreground font-semibold">audio-stories</span>
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span>Path:</span>
+                                        <span className="text-foreground break-all select-all leading-tight">
+                                            {story.remote_cover_path || "None"}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -334,6 +436,89 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                                         </Button>
                                     </>
                                 )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Video */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Video className="h-5 w-5" />
+                                Video
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {videoUrl ? (
+                                <div className="space-y-4">
+                                    <video
+                                        key={videoUrl}
+                                        controls
+                                        className="w-full rounded-lg bg-black aspect-video border shadow-inner"
+                                    >
+                                        <source key={videoUrl} src={videoUrl} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            ) : (
+                                <div className="w-full aspect-video bg-muted/20 rounded-lg flex items-center justify-center border border-dashed">
+                                    <p className="text-muted-foreground text-xs flex items-center gap-2">
+                                        <Video className="h-4 w-4 opacity-50" />
+                                        No video file
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex gap-2">
+                                <input
+                                    ref={videoInputRef}
+                                    type="file"
+                                    accept="video/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) uploadVideo(file);
+                                        // Reset so the same file can be re-selected after a delete
+                                        e.target.value = "";
+                                    }}
+                                />
+                                <Button
+                                    variant="outline"
+                                    onClick={() => videoInputRef.current?.click()}
+                                    disabled={uploadingVideo}
+                                    className="flex-1 text-xs"
+                                >
+                                    <Upload className="h-3.5 w-3.5 mr-2" />
+                                    {uploadingVideo ? "Uploading..." : "Upload Video"}
+                                </Button>
+                                {story.remote_video_path && (
+                                    <>
+                                        <Button variant="outline" size="icon" asChild>
+                                            <a href={videoUrl || story.remote_video_path} download target="_blank" rel="noopener noreferrer">
+                                                <Download className="h-4 w-4" />
+                                            </a>
+                                        </Button>
+                                        <Button variant="outline" size="icon" onClick={deleteVideo}>
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="pt-4 border-t border-dashed">
+                                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Storage Debug</h4>
+                                <div className="space-y-1 text-[9px] font-mono bg-muted/30 p-2 rounded border text-muted-foreground">
+                                    <div className="flex justify-between">
+                                        <span>Bucket:</span>
+                                        <span className="text-foreground font-semibold">story_videos</span>
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span>Full Path/URL:</span>
+                                        <span className="text-foreground break-all select-all leading-tight">
+                                            {story.remote_video_path || "None"}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -391,10 +576,89 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                             </div>
 
                             <div>
-                                <Label>Prompt (Read-only)</Label>
+                                <Label htmlFor="video_style">Video Style</Label>
+                                <Input
+                                    id="video_style"
+                                    value={story.video_style || ""}
+                                    placeholder="e.g. Pixar 3D"
+                                    onChange={(e) => setStory({ ...story, video_style: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="video_prompt">Video Generation Prompt</Label>
+                                <Textarea
+                                    id="video_prompt"
+                                    value={story.video_gen_prompt || ""}
+                                    placeholder="Visual prompt for AI video generation..."
+                                    onChange={(e) => setStory({ ...story, video_gen_prompt: e.target.value })}
+                                    rows={3}
+                                    className="text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <Label>Main Text Prompt (Read-only)</Label>
                                 <p className="text-sm text-muted-foreground border rounded-md p-3 bg-muted/50">
                                     {story.prompt}
                                 </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Quiz Questions */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <HelpCircle className="h-5 w-5" />
+                                Quiz Questions
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {quizQuestions.length > 0 ? (
+                                <div className="space-y-6">
+                                    {quizQuestions.map((q, idx) => (
+                                        <div key={idx} className="space-y-2 border-b pb-4 last:border-0">
+                                            <p className="font-medium text-sm">
+                                                {idx + 1}. {q.question}
+                                            </p>
+                                            <div className="grid grid-cols-1 gap-2 pl-4">
+                                                {q.choices.map((choice: string, cIdx: number) => (
+                                                    <div
+                                                        key={cIdx}
+                                                        className={`text-xs p-2 rounded border ${cIdx === q.correctIndex ? 'bg-green-50 border-green-200 text-green-700 font-semibold' : 'bg-muted/30'}`}
+                                                    >
+                                                        {choice}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 bg-muted/20 rounded-lg">
+                                    <p className="text-sm text-muted-foreground">No quiz questions generated yet.</p>
+                                    <Button variant="link" size="sm" onClick={() => {
+                                        const example = JSON.stringify([
+                                            { question: "Example question?", choices: ["A", "B", "C", "D"], correctIndex: 0 }
+                                        ]);
+                                        setStory({ ...story, comprehension_questions_json: example });
+                                    }}>
+                                        Add Example Structure
+                                    </Button>
+                                </div>
+                            )}
+
+                            <div className="pt-2">
+                                <Label htmlFor="quiz_json">Raw JSON</Label>
+                                <Textarea
+                                    id="quiz_json"
+                                    value={story.comprehension_questions_json || ""}
+                                    onChange={(e) => setStory({ ...story, comprehension_questions_json: e.target.value })}
+                                    rows={5}
+                                    className="font-mono text-xs"
+                                    placeholder='[{"question": "...", "choices": ["...", "..."], "correctIndex": 0}]'
+                                />
                             </div>
                         </CardContent>
                     </Card>
