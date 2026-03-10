@@ -9,38 +9,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Upload, Download, Trash2, Save, Eye, EyeOff, Video, HelpCircle } from "lucide-react";
+import { Story, StoryChapter } from "@/types/stories";
+import { ChevronLeft, Upload, Download, Trash2, Save, Eye, EyeOff, Video, HelpCircle, Plus, FileText, Music, Layout, ArrowUp, ArrowDown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { adminUpdateStory } from "./actions";
 import { useRouter } from "next/navigation";
 
-interface Story {
-    id: string;
-    title: string;
-    target_text: string;
-    native_text: string | null;
-    prompt: string;
-    language: string;
-    level: number;
-    remote_cover_path: string | null;
-    remote_audio_path: string | null;
-    comprehension_questions_json: string | null;
-    video_gen_prompt: string | null;
-    video_style: string | null;
-    remote_video_path: string | null;
-    created_at: string;
-    is_public: boolean;
-    user_id: string;
+interface StoryEditorProps {
+    story: any; // Using any for flexibility with database JSON
 }
 
-export default function StoryEditorClient({ story: initialStory }: { story: Story }) {
+export default function StoryEditorClient({ story: initialStory }: StoryEditorProps) {
     const [story, setStory] = useState(initialStory);
+    const [chapters, setChapters] = useState<StoryChapter[]>(
+        Array.isArray(initialStory.chapters) ? initialStory.chapters : []
+    );
     const [isSaving, setIsSaving] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
     const [uploadingAudio, setUploadingAudio] = useState(false);
+    const [uploadingChapterAudio, setUploadingChapterAudio] = useState<number | null>(null);
     const [uploadingVideo, setUploadingVideo] = useState(false);
     const coverInputRef = useRef<HTMLInputElement>(null);
     const audioInputRef = useRef<HTMLInputElement>(null);
+    const chapterAudioInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
     const router = useRouter();
@@ -68,7 +59,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
     const videoUrl = story.remote_video_path
         ? story.remote_video_path.startsWith("https://")
             ? story.remote_video_path  // Legacy: already a full public URL
-            : supabase.storage.from("story_videos").getPublicUrl(story.remote_video_path).data.publicUrl
+            : supabase.storage.from("audio-stories").getPublicUrl(story.remote_video_path).data.publicUrl
         : null;
 
     // Save story metadata — uses server action (service-role) to bypass RLS
@@ -86,6 +77,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                 video_gen_prompt: story.video_gen_prompt,
                 video_style: story.video_style,
                 comprehension_questions_json: story.comprehension_questions_json,
+                chapters: chapters, // Save chapters
             });
             alert("Story saved successfully!");
         } catch (error: any) {
@@ -102,7 +94,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         try {
             // Generate unique filename
             const fileExt = file.name.split(".").pop();
-            const fileName = `${story.id}/cover_${Date.now()}.${fileExt}`;
+            const fileName = `${story.user_id}/${story.id}/covers/${Date.now()}.${fileExt}`;
 
             // Upload to storage
             const { error: uploadError } = await supabase.storage
@@ -139,7 +131,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         try {
             // Generate unique filename
             const fileExt = file.name.split(".").pop();
-            const fileName = `${story.id}/audio_${Date.now()}.${fileExt}`;
+            const fileName = `${story.user_id}/${story.id}/audio/${Date.now()}.${fileExt}`;
 
             // Upload to storage
             const { error: uploadError } = await supabase.storage
@@ -199,6 +191,76 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         }
     };
 
+    // Chapter Management
+    const addChapter = () => {
+        const newChapter: StoryChapter = {
+            chapter_number: chapters.length + 1,
+            title_target_language: `Chapter ${chapters.length + 1}`,
+            title_english: `Chapter ${chapters.length + 1}`,
+            text_target_language: "",
+            text_english: "",
+            word_timings: [],
+        };
+        setChapters([...chapters, newChapter]);
+    };
+
+    const removeChapter = (index: number) => {
+        if (!confirm("Remove this chapter?")) return;
+        const newChapters = chapters.filter((_, i) => i !== index);
+        // Re-number chapters
+        const renumbered = newChapters.map((ch, i) => ({
+            ...ch,
+            chapter_number: i + 1,
+        }));
+        setChapters(renumbered);
+    };
+
+    const updateChapter = (index: number, updates: Partial<StoryChapter>) => {
+        const newChapters = [...chapters];
+        newChapters[index] = { ...newChapters[index], ...updates };
+        setChapters(newChapters);
+    };
+
+    const moveChapter = (index: number, direction: 'up' | 'down') => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === chapters.length - 1) return;
+
+        const newChapters = [...chapters];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        [newChapters[index], newChapters[targetIndex]] = [newChapters[targetIndex], newChapters[index]];
+
+        // Re-number
+        const renumbered = newChapters.map((ch, i) => ({
+            ...ch,
+            chapter_number: i + 1,
+        }));
+        setChapters(renumbered);
+    };
+
+    const uploadChapterAudio = async (index: number, file: File) => {
+        setUploadingChapterAudio(index);
+
+        try {
+            const fileExt = file.name.split(".").pop();
+            const fileName = `${story.user_id}/${story.id}/audio/chapter_${(index + 1).toString().padStart(2, '0')}_${Date.now()}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from("audio-stories")
+                .upload(fileName, file, {
+                    contentType: file.type,
+                    upsert: true,
+                });
+
+            if (uploadError) throw uploadError;
+
+            updateChapter(index, { audio_url: fileName });
+        } catch (error: any) {
+            alert("Error uploading chapter audio: " + error.message);
+        } finally {
+            setUploadingChapterAudio(null);
+        }
+    };
+
     // Upload video file
     const uploadVideo = async (file: File) => {
         setUploadingVideo(true);
@@ -206,11 +268,11 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
         try {
             // Get storage path (not public URL) — standard format: {storyID}/{timestamp}_{style}.mp4
             const fileExt = file.name.split(".").pop();
-            const storagePath = `${story.id}/${Date.now()}_upload.${fileExt}`;
+            const storagePath = `${story.user_id}/${story.id}/videos/${Date.now()}_upload.${fileExt}`;
 
             // Upload to storage
             const { error: uploadError } = await supabase.storage
-                .from("story_videos")
+                .from("audio-stories")
                 .upload(storagePath, file, {
                     contentType: file.type,
                     upsert: true,
@@ -246,7 +308,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
             // 2. Delete the file from storage if we have a path (not a legacy URL)
             if (currentPath && !currentPath.startsWith("https://")) {
                 await supabase.storage
-                    .from("story_videos")
+                    .from("audio-stories")
                     .remove([currentPath]);
             }
 
@@ -510,7 +572,7 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                                 <div className="space-y-1 text-[9px] font-mono bg-muted/30 p-2 rounded border text-muted-foreground">
                                     <div className="flex justify-between">
                                         <span>Bucket:</span>
-                                        <span className="text-foreground font-semibold">story_videos</span>
+                                        <span className="text-foreground font-semibold">audio-stories</span>
                                     </div>
                                     <div className="flex flex-col gap-0.5">
                                         <span>Full Path/URL:</span>
@@ -660,6 +722,126 @@ export default function StoryEditorClient({ story: initialStory }: { story: Stor
                                     placeholder='[{"question": "...", "choices": ["...", "..."], "correctIndex": 0}]'
                                 />
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Chapters Section */}
+                    <Card className="border-primary/20 shadow-md">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="flex items-center gap-2">
+                                <Layout className="h-5 w-5 text-primary" />
+                                Chapters Management
+                            </CardTitle>
+                            <Button size="sm" onClick={addChapter} className="h-8">
+                                <Plus className="h-4 w-4 mr-1" />
+                                Add Chapter
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="space-y-4 pt-4">
+                            {chapters.length === 0 ? (
+                                <div className="text-center py-10 bg-muted/20 rounded-lg border border-dashed">
+                                    <p className="text-sm text-muted-foreground">No chapters defined. This story uses single-file mode.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {chapters.map((chapter, index) => (
+                                        <div key={index} className="border rounded-lg p-4 bg-muted/10 space-y-4 relative">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="outline" className="bg-background">
+                                                        Chapter {chapter.chapter_number}
+                                                    </Badge>
+                                                    <div className="flex gap-1">
+                                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveChapter(index, 'up')} disabled={index === 0}>
+                                                            <ArrowUp className="h-3 w-3" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveChapter(index, 'down')} disabled={index === chapters.length - 1}>
+                                                            <ArrowDown className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => removeChapter(index)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] uppercase text-muted-foreground font-bold">Title (Spanish/Target)</Label>
+                                                    <Input
+                                                        value={chapter.title_target_language}
+                                                        onChange={(e) => updateChapter(index, { title_target_language: e.target.value })}
+                                                        placeholder="Chapter Title"
+                                                        className="h-8 text-sm"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] uppercase text-muted-foreground font-bold">Title (English)</Label>
+                                                    <Input
+                                                        value={chapter.title_english}
+                                                        onChange={(e) => updateChapter(index, { title_english: e.target.value })}
+                                                        placeholder="English Title"
+                                                        className="h-8 text-sm"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] uppercase text-muted-foreground font-bold">Chapter Text</Label>
+                                                <Textarea
+                                                    value={chapter.text_target_language}
+                                                    onChange={(e) => updateChapter(index, { text_target_language: e.target.value })}
+                                                    rows={4}
+                                                    className="text-xs font-mono"
+                                                    placeholder="Spanish/Target language text..."
+                                                />
+                                            </div>
+
+                                            <div className="flex items-center gap-4 pt-2">
+                                                <div className="flex-1">
+                                                    <Label className="text-[10px] uppercase text-muted-foreground font-bold mb-1 block">Audio File</Label>
+                                                    {chapter.audio_url ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex-1 text-[10px] bg-background border rounded px-2 py-1 truncate text-muted-foreground">
+                                                                {chapter.audio_url}
+                                                            </div>
+                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => updateChapter(index, { audio_url: undefined })}>
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-[10px] text-muted-foreground italic bg-background/50 border border-dashed rounded px-2 py-1">
+                                                            No audio file linked
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="file"
+                                                        accept="audio/*"
+                                                        className="hidden"
+                                                        id={`chapter-audio-${index}`}
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) uploadChapterAudio(index, file);
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="h-8"
+                                                        disabled={uploadingChapterAudio === index}
+                                                        onClick={() => document.getElementById(`chapter-audio-${index}`)?.click()}
+                                                    >
+                                                        <Music className="h-3.5 w-3.5 mr-1" />
+                                                        {uploadingChapterAudio === index ? "Uploading..." : "Upload Audio"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 

@@ -6,40 +6,46 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Play, Pause, Volume2, Download } from "lucide-react";
+import { Story, StoryChapter } from "@/types/stories";
+import { ChevronLeft, Play, Pause, Volume2, Download, SkipBack, SkipForward, ChevronRight } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-
-interface Story {
-    id: string;
-    title: string;
-    target_text: string;
-    native_text: string | null;
-    language: string;
-    level: number;
-    remote_cover_path: string | null;
-    remote_audio_path: string | null;
-    created_at: string;
-}
 
 type DisplayLanguage = "target" | "native";
 
-export default function StoryDetailClient({ story }: { story: Story }) {
+export default function StoryDetailClient({ story }: { story: any }) {
     const [selectedLanguage, setSelectedLanguage] = useState<DisplayLanguage>("target");
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [playbackRate, setPlaybackRate] = useState(1);
+    const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
     const audioRef = useRef<HTMLAudioElement>(null);
     const supabase = createClient();
+
+    // Parse chapters if they exist
+    const chapters: StoryChapter[] = Array.isArray(story.chapters) ? story.chapters : [];
+    const hasChapters = chapters.length > 0;
+    const currentChapter = hasChapters ? chapters[currentChapterIndex] : null;
 
     // Get URLs from Supabase Storage
     const coverUrl = story.remote_cover_path
         ? supabase.storage.from("audio-stories").getPublicUrl(story.remote_cover_path).data.publicUrl
         : null;
 
-    const audioUrl = story.remote_audio_path
-        ? supabase.storage.from("audio-stories").getPublicUrl(story.remote_audio_path).data.publicUrl
-        : null;
+    // Use chapter audio if available, fallback to legacy story audio
+    const getAudioUrl = () => {
+        if (currentChapter?.audio_url) {
+            // Check if it's already a public URL or a storage path
+            if (currentChapter.audio_url.startsWith('http')) return currentChapter.audio_url;
+            return supabase.storage.from("audio-stories").getPublicUrl(currentChapter.audio_url).data.publicUrl;
+        }
+        if (story.remote_audio_path) {
+            return supabase.storage.from("audio-stories").getPublicUrl(story.remote_audio_path).data.publicUrl;
+        }
+        return null;
+    };
+
+    const audioUrl = getAudioUrl();
 
     // Language display name
     const languageNames: Record<string, string> = {
@@ -60,7 +66,16 @@ export default function StoryDetailClient({ story }: { story: Story }) {
 
         const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
         const handleDurationChange = () => setDuration(audio.duration);
-        const handleEnded = () => setIsPlaying(false);
+        const handleEnded = () => {
+            if (hasChapters && currentChapterIndex < chapters.length - 1) {
+                // Auto-advance to next chapter
+                setCurrentChapterIndex(prev => prev + 1);
+                setCurrentTime(0);
+                // The useEffect for currentChapterIndex will handle playback
+            } else {
+                setIsPlaying(false);
+            }
+        };
 
         audio.addEventListener("timeupdate", handleTimeUpdate);
         audio.addEventListener("durationchange", handleDurationChange);
@@ -71,7 +86,14 @@ export default function StoryDetailClient({ story }: { story: Story }) {
             audio.removeEventListener("durationchange", handleDurationChange);
             audio.removeEventListener("ended", handleEnded);
         };
-    }, []);
+    }, [hasChapters, currentChapterIndex, chapters.length]);
+
+    // Handle audio URL change when chapter changes
+    useEffect(() => {
+        if (audioRef.current && isPlaying) {
+            audioRef.current.play().catch(console.error);
+        }
+    }, [currentChapterIndex]);
 
     const togglePlay = () => {
         if (!audioRef.current) return;
@@ -100,9 +122,32 @@ export default function StoryDetailClient({ story }: { story: Story }) {
     };
 
     const formatTime = (seconds: number) => {
+        if (isNaN(seconds)) return "0:00";
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
+
+    const nextChapter = () => {
+        if (currentChapterIndex < chapters.length - 1) {
+            setCurrentChapterIndex(prev => prev + 1);
+            setCurrentTime(0);
+        }
+    };
+
+    const prevChapter = () => {
+        if (currentChapterIndex > 0) {
+            setCurrentChapterIndex(prev => prev - 1);
+            setCurrentTime(0);
+        }
+    };
+
+    // Get current text
+    const displayChapterText = () => {
+        if (hasChapters) {
+            return selectedLanguage === "target" ? currentChapter?.text_target_language : currentChapter?.text_english;
+        }
+        return selectedLanguage === "target" ? story.target_text : story.native_text;
     };
 
     return (
@@ -129,10 +174,20 @@ export default function StoryDetailClient({ story }: { story: Story }) {
             {/* Title and Metadata */}
             <div className="mb-6">
                 <h1 className="text-3xl md:text-4xl font-bold mb-3">{story.title}</h1>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap mb-4">
                     <Badge variant="outline">{languageName}</Badge>
                     <Badge variant="secondary">Level {story.level}</Badge>
+                    {hasChapters && (
+                        <Badge variant="outline" className="bg-primary/5">
+                            Chapter {currentChapterIndex + 1} of {chapters.length}
+                        </Badge>
+                    )}
                 </div>
+                {hasChapters && currentChapter?.title_target_language && (
+                    <h2 className="text-xl md:text-2xl font-semibold text-muted-foreground italic">
+                        {selectedLanguage === "target" ? currentChapter.title_target_language : currentChapter.title_english}
+                    </h2>
+                )}
             </div>
 
             {/* Language Toggle */}
@@ -166,7 +221,7 @@ export default function StoryDetailClient({ story }: { story: Story }) {
                 <CardContent className="p-6">
                     <div className="prose prose-lg max-w-none">
                         <p className="whitespace-pre-wrap leading-relaxed">
-                            {selectedLanguage === "target" ? story.target_text : story.native_text}
+                            {displayChapterText()}
                         </p>
                     </div>
                 </CardContent>
@@ -179,22 +234,50 @@ export default function StoryDetailClient({ story }: { story: Story }) {
                         <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
                         {/* Audio Controls */}
-                        <div className="flex items-center gap-4">
-                            {/* Play/Pause Button */}
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                onClick={togglePlay}
-                                className="h-10 w-10 flex-shrink-0 border-2"
-                            >
-                                {isPlaying ? (
-                                    <Pause className="h-5 w-5" />
-                                ) : (
-                                    <Play className="h-5 w-5 ml-0.5" />
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center gap-4">
+                                {/* Previous Chapter */}
+                                {hasChapters && (
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={prevChapter}
+                                        disabled={currentChapterIndex === 0}
+                                        title="Previous Chapter"
+                                    >
+                                        <SkipBack className="h-5 w-5" />
+                                    </Button>
                                 )}
-                            </Button>
 
-                            {/* Time Display */}
+                                {/* Play/Pause Button */}
+                                <Button
+                                    size="icon"
+                                    variant="outline"
+                                    onClick={togglePlay}
+                                    className="h-12 w-12 flex-shrink-0 border-2"
+                                >
+                                    {isPlaying ? (
+                                        <Pause className="h-6 w-6" />
+                                    ) : (
+                                        <Play className="h-6 w-6 ml-0.5" />
+                                    )}
+                                </Button>
+
+                                {/* Next Chapter */}
+                                {hasChapters && (
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={nextChapter}
+                                        disabled={currentChapterIndex === chapters.length - 1}
+                                        title="Next Chapter"
+                                    >
+                                        <SkipForward className="h-5 w-5" />
+                                    </Button>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-4">
                             <span className="text-sm text-muted-foreground whitespace-nowrap">
                                 {formatTime(currentTime)}
                             </span>
@@ -240,8 +323,9 @@ export default function StoryDetailClient({ story }: { story: Story }) {
                                 </a>
                             </Button>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </CardContent>
+            </Card>
             )}
         </div>
     );
