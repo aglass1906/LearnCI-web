@@ -272,35 +272,22 @@ This granular checklist is designed to guide any software engineer or agentic AI
 *   [x] **Rebuild Public Landing Page (`app/(marketing)/page.tsx`):** Constructed the premium dark-mode hero, embedded App Store / Play browser CTAs, and integrated SEO metadata.
 *   [x] **Update Authentication Screen Layouts (`app/auth/`):** Overhauled `app/login/page.tsx`, `app/signup/page.tsx`, and the dual-mode `app/reset-password/page.tsx` into responsive glassmorphic cards with robust Supabase Auth controls.
 
-### ⬜ Phase 3: Learner Dashboard & Settings
-*   [ ] **Upgrade Portal Dashboard (`app/portal/page.tsx`):**
-    *   Refactor styling into the dark glassmorphic theme.
-    *   Refactor the input hours milestone progress rings (using Outfit and Lexend titles).
-*   [ ] **Create Settings Portal (`app/portal/profile/page.tsx`):**
-    *   Create profile selectors for target language, comprehension level, and TTS voice preferences.
-    *   Hook form inputs directly to Supabase client updates targeting the `profiles` table.
+### [x] Phase 3: Learner Dashboard & Settings
+*   [x] **Upgrade Portal Dashboard (`app/portal/page.tsx`):** Overhauled the dashboard into a premium dark glassmorphic design, updated streak/hours metrics, and integrated the milestone progress rings.
+*   [x] **Create Settings Portal (`app/portal/profile/page.tsx`):** Built a premium settings panel syncing with the Supabase `profiles` table to manage target language, difficulty level, and speech preferences.
 
-### ⬜ Phase 4: Multimedia Presenters (Story, Podcast, YouTube)
-*   [ ] **Build Persistent Audio Cockpit (`app/components/AudioCockpit.tsx`):**
-    *   Create a floating dock that remains active across client-side router transitions.
-    *   Integrate speed adjustments and play/pause controls linked to the active media context.
-*   [ ] **Upgrade Story Detail Player (`app/portal/stories/[id]/page.tsx`):**
-    *   *Chapter Intro Header:* Render `chapterIntroText` / `chapterIntroTextEnglish` with a thin glass separator.
-    *   *Prose Mode (`StoryBookPresenter`):* Parse the `WordTiming[]` array and highlight matching words as the HTML5 player advances. Add click-listeners to words to trigger definitions and jump audio tracks.
-    *   *Comic Mode (`ComicBookPresenter`):* Parse layout matrices from `layout_json` into a responsive CSS grid overlaying DALL-E scene assets.
-    *   *Bubble Mode (`InteractiveBookPresenter`):* Render speech bubbles with contrast color boundaries.
-*   [ ] **Implement Podcast Presenter (`app/portal/podcasts/`):**
-    *   Build show grids and episode index lists.
-    *   Connect active episode audio to the persistent audio cockpit and render scroll-highlighted transcription blocks.
-*   [ ] **Refactor YouTube Immersion Hub (`app/portal/watch/`):**
-    *   Replace standard page embeds with a curated channel grid.
-    *   Ensure iFrame state updates reliably invoke the Supabase progress syncer to increment minutes on `user_activities`.
+### [x] Phase 4: Multimedia Presenters (Story, Podcast, YouTube)
+*   [x] **Build Persistent Audio Cockpit (`components/FloatingAudioCockpit.tsx`):** Implemented the global audio provider and floating playback bar to support uninterrupted listening across page transitions.
+*   [x] **Upgrade Story Detail Player (`app/portal/stories/[id]/page.tsx`):** Built Prose, Dialogue, and Comic book views with Whisper-synchronized karaoke text and click-seeks.
+*   [x] **Implement Podcast Presenter (`app/portal/podcasts/`):** Developed the split-view player with interactive segment highlighting, bilingually toggled dialogue rows, and complete database resilience.
+*   [x] **Refactor YouTube Immersion Hub (`app/portal/watch/`):** Built the channel catalog and cinematic player with automated background minute-tracking.
 
-### 👥 Phase 5: Vocabulary Study & SRS Flashcards (In Progress)
-*   [/] **Build Flashcard Flipping Panel (`app/portal/review/page.tsx`):**
+### [x] Phase 5: Vocabulary Study & SRS Flashcards
+*   [x] **Build Flashcard Flipping Panel (`app/portal/review/page.tsx`):**
     *   [x] Construct 3D CSS transform classes for a double-sided study card.
-    *   [x] Implement SRS response triggers (Again, Hard, Good, Easy) adjusting database intervals.
-    *   [ ] Add vocabulary filter panels driven by Lexend category chips.
+    *   [x] Implement SRS response triggers (Again, Hard, Good, Easy) adjusting database intervals (Smart Queue).
+    *   [x] Add vocabulary filter panels driven by Lexend category chips.
+    *   [x] Connect Flashcards to the Supabase DB `saved_study_words` table.
 
 ### ⬜ Phase 6: Overhauled Administrative Control Center
 *   [ ] **Upgrade Admin Dashboard Overview (`app/admin/page.tsx`):**

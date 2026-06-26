@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
     Layers, RotateCcw, Volume2, Sparkles, 
-    BookOpen, Check, HelpCircle, ArrowRight, Play
+    BookOpen, Check, HelpCircle, ArrowRight, Play, Award, Clock, Flame
 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 interface SrsCard {
     id: string;
@@ -18,282 +19,527 @@ interface SrsCard {
     examples: { target: string; english: string }[];
     language: string;
     created_at: string;
-    interval: number; // days
-    repetition: number;
-    ease_factor: number;
-    next_review_date: string;
+    sourceTitle: string;
 }
 
 export default function ReviewPage() {
-    const [cards, setCards] = useState<SrsCard[]>([]);
-    const [isFlipped, setIsFlipped] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [completedCount, setCompletedCount] = useState(0);
+    const supabase = createClient();
 
-    // Load cards from localStorage
+    // Authentication & Database State
+    const [userId, setUserId] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [dbWords, setDbWords] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Filter State
+    const [activeFilter, setActiveFilter] = useState("All Decks");
+
+    // Active Study Session State
+    const [sessionActive, setSessionActive] = useState(false);
+    const [activeQueue, setActiveQueue] = useState<SrsCard[]>([]);
+    const [initialSessionSize, setInitialSessionSize] = useState(0);
+    const [completedCount, setCompletedCount] = useState(0);
+    const [reviewsCount, setReviewsCount] = useState(0);
+    
+    // Performance Scoring metrics
+    const [againCount, setAgainCount] = useState(0);
+    const [easyCount, setEasyCount] = useState(0);
+
+    // Timing
+    const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+    const [sessionEndTime, setSessionEndTime] = useState<number | null>(null);
+    
+    // Setup controls
+    const [selectedSessionLimit, setSelectedSessionLimit] = useState<number | "all">(10);
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    // 1. Fetch User Session & Saved Study Words on Mount
     useEffect(() => {
-        const loadCards = () => {
-            const raw = localStorage.getItem('learnci_srs_cards');
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    setCards(parsed);
-                } catch (e) {
-                    console.error("Error loading SRS cards:", e);
+        const fetchSessionAndWords = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    setUserId(session.user.id);
+                    setUserEmail(session.user.email || "No Email");
+                    await fetchSavedWords(session.user.id);
+                } else {
+                    setLoading(false);
                 }
+            } catch (err) {
+                console.error("Error loading session:", err);
+                setLoading(false);
             }
-            setLoading(false);
         };
-        loadCards();
+        fetchSessionAndWords();
     }, []);
 
-    // Filter due cards (next_review_date <= now)
-    const dueCards = useMemo(() => {
-        const now = new Date();
-        return cards.filter(card => {
-            const reviewDate = new Date(card.next_review_date);
-            return reviewDate <= now;
-        });
-    }, [cards]);
+    // 2. Load Saved Study Words from Supabase
+    const fetchSavedWords = async (uid: string) => {
+        setLoading(true);
+        try {
+            const { data, error } = await (supabase.from("saved_study_words") as any)
+                .select("*")
+                .eq("user_id", uid);
 
-    const activeCard = dueCards[currentIndex];
-
-    // Format language name
-    const languageNames: Record<string, string> = {
-        spanish: "Spanish",
-        french: "French",
-        german: "German",
-        italian: "Italian",
-        portuguese: "Portuguese",
-        mandarin: "Mandarin",
-        japanese: "Japanese",
+            if (error) throw error;
+            setDbWords(data || []);
+        } catch (err) {
+            console.error("Failed to load saved study words:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Voice Pronunciation
-    const playPronunciation = (word: string, language: string) => {
+    // 3. Map Database Records to SrsCard Structure
+    const mappedCards = useMemo<SrsCard[]>(() => {
+        return dbWords.map(w => ({
+            id: w.id,
+            word: w.word,
+            translation: w.translation || "No translation",
+            type: w.part_of_speech || w.verb_tense || "Vocabulary",
+            definition: w.grammar_notes || w.lemma || `Saved vocabulary word from "${w.source_title}".`,
+            examples: w.sentence_target ? [{ target: w.sentence_target, english: w.sentence_native || "" }] : [],
+            language: w.language_code || "spanish",
+            created_at: w.created_at,
+            sourceTitle: w.source_title || "Other Decks"
+        }));
+    }, [dbWords]);
+
+    // 4. Extract Unique Decks (by Story Source) and Card Counts
+    const deckCategories = useMemo(() => {
+        const counts: Record<string, number> = {};
+        mappedCards.forEach(card => {
+            counts[card.sourceTitle] = (counts[card.sourceTitle] || 0) + 1;
+        });
+
+        const sortedDecks = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+        return [
+            { name: "All Decks", count: mappedCards.length },
+            ...sortedDecks.map(name => ({ name, count: counts[name] }))
+        ];
+    }, [mappedCards]);
+
+    // 5. Apply Active Deck Filters
+    const filteredCards = useMemo(() => {
+        return mappedCards.filter(card => 
+            activeFilter === "All Decks" || card.sourceTitle === activeFilter
+        );
+    }, [mappedCards, activeFilter]);
+
+    const activeCard = activeQueue[0];
+
+    // Language locale code mapper for Web Speech synthesis
+    const languageNames: Record<string, string> = {
+        spanish: "Spanish",
+        es: "Spanish",
+        french: "French",
+        fr: "French",
+        german: "German",
+        de: "German",
+        italian: "Italian",
+        it: "Italian",
+        portuguese: "Portuguese",
+        pt: "Portuguese",
+        mandarin: "Mandarin",
+        zh: "Mandarin",
+        japanese: "Japanese",
+        ja: "Japanese",
+    };
+
+    // Audio Voice Pronunciation using Web Speech API
+    const playPronunciation = (word: string, langCode: string) => {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(word);
             const langLocales: Record<string, string> = {
                 spanish: 'es-ES',
+                es: 'es-ES',
                 french: 'fr-FR',
+                fr: 'fr-FR',
                 german: 'de-DE',
+                de: 'de-DE',
                 italian: 'it-IT',
+                it: 'it-IT',
                 portuguese: 'pt-PT',
+                pt: 'pt-PT',
                 japanese: 'ja-JP',
-                mandarin: 'zh-CN'
+                ja: 'ja-JP',
+                mandarin: 'zh-CN',
+                zh: 'zh-CN'
             };
-            utterance.lang = langLocales[language.toLowerCase()] || 'es-ES';
+            utterance.lang = langLocales[langCode.toLowerCase()] || 'es-ES';
             window.speechSynthesis.speak(utterance);
         }
     };
 
-    // SuperMemo-2 SRS Algorithm implementation
-    const handleScoreCard = (quality: number) => {
+    // 6. Start the Active Smart Queue Session
+    const handleStartSession = () => {
+        if (filteredCards.length === 0) return;
+
+        // Shuffle cards for this session
+        const shuffled = [...filteredCards].sort(() => Math.random() - 0.5);
+        
+        // Apply session size limit
+        const limit = selectedSessionLimit === "all" ? shuffled.length : Math.min(selectedSessionLimit, shuffled.length);
+        const sessionPool = shuffled.slice(0, limit);
+
+        setActiveQueue(sessionPool);
+        setInitialSessionSize(sessionPool.length);
+        setCompletedCount(0);
+        setReviewsCount(0);
+        setAgainCount(0);
+        setEasyCount(0);
+        setIsFlipped(false);
+        setSessionStartTime(Date.now());
+        setSessionEndTime(null);
+        setSessionActive(true);
+    };
+
+    // 7. Core Intra-Session Smart Queue Re-queuing Engine
+    const handleScoreCard = (confidence: "again" | "hard" | "good" | "easy") => {
         if (!activeCard) return;
 
-        const updatedCards = cards.map(card => {
-            if (card.id !== activeCard.id) return card;
-
-            let repetition = card.repetition;
-            let interval = card.interval;
-            let easeFactor = card.ease_factor;
-
-            if (quality >= 3) {
-                // Correct response
-                if (repetition === 0) {
-                    interval = 1; // 1 day
-                } else if (repetition === 1) {
-                    interval = 6; // 6 days
-                } else {
-                    interval = Math.round(card.interval * easeFactor);
-                }
-                repetition += 1;
-            } else {
-                // Incorrect response
-                repetition = 0;
-                interval = 1; // reset to 1 day
-            }
-
-            // Adjust ease factor
-            easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-            if (easeFactor < 1.3) easeFactor = 1.3;
-
-            // Set next review date
-            const nextReview = new Date();
-            nextReview.setDate(nextReview.getDate() + interval);
-
-            return {
-                ...card,
-                repetition,
-                interval,
-                ease_factor: easeFactor,
-                next_review_date: nextReview.toISOString()
-            };
-        });
-
-        // Save back to state and localStorage
-        setCards(updatedCards);
-        localStorage.setItem('learnci_srs_cards', JSON.stringify(updatedCards));
-
-        // Animate review completion
+        setReviewsCount(prev => prev + 1);
         setIsFlipped(false);
-        setCompletedCount(prev => prev + 1);
 
-        // If we have more due cards, advance index (wait for flip animation to finish)
-        setTimeout(() => {
-            if (currentIndex >= dueCards.length - 1) {
-                setCurrentIndex(0);
+        const currentWord = activeCard;
+        const remainingQueue = activeQueue.slice(1);
+
+        if (confidence === "easy") {
+            setEasyCount(prev => prev + 1);
+            setCompletedCount(prev => prev + 1);
+            
+            // If the queue is now empty, end the session
+            if (remainingQueue.length === 0) {
+                setSessionActive(false);
+                setSessionEndTime(Date.now());
+                setActiveQueue([]);
+                return;
             }
-        }, 300);
+            setActiveQueue(remainingQueue);
+        } else {
+            let insertIndex = 0;
+            const size = remainingQueue.length;
+
+            if (confidence === "again") {
+                setAgainCount(prev => prev + 1);
+                // Re-queue near the front: 25% of the remaining deck
+                insertIndex = Math.max(1, Math.floor(size * 0.25));
+            } else if (confidence === "hard") {
+                // Re-queue in the middle: 50% of the remaining deck
+                insertIndex = Math.max(1, Math.floor(size * 0.5));
+            } else if (confidence === "good") {
+                // Re-queue at the end: 100% of the remaining deck
+                insertIndex = size;
+            }
+
+            // Insert card back into queue at the calculated index
+            const newQueue = [
+                ...remainingQueue.slice(0, insertIndex),
+                currentWord,
+                ...remainingQueue.slice(insertIndex)
+            ];
+
+            // Animate transition delay slightly so the card doesn't visually glitch during flips
+            setTimeout(() => {
+                setActiveQueue(newQueue);
+            }, 100);
+        }
     };
 
-    // Reset all review intervals for testing
-    const handleResetDecks = () => {
-        if (cards.length === 0) return;
-        const reset = cards.map(c => ({
-            ...c,
-            interval: 1,
-            repetition: 0,
-            ease_factor: 2.5,
-            next_review_date: new Date().toISOString()
-        }));
-        setCards(reset);
-        localStorage.setItem('learnci_srs_cards', JSON.stringify(reset));
-        setCurrentIndex(0);
+    // Cancel / Exit active session
+    const handleExitSession = () => {
+        setSessionActive(false);
+        setSessionStartTime(null);
+        setSessionEndTime(null);
+        setActiveQueue([]);
+    };
+
+    // Reset stats to setup another deck
+    const handleReturnToDecks = () => {
+        setSessionEndTime(null);
+        setSessionStartTime(null);
         setCompletedCount(0);
-        setIsFlipped(false);
+        setReviewsCount(0);
     };
 
+    // Format duration helper
+    const formatSessionTime = () => {
+        if (!sessionStartTime || !sessionEndTime) return "0s";
+        const diffMs = sessionEndTime - sessionStartTime;
+        const totalSecs = Math.floor(diffMs / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        if (mins > 0) return `${mins}m ${secs}s`;
+        return `${secs}s`;
+    };
+
+    // Dynamic session progress percentage
+    const progressPercent = initialSessionSize > 0 
+        ? (completedCount / initialSessionSize) * 100 
+        : 0;
+
+    // Loading State
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-                <div className="w-8 h-8 border-4 border-t-primaryAccent border-white/10 rounded-full animate-spin"></div>
-                <p className="font-labels text-[10px] tracking-widest text-white/40 uppercase">Loading decks...</p>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+                <div className="h-10 w-10 border-4 border-t-primaryAccent border-white/10 rounded-full animate-spin"></div>
+                <p className="font-labels text-[10px] tracking-widest text-white/40 uppercase font-bold">Synchronizing decks...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 pb-12 relative z-10 max-w-3xl mx-auto">
+        <div className="space-y-8 pb-12 relative z-10 max-w-4xl mx-auto px-4">
             
-            {/* Header / Deck Status */}
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="font-heading text-3xl font-extrabold text-white tracking-tight">
-                        Spaced Repetition (SRS)
-                    </h1>
-                    <p className="text-white/45 font-sans text-sm mt-1">
-                        Review cards scheduled for recall practice. SM-2 algorithm active.
-                    </p>
-                </div>
-                
-                {cards.length > 0 && (
-                    <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={handleResetDecks}
-                        className="rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-xs font-labels tracking-wider uppercase font-extrabold flex items-center gap-1"
-                    >
-                        <RotateCcw className="h-3.5 w-3.5" /> Reset Deck
-                    </Button>
-                )}
-            </header>
-
-            {/* Deck Summary Stats Row */}
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
-                    <span className="block font-labels text-[8px] text-white/35 tracking-widest uppercase font-bold">Total Collection</span>
-                    <span className="font-heading text-xl font-extrabold text-white mt-1 block">{cards.length} cards</span>
-                </div>
-                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
-                    <span className="block font-labels text-[8px] text-accentTeal tracking-widest uppercase font-bold">Due for Review</span>
-                    <span className="font-heading text-xl font-extrabold text-accentTeal mt-1 block">{dueCards.length} cards</span>
-                </div>
-                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
-                    <span className="block font-labels text-[8px] text-purple-400 tracking-widest uppercase font-bold">Reviewed Today</span>
-                    <span className="font-heading text-xl font-extrabold text-purple-400 mt-1 block">{completedCount} cards</span>
-                </div>
-            </div>
-
-            {/* Main Interactive Deck Play Area */}
-            {dueCards.length === 0 ? (
-                <div className="glass-card rounded-[28px] p-12 border border-white/5 text-center flex flex-col items-center justify-center space-y-6 shadow-2xl">
-                    <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <Check className="h-8 w-8" />
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="font-heading text-2xl font-extrabold text-white">Deck Fully Cleared!</h2>
-                        <p className="text-white/50 font-sans text-sm max-w-sm mx-auto leading-relaxed">
-                            Excellent work, operative. You have completed all due card reviews for today. Return tomorrow or read more stories to mine new vocabulary.
+            {/* Top Navigation / Header */}
+            {!sessionActive && !sessionEndTime && (
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="p-1.5 rounded-lg bg-primaryAccent/10 border border-primaryAccent/20">
+                                <Layers className="h-4 w-4 text-primaryAccent" />
+                            </span>
+                            <h1 className="font-heading text-3xl font-extrabold text-white tracking-tight">
+                                Vocabulary Review Center
+                            </h1>
+                        </div>
+                        <p className="text-white/55 font-sans text-sm mt-1.5 max-w-2xl">
+                            Master your saved words in real-time. This page synchronizes with the <strong className="text-white/85">saved_study_words</strong> database table, matching the active vocabulary bookmarked in your iOS and web clients.
                         </p>
                     </div>
+                </header>
+            )}
+
+            {/* 1. SETUP STATE: Deck Selection & Size Limits */}
+            {!sessionActive && !sessionEndTime && (
+                <div className="space-y-8 animate-fade-in">
                     
-                    <Link href="/portal/stories">
-                        <Button className="bg-primaryAccent hover:scale-105 transition-all text-brandDark font-heading text-xs font-extrabold tracking-wider py-3.5 px-6 rounded-xl shadow-lg shadow-primaryAccent/10 flex items-center gap-1.5">
-                            <BookOpen className="h-4 w-4 fill-brandDark" /> BROWSE IMMERSIVE STORIES
-                        </Button>
-                    </Link>
-                </div>
-            ) : (
-                <div className="space-y-6">
-                    {/* Progress tracking bar */}
-                    <div className="flex justify-between items-center px-1 font-labels text-[9px] text-white/40 uppercase tracking-widest font-extrabold">
-                        <span>Card {currentIndex + 1} of {dueCards.length}</span>
-                        <span>{dueCards.length - currentIndex} cards remaining</span>
+                    {/* Collection Summary Bento Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div className="glass-card rounded-2xl p-5 text-center border border-white/5 relative overflow-hidden shadow-lg">
+                            <div className="absolute top-[-20%] left-[-20%] w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(56,97,251,0.05)_0%,rgba(56,97,251,0)_70%)] blur-[30px] pointer-events-none"></div>
+                            <span className="block font-labels text-[8px] text-white/35 tracking-widest uppercase font-extrabold">Total Saved Collection</span>
+                            <span className="font-heading text-2xl font-extrabold text-white mt-1.5 block">{mappedCards.length} words</span>
+                        </div>
+                        
+                        <div className="glass-card rounded-2xl p-5 text-center border border-white/5 relative overflow-hidden shadow-lg">
+                            <div className="absolute top-[-20%] left-[-20%] w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(0,229,255,0.05)_0%,rgba(0,229,255,0)_70%)] blur-[30px] pointer-events-none"></div>
+                            <span className="block font-labels text-[8px] text-accentTeal tracking-widest uppercase font-extrabold">Active Filter Size</span>
+                            <span className="font-heading text-2xl font-extrabold text-accentTeal mt-1.5 block">{filteredCards.length} words</span>
+                        </div>
+
+                        <div className="glass-card rounded-2xl p-5 text-center border border-white/5 relative overflow-hidden shadow-lg">
+                            <div className="absolute top-[-20%] left-[-20%] w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,160,0,0.05)_0%,rgba(255,160,0)_70%)] blur-[30px] pointer-events-none"></div>
+                            <span className="block font-labels text-[8px] text-primaryAccent tracking-widest uppercase font-extrabold">Device Sync Status</span>
+                            <span className="font-heading text-xs font-bold text-emerald-400 mt-2 flex items-center justify-center gap-1">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                DB Connected ({userEmail})
+                            </span>
+                        </div>
                     </div>
 
-                    {/* 3D Flashcard Container */}
-                    <div className={`flip-card w-full h-80 cursor-pointer ${isFlipped ? "flipped" : ""}`} onClick={() => setIsFlipped(!isFlipped)}>
+                    {dbWords.length === 0 ? (
+                        /* Empty Collection Welcome Card */
+                        <div className="glass-card rounded-[28px] border border-white/5 p-12 text-center flex flex-col items-center justify-center min-h-[350px] shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[radial-gradient(circle,rgba(56,97,251,0.06)_0%,rgba(56,97,251,0)_70%)] blur-[80px] pointer-events-none"></div>
+                            
+                            <div className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/30 mb-6">
+                                <Flame className="h-7 w-7" />
+                            </div>
+                            
+                            <h2 className="font-heading text-xl md:text-2xl font-extrabold text-white tracking-tight">
+                                Your Study Deck is Empty
+                            </h2>
+                            <p className="text-white/50 text-xs md:text-sm font-sans mt-2.5 max-w-sm leading-relaxed">
+                                You haven't bookmarked any vocabulary words yet. Read immersive stories, listen to podcasts, or watch tracked YouTube videos to mine new words!
+                            </p>
+                            
+                            <Link href="/portal/stories" className="mt-6">
+                                <Button className="bg-primaryAccent hover:scale-[1.02] active:scale-[0.98] transition-all text-brandDark font-heading text-xs font-extrabold tracking-wider py-3.5 px-6 rounded-xl shadow-lg shadow-primaryAccent/10 flex items-center gap-1.5">
+                                    <BookOpen className="h-4 w-4 fill-brandDark" /> Browse Immersive Stories
+                                </Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        /* Interactive Deck & Limit Setup Screen */
+                        <div className="glass-card rounded-[28px] p-6 md:p-8 border border-white/5 space-y-8 shadow-2xl relative overflow-hidden">
+                            
+                            {/* Scrollable category filter chips */}
+                            <div className="space-y-3">
+                                <h3 className="font-labels text-[9px] tracking-widest text-white/40 uppercase font-extrabold">
+                                    Select Study Deck (Source Story)
+                                </h3>
+                                <div className="flex gap-2.5 overflow-x-auto pb-3 pt-1 scrollbar-thin scrollbar-thumb-white/10 custom-scrollbar pr-2">
+                                    {deckCategories.map(deck => (
+                                        <button
+                                            key={deck.name}
+                                            onClick={() => setActiveFilter(deck.name)}
+                                            className={`px-4 py-2 rounded-xl text-xs font-labels font-extrabold tracking-wide uppercase border transition-all shrink-0 select-none ${
+                                                activeFilter === deck.name
+                                                    ? "bg-primaryAccent text-brandDark border-primaryAccent shadow-md shadow-primaryAccent/10"
+                                                    : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border-white/5"
+                                            }`}
+                                        >
+                                            {deck.name} ({deck.count})
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Session limit selector controls */}
+                            <div className="space-y-4 pt-2 border-t border-white/5">
+                                <h3 className="font-labels text-[9px] tracking-widest text-white/40 uppercase font-extrabold">
+                                    Select Session Review Size
+                                </h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {[5, 10, 20, 30].map(limit => (
+                                        <button
+                                            key={limit}
+                                            disabled={filteredCards.length < limit}
+                                            onClick={() => setSelectedSessionLimit(limit)}
+                                            className={`flex-1 min-w-[70px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
+                                                selectedSessionLimit === limit
+                                                    ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
+                                                    : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5 disabled:opacity-30 disabled:hover:bg-white/[0.02]"
+                                            }`}
+                                        >
+                                            {limit} Cards
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => setSelectedSessionLimit("all")}
+                                        className={`flex-2 min-w-[100px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
+                                            selectedSessionLimit === "all"
+                                                ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
+                                                : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5"
+                                        }`}
+                                    >
+                                        All Cards ({filteredCards.length})
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Large Start Session Call-to-Action */}
+                            <div className="pt-4 border-t border-white/5">
+                                <Button
+                                    onClick={handleStartSession}
+                                    disabled={filteredCards.length === 0}
+                                    className="w-full h-14 bg-gradient-to-r from-primaryAccent to-amber-500 hover:from-primaryAccent hover:to-amber-600 hover:scale-[1.01] active:scale-95 transition-all text-brandDark shadow-lg shadow-primaryAccent/15 rounded-2xl font-heading text-sm font-extrabold tracking-wider flex items-center justify-center gap-2"
+                                >
+                                    <Play className="h-4.5 w-4.5 fill-brandDark text-brandDark" />
+                                    START INTRA-SESSION SMART QUEUE REVIEW
+                                </Button>
+                                <p className="text-[10px] text-white/30 font-sans text-center mt-2.5 leading-relaxed">
+                                    Smart Queue logic dynamically schedules cards during review. Session completes only when all cards are fully mastered.
+                                </p>
+                            </div>
+
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 2. ACTIVE REVIEW STATE: Flip Card & Cockpit */}
+            {sessionActive && activeQueue.length > 0 && activeCard && (
+                <div className="space-y-6 animate-fade-in relative z-10">
+                    
+                    {/* Session HUD Status Bar */}
+                    <div className="glass-card p-4 border border-white/5 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-xl">
+                        
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            <Button 
+                                size="sm" 
+                                variant="ghost"
+                                onClick={handleExitSession}
+                                className="h-8 rounded-lg px-2.5 border border-red-500/15 text-red-400 hover:bg-red-500/10 text-[9px] font-labels tracking-wider uppercase font-extrabold"
+                            >
+                                Abort
+                            </Button>
+                            
+                            <div className="text-left font-labels font-extrabold tracking-wider text-[9px] uppercase text-white/40">
+                                Session Deck: <strong className="text-white">{activeFilter}</strong>
+                            </div>
+                        </div>
+
+                        {/* Progress bar tracker */}
+                        <div className="flex-1 max-w-md w-full flex items-center gap-3">
+                            <div className="flex-1 h-2 rounded-full bg-white/5 border border-white/5 overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-primaryAccent to-accentTeal transition-all duration-300"
+                                    style={{ width: `${progressPercent}%` }}
+                                ></div>
+                            </div>
+                            <span className="font-labels text-[9px] font-extrabold tracking-widest text-accentTeal uppercase w-10 text-right shrink-0">
+                                {Math.round(progressPercent)}%
+                            </span>
+                        </div>
+
+                        {/* Smart Queue Metrics */}
+                        <div className="flex items-center gap-4 shrink-0 font-labels font-extrabold tracking-widest text-[9px] uppercase text-white/40">
+                            <span>Mastered: <strong className="text-emerald-400">{completedCount}</strong></span>
+                            <span>Queue: <strong className="text-primaryAccent">{activeQueue.length}</strong></span>
+                        </div>
+
+                    </div>
+
+                    {/* 3D Flashcard */}
+                    <div 
+                        className={`flip-card w-full h-80 cursor-pointer ${isFlipped ? "flipped" : ""}`} 
+                        onClick={() => setIsFlipped(!isFlipped)}
+                    >
                         <div className="flip-card-inner">
                             
-                            {/* Card Front View (Target Word) */}
-                            <div className="flip-card-front bg-brandSurface rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center">
-                                <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase">
+                            {/* CARD FRONT VIEW (Target Word) */}
+                            <div className="flip-card-front bg-brandSurface rounded-[28px] p-6 md:p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center relative">
+                                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[radial-gradient(circle,rgba(56,97,251,0.03)_0%,rgba(56,97,251,0)_70%)] blur-[25px] pointer-events-none"></div>
+                                
+                                <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase relative z-10">
                                     <span>Front (Target)</span>
-                                    <Badge className="bg-white/5 border border-white/10 text-white/60 font-labels text-[8px] tracking-wider uppercase font-bold">
+                                    <Badge className="bg-white/5 border border-white/10 text-white/60 font-labels text-[8px] tracking-wider uppercase font-bold px-2 py-0.5">
                                         {languageNames[activeCard.language.toLowerCase()] || activeCard.language}
                                     </Badge>
                                 </div>
                                 
-                                <div className="space-y-3 my-auto">
-                                    <h2 className="font-heading text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                                <div className="space-y-4 my-auto relative z-10 w-full px-4">
+                                    <h2 className="font-heading text-4xl md:text-5xl font-extrabold text-white tracking-tight break-words">
                                         {activeCard.word}
                                     </h2>
-                                    <span className="inline-block px-2.5 py-0.5 rounded bg-white/5 border border-white/5 text-[9px] font-labels tracking-wider uppercase text-white/40 font-bold">
+                                    <span className="inline-block px-3 py-1 rounded-xl bg-white/5 border border-white/5 text-[9px] font-labels tracking-widest uppercase text-white/40 font-extrabold">
                                         {activeCard.type}
                                     </span>
                                 </div>
 
-                                <div className="w-full flex justify-between items-center text-white/40 font-labels text-[9px] tracking-wider uppercase font-bold">
+                                <div className="w-full flex justify-between items-center text-white/40 font-labels text-[9px] tracking-wider uppercase font-bold relative z-10">
                                     <span 
                                         onClick={(e) => { e.stopPropagation(); playPronunciation(activeCard.word, activeCard.language); }}
-                                        className="flex items-center gap-1 text-primaryAccent hover:text-primaryAccent/80 transition-colors cursor-pointer animate-pulse"
+                                        className="flex items-center gap-1.5 text-primaryAccent hover:text-primaryAccent/85 transition-colors cursor-pointer"
                                         title="Hear Pronunciation"
                                     >
-                                        <Volume2 className="h-4 w-4" /> Click speaker front
+                                        <Volume2 className="h-4 w-4" /> Pronounce
                                     </span>
-                                    <span>Tap to reveal back</span>
+                                    <span>Tap Card to Flip</span>
                                 </div>
                             </div>
 
-                            {/* Card Back View (Definition & Examples) */}
-                            <div className="flip-card-back bg-brandSurface rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center">
-                                <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase border-b border-white/5 pb-2">
-                                    <span>Back (Recall)</span>
-                                    <span className="text-accentTeal font-semibold">{activeCard.translation}</span>
+                            {/* CARD BACK VIEW (Recall definition) */}
+                            <div className="flip-card-back bg-brandSurface rounded-[28px] p-6 md:p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center relative">
+                                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[radial-gradient(circle,rgba(0,229,255,0.03)_0%,rgba(0,229,255,0)_70%)] blur-[25px] pointer-events-none"></div>
+                                
+                                <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase border-b border-white/5 pb-2.5 relative z-10">
+                                    <span>Back (Recall translation)</span>
+                                    <span className="text-accentTeal font-extrabold tracking-wide">{activeCard.translation}</span>
                                 </div>
                                 
-                                <div className="space-y-4 my-auto w-full max-w-md">
+                                <div className="space-y-4 my-auto w-full max-w-md relative z-10">
                                     <div className="space-y-1">
-                                        <h3 className="font-heading text-2xl font-bold text-accentTeal">
+                                        <h3 className="font-heading text-2xl font-bold text-accentTeal break-words">
                                             {activeCard.word}
                                         </h3>
                                         <p className="text-xs text-white/50 font-sans font-semibold italic">({activeCard.type})</p>
                                     </div>
                                     
-                                    {/* Scrollable content container to prevent overflow overlapping */}
-                                    <div className="overflow-y-auto max-h-[150px] space-y-3 pr-1 text-center w-full">
+                                    {/* Scrollable content container to prevent text overflows */}
+                                    <div className="overflow-y-auto max-h-[120px] space-y-3 pr-1 text-center w-full scrollbar-thin scrollbar-thumb-white/5">
                                         <p className="text-xs text-white/80 font-sans leading-relaxed px-4">
                                             {activeCard.definition}
                                         </p>
@@ -310,8 +556,8 @@ export default function ReviewPage() {
                                     </div>
                                 </div>
 
-                                <div className="w-full text-right text-white/30 font-labels text-[8px] tracking-widest uppercase">
-                                    Tap to show front
+                                <div className="w-full text-right text-white/30 font-labels text-[8px] tracking-widest uppercase relative z-10">
+                                    Tap Card to Flip Front
                                 </div>
                             </div>
 
@@ -320,34 +566,37 @@ export default function ReviewPage() {
 
                     {/* Spaced Repetition Grading Cockpit Controls */}
                     {isFlipped ? (
-                        <div className="flex flex-col sm:flex-row w-full gap-3 animate-fade-in">
+                        <div className="flex flex-col sm:flex-row w-full gap-3 animate-fade-in relative z-20">
                             <Button 
-                                onClick={(e) => { e.stopPropagation(); handleScoreCard(1); }}
+                                onClick={(e) => { e.stopPropagation(); handleScoreCard("again"); }}
                                 className="flex-1 h-14 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>AGAIN</span>
-                                <span className="text-[7px] opacity-50">STUMBLED</span>
+                                <span className="text-[7px] opacity-50 font-sans">STUMBLED (Re-queue 25%)</span>
                             </Button>
+                            
                             <Button 
-                                onClick={(e) => { e.stopPropagation(); handleScoreCard(2); }}
+                                onClick={(e) => { e.stopPropagation(); handleScoreCard("hard"); }}
                                 className="flex-1 h-14 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500 text-amber-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>HARD</span>
-                                <span className="text-[7px] opacity-50">STRUGGLED</span>
+                                <span className="text-[7px] opacity-50 font-sans">STRUGGLED (Re-queue 50%)</span>
                             </Button>
+                            
                             <Button 
-                                onClick={(e) => { e.stopPropagation(); handleScoreCard(4); }}
+                                onClick={(e) => { e.stopPropagation(); handleScoreCard("good"); }}
                                 className="flex-1 h-14 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>GOOD</span>
-                                <span className="text-[7px] opacity-50">RECALLED</span>
+                                <span className="text-[7px] opacity-50 font-sans">RECALLED (Re-queue 100%)</span>
                             </Button>
+                            
                             <Button 
-                                onClick={(e) => { e.stopPropagation(); handleScoreCard(5); }}
+                                onClick={(e) => { e.stopPropagation(); handleScoreCard("easy"); }}
                                 className="flex-1 h-14 bg-accentTeal/10 hover:bg-accentTeal/20 border border-accentTeal/30 hover:border-accentTeal text-accentTeal rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>EASY</span>
-                                <span className="text-[7px] opacity-50">INSTANT</span>
+                                <span className="text-[7px] opacity-50 font-sans">INSTANT (Mastered)</span>
                             </Button>
                         </div>
                     ) : (
@@ -359,8 +608,66 @@ export default function ReviewPage() {
                             <Play className="h-4 w-4 fill-brandDark text-brandDark" />
                         </Button>
                     )}
+
                 </div>
             )}
+
+            {/* 3. COMPLETED STATE: Session Stats Bento Card */}
+            {!sessionActive && sessionEndTime && (
+                <div className="glass-card rounded-[28px] p-8 md:p-12 border border-white/5 text-center flex flex-col items-center justify-center space-y-8 shadow-2xl relative overflow-hidden animate-fade-in max-w-2xl mx-auto">
+                    <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[radial-gradient(circle,rgba(56,97,251,0.07)_0%,rgba(56,97,251,0)_70%)] blur-[80px] pointer-events-none"></div>
+                    
+                    <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <Check className="h-8 w-8" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                        <h2 className="font-heading text-2xl md:text-3xl font-extrabold text-white">Smart Queue Cleared!</h2>
+                        <p className="text-white/50 font-sans text-sm max-w-sm mx-auto leading-relaxed">
+                            Excellent work, operative. You have successfully committed all <strong className="text-white">{initialSessionSize}</strong> cards to your active vocabulary.
+                        </p>
+                    </div>
+
+                    {/* Session Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full pt-4 border-t border-white/5">
+                        <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4">
+                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold mb-1">Cards Mastered</span>
+                            <span className="font-heading text-lg font-extrabold text-emerald-400">{initialSessionSize}</span>
+                        </div>
+                        <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4">
+                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold mb-1">Total Reviews</span>
+                            <span className="font-heading text-lg font-extrabold text-primaryAccent">{reviewsCount}</span>
+                        </div>
+                        <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4">
+                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold mb-1">Time Elapsed</span>
+                            <span className="font-heading text-lg font-extrabold text-purple-400">{formatSessionTime()}</span>
+                        </div>
+                        <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4">
+                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold mb-1">Self-Correction</span>
+                            <span className="font-heading text-lg font-extrabold text-accentTeal">
+                                {reviewsCount > 0 ? Math.round((easyCount / reviewsCount) * 100) : 100}%
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 w-full pt-4">
+                        <Button 
+                            onClick={handleReturnToDecks}
+                            className="flex-1 h-12 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-heading text-xs font-extrabold tracking-wider uppercase"
+                        >
+                            Select Another Deck
+                        </Button>
+                        <Button 
+                            onClick={handleStartSession}
+                            className="flex-1 h-12 bg-primaryAccent text-brandDark hover:scale-[1.01] active:scale-95 transition-all font-heading text-xs font-extrabold tracking-wider uppercase shadow-lg shadow-primaryAccent/15"
+                        >
+                            Study Again
+                        </Button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
