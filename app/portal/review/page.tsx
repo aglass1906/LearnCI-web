@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
     Layers, RotateCcw, Volume2, Sparkles, 
-    BookOpen, Check, HelpCircle, ArrowRight, Play, Award, Clock, Flame
+    BookOpen, Check, HelpCircle, ArrowRight, Play, Award, Clock, Flame,
+    Search, Trash2
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -52,6 +53,10 @@ export default function ReviewPage() {
     // Setup controls
     const [selectedSessionLimit, setSelectedSessionLimit] = useState<number | "all">(10);
     const [isFlipped, setIsFlipped] = useState(false);
+
+    // Browse & Search State
+    const [viewMode, setViewMode] = useState<"study" | "browse">("study");
+    const [searchQuery, setSearchQuery] = useState("");
 
     // 1. Fetch User Session & Saved Study Words on Mount
     useEffect(() => {
@@ -278,6 +283,32 @@ export default function ReviewPage() {
         ? (completedCount / initialSessionSize) * 100 
         : 0;
 
+    // Filter by search query
+    const searchedCards = useMemo(() => {
+        return filteredCards.filter(card => 
+            card.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            card.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            card.definition.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [filteredCards, searchQuery]);
+
+    // Delete bookmark word
+    const handleDeleteWord = async (cardId: string) => {
+        try {
+            const { error } = await supabase
+                .from("saved_study_words")
+                .delete()
+                .eq("id", cardId);
+            
+            if (error) throw error;
+            
+            // Remove from state
+            setDbWords(prev => prev.filter(w => w.id !== cardId));
+        } catch (err) {
+            console.error("Failed to delete word:", err);
+        }
+    };
+
     // Loading State
     if (loading) {
         return (
@@ -361,13 +392,35 @@ export default function ReviewPage() {
                             </Link>
                         </div>
                     ) : (
-                        /* Interactive Deck & Limit Setup Screen */
-                        <div className="glass-card rounded-[28px] p-6 md:p-8 border border-white/5 space-y-8 shadow-2xl relative overflow-hidden">
-                            
-                            {/* Scrollable category filter chips */}
-                            <div className="space-y-3">
+                        <div className="space-y-6">
+                            {/* View Mode Tabs */}
+                            <div className="flex border-b border-white/5 pb-px gap-6 max-w-xs">
+                                <button
+                                    onClick={() => setViewMode("study")}
+                                    className={`pb-3 font-heading text-xs font-extrabold tracking-wider uppercase border-b-2 transition-all relative ${
+                                        viewMode === "study"
+                                            ? "text-primaryAccent border-primaryAccent"
+                                            : "text-white/45 border-transparent hover:text-white/80"
+                                    }`}
+                                >
+                                    Study Mode
+                                </button>
+                                <button
+                                    onClick={() => setViewMode("browse")}
+                                    className={`pb-3 font-heading text-xs font-extrabold tracking-wider uppercase border-b-2 transition-all relative ${
+                                        viewMode === "browse"
+                                            ? "text-primaryAccent border-primaryAccent"
+                                            : "text-white/45 border-transparent hover:text-white/80"
+                                    }`}
+                                >
+                                    Browse Collection ({dbWords.length})
+                                </button>
+                            </div>
+
+                            {/* Scrollable category filter chips (Visible on both modes for unified filtering) */}
+                            <div className="space-y-3 pt-2">
                                 <h3 className="font-labels text-[9px] tracking-widest text-white/40 uppercase font-extrabold">
-                                    Select Study Deck (Source Story)
+                                    Filter Deck (Source Story)
                                 </h3>
                                 <div className="flex gap-2.5 overflow-x-auto pb-3 pt-1 scrollbar-thin scrollbar-thumb-white/10 custom-scrollbar pr-2">
                                     {deckCategories.map(deck => (
@@ -386,54 +439,156 @@ export default function ReviewPage() {
                                 </div>
                             </div>
 
-                            {/* Session limit selector controls */}
-                            <div className="space-y-4 pt-2 border-t border-white/5">
-                                <h3 className="font-labels text-[9px] tracking-widest text-white/40 uppercase font-extrabold">
-                                    Select Session Review Size
-                                </h3>
-                                <div className="flex flex-wrap gap-3">
-                                    {[5, 10, 20, 30].map(limit => (
-                                        <button
-                                            key={limit}
-                                            disabled={filteredCards.length < limit}
-                                            onClick={() => setSelectedSessionLimit(limit)}
-                                            className={`flex-1 min-w-[70px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
-                                                selectedSessionLimit === limit
-                                                    ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
-                                                    : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5 disabled:opacity-30 disabled:hover:bg-white/[0.02]"
-                                            }`}
+                            {viewMode === "study" ? (
+                                /* Interactive Deck & Limit Setup Screen */
+                                <div className="glass-card rounded-[28px] p-6 md:p-8 border border-white/5 space-y-8 shadow-2xl relative overflow-hidden">
+                                    
+                                    {/* Session limit selector controls */}
+                                    <div className="space-y-4">
+                                        <h3 className="font-labels text-[9px] tracking-widest text-white/40 uppercase font-extrabold">
+                                            Select Session Review Size
+                                        </h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {[5, 10, 20, 30].map(limit => (
+                                                <button
+                                                    key={limit}
+                                                    disabled={filteredCards.length < limit}
+                                                    onClick={() => setSelectedSessionLimit(limit)}
+                                                    className={`flex-1 min-w-[70px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
+                                                        selectedSessionLimit === limit
+                                                            ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
+                                                            : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5 disabled:opacity-30 disabled:hover:bg-white/[0.02]"
+                                                    }`}
+                                                >
+                                                    {limit} Cards
+                                                </button>
+                                            ))}
+                                            <button
+                                                onClick={() => setSelectedSessionLimit("all")}
+                                                className={`flex-2 min-w-[100px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
+                                                    selectedSessionLimit === "all"
+                                                        ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
+                                                        : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5"
+                                                }`}
+                                            >
+                                                All Cards ({filteredCards.length})
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Large Start Session Call-to-Action */}
+                                    <div className="pt-4 border-t border-white/5">
+                                        <Button
+                                            onClick={handleStartSession}
+                                            disabled={filteredCards.length === 0}
+                                            className="w-full h-14 bg-gradient-to-r from-primaryAccent to-amber-500 hover:from-primaryAccent hover:to-amber-600 hover:scale-[1.01] active:scale-95 transition-all text-brandDark shadow-lg shadow-primaryAccent/15 rounded-2xl font-heading text-sm font-extrabold tracking-wider flex items-center justify-center gap-2"
                                         >
-                                            {limit} Cards
-                                        </button>
-                                    ))}
-                                    <button
-                                        onClick={() => setSelectedSessionLimit("all")}
-                                        className={`flex-2 min-w-[100px] py-2.5 rounded-xl text-xs font-labels font-extrabold tracking-wider uppercase border transition-all ${
-                                            selectedSessionLimit === "all"
-                                                ? "bg-white/10 text-primaryAccent border-primaryAccent/30 shadow-inner"
-                                                : "bg-white/[0.02] hover:bg-white/5 text-white/50 hover:text-white border-white/5"
-                                        }`}
-                                    >
-                                        All Cards ({filteredCards.length})
-                                    </button>
+                                            <Play className="h-4.5 w-4.5 fill-brandDark text-brandDark" />
+                                            START INTRA-SESSION SMART QUEUE REVIEW
+                                        </Button>
+                                        <p className="text-[10px] text-white/30 font-sans text-center mt-2.5 leading-relaxed">
+                                            Smart Queue logic dynamically schedules cards during review. Session completes only when all cards are fully mastered.
+                                        </p>
+                                    </div>
+
                                 </div>
-                            </div>
+                            ) : (
+                                /* Interactive Browse Screen */
+                                <div className="space-y-6 animate-fade-in">
+                                    
+                                    {/* Search input bar */}
+                                    <div className="relative w-full md:max-w-md">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search spelling, translation, or notes..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full h-11 pl-11 pr-4 rounded-xl bg-white/[0.02] border border-white/5 focus:border-primaryAccent/30 text-white font-sans text-xs focus:outline-none placeholder:text-white/20 transition-all focus:ring-1 focus:ring-primaryAccent/20"
+                                        />
+                                    </div>
 
-                            {/* Large Start Session Call-to-Action */}
-                            <div className="pt-4 border-t border-white/5">
-                                <Button
-                                    onClick={handleStartSession}
-                                    disabled={filteredCards.length === 0}
-                                    className="w-full h-14 bg-gradient-to-r from-primaryAccent to-amber-500 hover:from-primaryAccent hover:to-amber-600 hover:scale-[1.01] active:scale-95 transition-all text-brandDark shadow-lg shadow-primaryAccent/15 rounded-2xl font-heading text-sm font-extrabold tracking-wider flex items-center justify-center gap-2"
-                                >
-                                    <Play className="h-4.5 w-4.5 fill-brandDark text-brandDark" />
-                                    START INTRA-SESSION SMART QUEUE REVIEW
-                                </Button>
-                                <p className="text-[10px] text-white/30 font-sans text-center mt-2.5 leading-relaxed">
-                                    Smart Queue logic dynamically schedules cards during review. Session completes only when all cards are fully mastered.
-                                </p>
-                            </div>
+                                    {/* Words Grid list */}
+                                    {searchedCards.length === 0 ? (
+                                        <div className="glass-card rounded-[24px] border border-white/5 p-12 text-center text-white/40 font-sans text-sm">
+                                            No matching words found in this deck.
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {searchedCards.map((card) => (
+                                                <div 
+                                                    key={card.id} 
+                                                    className="glass-card rounded-[24px] p-6 border border-white/5 relative overflow-hidden group hover:bg-white/[0.01] transition-all flex flex-col justify-between gap-4 shadow-xl"
+                                                >
+                                                    <div className="absolute top-[-20%] left-[-20%] w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(56,97,251,0.02)_0%,rgba(56,97,251,0)_70%)] blur-[35px] pointer-events-none group-hover:opacity-100 transition-opacity opacity-0"></div>
+                                                    
+                                                    {/* Card Header Info */}
+                                                    <div className="flex justify-between items-start gap-4 relative z-10">
+                                                        <div className="space-y-1 text-left flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <h4 className="font-heading text-xl font-extrabold text-white tracking-tight break-all">
+                                                                    {card.word}
+                                                                </h4>
+                                                                <Badge className="bg-white/5 border border-white/10 text-white/60 font-labels text-[8px] tracking-wider uppercase font-bold px-2 py-0.5 shrink-0">
+                                                                    {languageNames[card.language.toLowerCase()] || card.language}
+                                                                </Badge>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="inline-block text-[8px] font-labels tracking-widest uppercase text-white/35 font-extrabold">
+                                                                    {card.type}
+                                                                </span>
+                                                                <span className="text-white/20 text-[8px]">•</span>
+                                                                <span className="text-[8px] font-labels tracking-widest uppercase text-white/25 truncate font-extrabold" title={card.sourceTitle}>
+                                                                    {card.sourceTitle}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center gap-1.5 shrink-0">
+                                                            <button 
+                                                                onClick={() => playPronunciation(card.word, card.language)}
+                                                                className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-primaryAccent hover:text-primaryAccent/90 transition-all hover:scale-105"
+                                                                title="Hear Pronunciation"
+                                                            >
+                                                                <Volume2 className="h-4 w-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDeleteWord(card.id)}
+                                                                className="h-8 w-8 rounded-lg bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 flex items-center justify-center text-red-400 hover:text-red-300 transition-all hover:scale-105"
+                                                                title="Unbookmark Word"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
 
+                                                    {/* Card Content Details */}
+                                                    <div className="space-y-2.5 text-left border-t border-white/5 pt-3.5 relative z-10">
+                                                        <div className="space-y-0.5">
+                                                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold">Translation</span>
+                                                            <p className="text-xs text-accentTeal font-semibold font-sans">{card.translation}</p>
+                                                        </div>
+                                                        <div className="space-y-0.5">
+                                                            <span className="block font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold">Definition & Grammar Notes</span>
+                                                            <p className="text-xs text-white/65 font-sans leading-relaxed">{card.definition}</p>
+                                                        </div>
+                                                        
+                                                        {card.examples.length > 0 && (
+                                                            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-3 space-y-1 mt-1.5">
+                                                                <span className="block font-labels text-[6px] text-white/30 tracking-widest uppercase font-extrabold">Context Sentence</span>
+                                                                <p className="text-xs text-primaryAccent font-sans italic">{card.examples[0].target}</p>
+                                                                {card.examples[0].english && (
+                                                                    <p className="text-[10px] text-white/40 font-sans">{card.examples[0].english}</p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
