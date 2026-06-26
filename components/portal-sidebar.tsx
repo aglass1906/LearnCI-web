@@ -16,6 +16,7 @@ import {
     BookOpen,
     Layers,
     Youtube,
+    Headphones,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -46,6 +47,11 @@ const sidebarLinks = [
         title: "Stories",
         href: "/portal/stories",
         icon: BookOpen,
+    },
+    {
+        title: "Podcasts",
+        href: "/portal/podcasts",
+        icon: Headphones,
     },
     {
         title: "Video Immersion",

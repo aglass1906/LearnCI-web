@@ -30,10 +30,10 @@ export function FloatingAudioCockpit() {
 
     if (!mounted || !track) return null;
 
-    // Do not render if the user is on the dedicated story detail player page
-    // The story detail page path is /portal/stories/[id]
+    // Do not render if the user is on the dedicated story detail player page or the podcast portal
     const isStoryPlayerPage = pathname?.includes("/portal/stories/") && pathname?.split("/").length > 3;
-    if (isStoryPlayerPage) return null;
+    const isPodcastPage = pathname === "/portal/podcasts";
+    if (isStoryPlayerPage || isPodcastPage) return null;
 
     const formatTime = (seconds: number) => {
         if (isNaN(seconds)) return "0:00";
