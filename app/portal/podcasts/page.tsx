@@ -7,7 +7,7 @@ import Image from "next/image";
 import { 
     Play, Pause, Volume2, RotateCcw, RotateCw, 
     Search, ChevronDown, Headphones, Sparkles, 
-    Clock, User, ChevronRight, Check, Plus, Trash2, Loader2
+    Clock, User, ChevronRight, Check, Plus, Trash2, Loader2, Bookmark
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useAudio } from "@/context/audio-context";
@@ -35,7 +35,8 @@ export default function PodcastsPage() {
     const [loading, setLoading] = useState(true);
     const [submittingShowId, setSubmittingShowId] = useState<string | null>(null);
 
-    // UI States
+    // UI Navigation & Filters
+    const [sidebarTab, setSidebarTab] = useState<"library" | "discover">("library");
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedShowId, setSelectedShowId] = useState<string | null>(null);
     const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export default function PodcastsPage() {
     const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
     const lastSavedTimeRef = useRef(0);
 
-    // 1. Fetch User Session
+    // 1. Fetch User Session on Mount
     useEffect(() => {
         const fetchSession = async () => {
             try {
@@ -86,11 +87,19 @@ export default function PodcastsPage() {
 
                 if (epsError) throw epsError;
                 setDbEpisodes(epsData || []);
+                
+                // Default to library view since there are subscriptions
+                setSidebarTab("library");
+                return subs;
             } else {
                 setDbEpisodes([]);
+                // No subscriptions, default to discover so they can find shows
+                setSidebarTab("discover");
+                return [];
             }
         } catch (err) {
             console.error("Error loading podcast database tables:", err);
+            return [];
         } finally {
             setLoading(false);
         }
@@ -99,69 +108,179 @@ export default function PodcastsPage() {
     // Sync UI selection with background playing track if it's a podcast
     useEffect(() => {
         if (track && track.type === "podcast") {
-            // Find show and episode that matches the active track id
-            for (const show of mockPodcasts) {
-                const ep = show.episodes.find(e => e.id === track.id);
-                if (ep) {
-                    setSelectedShowId(show.id);
-                    setSelectedEpisodeId(ep.id);
-                    setExpandedShows(prev => ({ ...prev, [show.id]: true }));
+            // Check if the playing episode is in our database subscriptions
+            let foundInDb = false;
+            for (const sub of subscriptions) {
+                const dbEp = dbEpisodes.find(e => e.title === track.title && e.show_id === sub.id);
+                if (dbEp) {
+                    setSelectedShowId(sub.id);
+                    setSelectedEpisodeId(dbEp.id);
+                    setExpandedShows(prev => ({ ...prev, [sub.id]: true }));
+                    setSidebarTab("library");
+                    foundInDb = true;
                     break;
                 }
             }
-        }
-    }, [track]);
 
-    // Derived Selection Data
-    const selectedShow = useMemo(() => {
-        return mockPodcasts.find(s => s.id === selectedShowId) || null;
-    }, [selectedShowId]);
-
-    const selectedEpisode = useMemo(() => {
-        if (!selectedShow) return null;
-        return selectedShow.episodes.find(e => e.id === selectedEpisodeId) || null;
-    }, [selectedShow, selectedEpisodeId]);
-
-    // Filter shows/episodes based on search query
-    const filteredPodcasts = useMemo(() => {
-        if (!searchQuery) return mockPodcasts;
-        const query = searchQuery.toLowerCase();
-        return mockPodcasts.map(show => {
-            const matchesShow = show.title.toLowerCase().includes(query) || 
-                                show.description.toLowerCase().includes(query) ||
-                                show.host.toLowerCase().includes(query);
-            
-            const matchedEpisodes = show.episodes.filter(ep => 
-                ep.title.toLowerCase().includes(query) || 
-                ep.description.toLowerCase().includes(query)
-            );
-
-            if (matchesShow || matchedEpisodes.length > 0) {
-                return {
-                    ...show,
-                    episodes: matchesShow ? show.episodes : matchedEpisodes
-                };
+            // Fallback: If not in DB, search the catalog (Discover tab)
+            if (!foundInDb) {
+                for (const show of mockPodcasts) {
+                    const ep = show.episodes.find(e => e.id === track.id);
+                    if (ep) {
+                        setSelectedShowId(show.id);
+                        setSelectedEpisodeId(ep.id);
+                        setExpandedShows(prev => ({ ...prev, [show.id]: true }));
+                        setSidebarTab("discover");
+                        break;
+                    }
+                }
             }
-            return null;
-        }).filter(Boolean) as PodcastShow[];
-    }, [searchQuery]);
+        }
+    }, [track, subscriptions, dbEpisodes]);
 
-    // Set initial expanded states on load
-    useEffect(() => {
-        const initialStates: Record<string, boolean> = {};
-        mockPodcasts.forEach(show => {
-            initialStates[show.id] = show.id === selectedShowId;
-        });
-        setExpandedShows(prev => ({ ...initialStates, ...prev }));
-    }, [selectedShowId]);
+    const isLibraryView = sidebarTab === "library";
+
+    // Resolved Selected Show Details (resilient to Library vs Discover views)
+    const selectedShowData = useMemo(() => {
+        if (!selectedShowId) return null;
+        
+        if (isLibraryView) {
+            const dbShow = subscriptions.find(s => s.id === selectedShowId);
+            if (!dbShow) return null;
+            
+            // Look up rich details from local catalog by title
+            const catShow = mockPodcasts.find(m => m.title.toLowerCase() === dbShow.title.toLowerCase());
+            return {
+                id: dbShow.id,
+                title: dbShow.title,
+                host: catShow?.host || "Podcast Host",
+                description: catShow?.description || "Subscribed podcast show from your database.",
+                coverUrl: catShow?.coverUrl || "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=400&auto=format&fit=crop",
+                hostAvatarUrl: catShow?.hostAvatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+                isDbRecord: true,
+                dbRecord: dbShow,
+                catalogRecord: catShow
+            };
+        } else {
+            const catShow = mockPodcasts.find(s => s.id === selectedShowId);
+            if (!catShow) return null;
+            return {
+                id: catShow.id,
+                title: catShow.title,
+                host: catShow.host,
+                description: catShow.description,
+                coverUrl: catShow.coverUrl,
+                hostAvatarUrl: catShow.hostAvatarUrl,
+                isDbRecord: false,
+                dbRecord: null,
+                catalogRecord: catShow
+            };
+        }
+    }, [selectedShowId, isLibraryView, subscriptions]);
+
+    // Resolved Selected Episode Details
+    const selectedEpisodeData = useMemo(() => {
+        if (!selectedShowId || !selectedEpisodeId || !selectedShowData) return null;
+
+        if (isLibraryView) {
+            const dbEp = dbEpisodes.find(e => e.id === selectedEpisodeId && e.show_id === selectedShowData.id);
+            if (!dbEp) return null;
+
+            // Look up rich transcript/metadata from local catalog by title
+            const catEp = selectedShowData.catalogRecord?.episodes.find(
+                (e: any) => e.title.toLowerCase() === dbEp.title.toLowerCase()
+            );
+            return {
+                id: dbEp.id,
+                episodeNumber: catEp?.episodeNumber || "EPISODE",
+                title: dbEp.title,
+                description: catEp?.description || "Subscribed episode from your database.",
+                duration: dbEp.duration,
+                durationSeconds: catEp?.durationSeconds || 30,
+                level: catEp?.level || "INTERMEDIATE",
+                audioUrl: dbEp.audio_url,
+                transcript: catEp?.transcript || [],
+                isDbRecord: true,
+                dbRecord: dbEp,
+                catalogRecord: catEp
+            };
+        } else {
+            const catEp = selectedShowData.catalogRecord?.episodes.find((e: any) => e.id === selectedEpisodeId);
+            if (!catEp) return null;
+            return {
+                id: catEp.id,
+                episodeNumber: catEp.episodeNumber,
+                title: catEp.title,
+                description: catEp.description,
+                duration: catEp.duration,
+                durationSeconds: catEp.durationSeconds,
+                level: catEp.level,
+                audioUrl: catEp.audioUrlPath,
+                transcript: catEp.transcript,
+                isDbRecord: false,
+                dbRecord: null,
+                catalogRecord: catEp
+            };
+        }
+    }, [selectedEpisodeId, selectedShowId, isLibraryView, selectedShowData, dbEpisodes]);
+
+    // Filtered lists for rendering (based on active tab and search query)
+    const displayShows = useMemo(() => {
+        const query = searchQuery.toLowerCase();
+        
+        if (isLibraryView) {
+            // Load from database subscriptions
+            const dbShows = subscriptions.map(dbShow => {
+                const catShow = mockPodcasts.find(m => m.title.toLowerCase() === dbShow.title.toLowerCase());
+                const eps = dbEpisodes.filter(e => e.show_id === dbShow.id);
+                
+                const matchesSearch = dbShow.title.toLowerCase().includes(query) ||
+                                      (catShow && catShow.host.toLowerCase().includes(query)) ||
+                                      eps.some(e => e.title.toLowerCase().includes(query));
+
+                if (!query || matchesSearch) {
+                    return {
+                        id: dbShow.id,
+                        title: dbShow.title,
+                        host: catShow?.host || "Podcast Host",
+                        coverUrl: catShow?.coverUrl || "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=400&auto=format&fit=crop",
+                        episodes: eps
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+            return dbShows;
+        } else {
+            // Load from Discover catalog
+            if (!query) return mockPodcasts;
+            return mockPodcasts.map(show => {
+                const matchesShow = show.title.toLowerCase().includes(query) || 
+                                    show.description.toLowerCase().includes(query) ||
+                                    show.host.toLowerCase().includes(query);
+                
+                const matchedEpisodes = show.episodes.filter(ep => 
+                    ep.title.toLowerCase().includes(query) || 
+                    ep.description.toLowerCase().includes(query)
+                );
+
+                if (matchesShow || matchedEpisodes.length > 0) {
+                    return {
+                        ...show,
+                        episodes: matchesShow ? show.episodes : matchedEpisodes
+                    };
+                }
+                return null;
+            }).filter(Boolean) as any[];
+        }
+    }, [searchQuery, isLibraryView, subscriptions, dbEpisodes]);
 
     // Active transcript segment calculation
     const activeSegmentIndex = useMemo(() => {
-        if (!selectedEpisode || !track || track.id !== selectedEpisode.id) return -1;
-        return selectedEpisode.transcript.findIndex(
-            seg => currentTime >= seg.start && currentTime <= seg.end
+        if (!selectedEpisodeData || !track || track.id !== selectedEpisodeData.id) return -1;
+        return selectedEpisodeData.transcript.findIndex(
+            (seg: any) => currentTime >= seg.start && currentTime <= seg.end
         );
-    }, [selectedEpisode, track, currentTime]);
+    }, [selectedEpisodeData, track, currentTime]);
 
     // Auto-scroll transcript active line into view
     useEffect(() => {
@@ -176,37 +295,44 @@ export default function PodcastsPage() {
         }
     }, [activeSegmentIndex]);
 
-    // Periodic progress saving to database (every 5 seconds of active playback)
+    // Periodic progress saving to database (every 5 seconds of active playback in Library view)
     useEffect(() => {
-        if (!userId || !selectedEpisode || !selectedShow) return;
-        if (track?.id !== selectedEpisode.id || !isPlaying) return;
+        if (!userId || !selectedEpisodeData || !selectedShowData) return;
+        if (!selectedEpisodeData.isDbRecord || track?.id !== selectedEpisodeData.id || !isPlaying) return;
 
         if (Math.abs(currentTime - lastSavedTimeRef.current) >= 5) {
-            saveEpisodeProgress(selectedShow.title, selectedEpisode.title, currentTime);
+            saveEpisodeProgress(selectedShowData.title, selectedEpisodeData.title, currentTime);
         }
-    }, [currentTime, isPlaying, selectedEpisode, selectedShow, track, userId]);
+    }, [currentTime, isPlaying, selectedEpisodeData, selectedShowData, track, userId]);
 
     // Save progress on pause or ended
     useEffect(() => {
-        if (!isPlaying && currentTime > 0 && selectedEpisode && selectedShow && userId) {
-            saveEpisodeProgress(selectedShow.title, selectedEpisode.title, currentTime);
+        if (!isPlaying && currentTime > 0 && selectedEpisodeData?.isDbRecord && selectedShowData && userId) {
+            saveEpisodeProgress(selectedShowData.title, selectedEpisodeData.title, currentTime);
         }
     }, [isPlaying]);
 
-    const isCurrentEpisode = track?.id === selectedEpisode?.id;
+    const isCurrentEpisode = track?.id === selectedEpisodeData?.id;
+
+    const toggleShowExpanded = (showId: string) => {
+        setExpandedShows(prev => ({
+            ...prev,
+            [showId]: !prev[showId]
+        }));
+    };
 
     const getShowSubscription = (showTitle: string) => {
-        return subscriptions.find(s => s.title === showTitle) || null;
+        return subscriptions.find(s => s.title.toLowerCase() === showTitle.toLowerCase()) || null;
     };
 
     const getEpisodeDbRecord = (showTitle: string, episodeTitle: string) => {
         const sub = getShowSubscription(showTitle);
         if (!sub) return null;
-        return dbEpisodes.find(e => e.title === episodeTitle && e.show_id === sub.id) || null;
+        return dbEpisodes.find(e => e.title.toLowerCase() === episodeTitle.toLowerCase() && e.show_id === sub.id) || null;
     };
 
     // DB Operations: Subscribe
-    const handleSubscribe = async (show: PodcastShow) => {
+    const handleSubscribe = async (show: any) => {
         if (!userId) return;
         setSubmittingShowId(show.id);
         try {
@@ -224,27 +350,37 @@ export default function PodcastsPage() {
 
             const dbShow = newShows[0];
 
-            // 2. Insert all episodes for this show into podcast_episodes
-            const epsToInsert = show.episodes.map(ep => ({
-                show_id: dbShow.id,
-                title: ep.title,
-                duration: ep.duration,
-                audio_url: ep.audioUrlPath,
-                playback_position: 0,
-                is_played: false
-            }));
+            // Resolve episodes from local catalog if subscribing to a catalog show
+            const catalogShow = mockPodcasts.find(m => m.title.toLowerCase() === show.title.toLowerCase());
+            const episodesToInsert = catalogShow 
+                ? catalogShow.episodes.map(ep => ({
+                    show_id: dbShow.id,
+                    title: ep.title,
+                    duration: ep.duration,
+                    audio_url: ep.audioUrlPath,
+                    playback_position: 0,
+                    is_played: false
+                }))
+                : [];
 
-            const { data: newEps, error: epsErr } = await (supabase.from("podcast_episodes") as any)
-                .insert(epsToInsert)
-                .select();
+            if (episodesToInsert.length > 0) {
+                const { data: newEps, error: epsErr } = await (supabase.from("podcast_episodes") as any)
+                    .insert(episodesToInsert)
+                    .select();
 
-            if (epsErr) throw epsErr;
+                if (epsErr) throw epsErr;
+                if (newEps) {
+                    setDbEpisodes(prev => [...prev, ...newEps]);
+                }
+            }
 
             // Update local state
             setSubscriptions(prev => [...prev, dbShow]);
-            if (newEps) {
-                setDbEpisodes(prev => [...prev, ...newEps]);
-            }
+            
+            // Auto-switch to Library view and expand the newly subscribed show
+            setSidebarTab("library");
+            setSelectedShowId(dbShow.id);
+            setExpandedShows(prev => ({ ...prev, [dbShow.id]: true }));
         } catch (err) {
             console.error("Error subscribing to podcast show:", err);
         } finally {
@@ -253,14 +389,14 @@ export default function PodcastsPage() {
     };
 
     // DB Operations: Unsubscribe
-    const handleUnsubscribe = async (show: PodcastShow) => {
+    const handleUnsubscribe = async (show: any) => {
         if (!userId) return;
         const sub = getShowSubscription(show.title);
         if (!sub) return;
 
         setSubmittingShowId(show.id);
         try {
-            // Delete episodes first (safe cascade)
+            // Delete episodes first
             await (supabase.from("podcast_episodes") as any)
                 .delete()
                 .eq("show_id", sub.id);
@@ -273,6 +409,12 @@ export default function PodcastsPage() {
             // Update local state
             setSubscriptions(prev => prev.filter(s => s.id !== sub.id));
             setDbEpisodes(prev => prev.filter(e => e.show_id !== sub.id));
+            
+            // If the active show was deleted, clear selections
+            if (selectedShowId === sub.id) {
+                setSelectedShowId(null);
+                setSelectedEpisodeId(null);
+            }
         } catch (err) {
             console.error("Error unsubscribing from show:", err);
         } finally {
@@ -289,7 +431,6 @@ export default function PodcastsPage() {
         if (!dbEp) return;
 
         try {
-            // Mark as completed if 90% of duration is reached
             const isPlayed = position >= (duration || 30) * 0.9;
             
             const { error } = await (supabase.from("podcast_episodes") as any)
@@ -312,28 +453,30 @@ export default function PodcastsPage() {
         }
     };
 
-    const toggleShowExpanded = (showId: string) => {
-        setExpandedShows(prev => ({
-            ...prev,
-            [showId]: !prev[showId]
-        }));
-    };
-
-    const handlePlayEpisode = (show: PodcastShow, episode: PodcastEpisode) => {
+    const getEpisodeAudioUrl = (episode: any) => {
+        if (!episode) return "";
+        const url = episode.audioUrl;
+        if (url.startsWith("http")) {
+            return url;
+        }
+        // Build public URL from relative path inside bucket
         const { data: { publicUrl } } = supabase.storage
             .from("audio-stories")
-            .getPublicUrl(episode.audioUrlPath);
+            .getPublicUrl(url);
+        return publicUrl;
+    };
 
-        // Fetch last saved position if subscribed
-        const dbEp = getEpisodeDbRecord(show.title, episode.title);
-        const savedPosition = dbEp ? dbEp.playback_position : 0;
+    const handlePlayEpisode = (show: any, episode: any) => {
+        const audioUrl = episode.isDbRecord 
+            ? getEpisodeAudioUrl(episode)
+            : getEpisodeAudioUrl({ audioUrl: episode.audioUrl });
 
         playTrack({
             id: episode.id,
             title: episode.title,
             subtitle: show.title,
             coverUrl: show.coverUrl,
-            audioUrl: publicUrl,
+            audioUrl: audioUrl,
             type: "podcast",
             metadata: {
                 showId: show.id,
@@ -342,6 +485,7 @@ export default function PodcastsPage() {
         });
 
         // Resume from saved playback position if available
+        const savedPosition = episode.isDbRecord ? episode.dbRecord?.playback_position : 0;
         if (savedPosition > 0) {
             setTimeout(() => {
                 seek(savedPosition);
@@ -350,7 +494,7 @@ export default function PodcastsPage() {
     };
 
     const togglePlay = () => {
-        if (!selectedEpisode || !selectedShow) return;
+        if (!selectedEpisodeData || !selectedShowData) return;
         if (isCurrentEpisode) {
             if (isPlaying) {
                 pause();
@@ -358,18 +502,18 @@ export default function PodcastsPage() {
                 play();
             }
         } else {
-            handlePlayEpisode(selectedShow, selectedEpisode);
+            handlePlayEpisode(selectedShowData, selectedEpisodeData);
         }
     };
 
     const handleSegmentClick = (segmentStart: number) => {
-        if (!selectedEpisode || !selectedShow) return;
+        if (!selectedEpisodeData || !selectedShowData) return;
 
         if (isCurrentEpisode) {
             seek(segmentStart);
             if (!isPlaying) play();
         } else {
-            handlePlayEpisode(selectedShow, selectedEpisode);
+            handlePlayEpisode(selectedShowData, selectedEpisodeData);
             setTimeout(() => {
                 seek(segmentStart);
             }, 350);
@@ -431,13 +575,48 @@ export default function PodcastsPage() {
                 
                 {/* Left Sidebar: Shows and Episodes (4 cols) */}
                 <div className="lg:col-span-4 space-y-4">
+                    
+                    {/* Library vs Discover Tabs */}
+                    <div className="flex rounded-2xl bg-white/5 p-1 border border-white/5 shadow-md">
+                        <button
+                            onClick={() => {
+                                setSidebarTab("library");
+                                setSelectedShowId(null);
+                                setSelectedEpisodeId(null);
+                            }}
+                            className={`flex-1 py-2.5 rounded-xl font-heading text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 ${
+                                sidebarTab === "library"
+                                    ? "bg-white/10 text-primaryAccent shadow-sm shadow-black/25"
+                                    : "text-white/50 hover:text-white"
+                            }`}
+                        >
+                            <Bookmark className="h-3.5 w-3.5" />
+                            My Library ({subscriptions.length})
+                        </button>
+                        <button
+                            onClick={() => {
+                                setSidebarTab("discover");
+                                setSelectedShowId(null);
+                                setSelectedEpisodeId(null);
+                            }}
+                            className={`flex-1 py-2.5 rounded-xl font-heading text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 ${
+                                sidebarTab === "discover"
+                                    ? "bg-white/10 text-primaryAccent shadow-sm shadow-black/25"
+                                    : "text-white/50 hover:text-white"
+                            }`}
+                        >
+                            <Sparkles className="h-3.5 w-3.5" />
+                            Discover
+                        </button>
+                    </div>
+
                     {/* Search and Filters */}
                     <div className="glass-card rounded-2xl p-4 border border-white/5 space-y-3 shadow-lg">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                             <input
                                 type="text"
-                                placeholder="Search shows or episodes..."
+                                placeholder={isLibraryView ? "Search your library..." : "Search catalog shows..."}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-sans text-white placeholder-white/45 focus:outline-none focus:border-primaryAccent/50 focus:ring-1 focus:ring-primaryAccent/20 transition-all"
@@ -446,16 +625,20 @@ export default function PodcastsPage() {
                     </div>
 
                     {/* Shows List */}
-                    <div className="space-y-3 max-h-[70vh] overflow-y-auto custom-scrollbar pr-1">
-                        {filteredPodcasts.length === 0 ? (
+                    <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
+                        {displayShows.length === 0 ? (
                             <div className="glass-card rounded-2xl p-8 text-center text-white/40 border border-white/5">
                                 <Search className="h-8 w-8 mx-auto mb-2 text-white/20" />
-                                <p className="text-xs font-sans">No shows or episodes found matching your search.</p>
+                                <p className="text-xs font-sans">
+                                    {isLibraryView 
+                                        ? "Your Library is empty. Switch to the Discover tab to subscribe to shows." 
+                                        : "No catalog shows match your search."}
+                                </p>
                             </div>
                         ) : (
-                            filteredPodcasts.map(show => {
+                            displayShows.map(show => {
                                 const isExpanded = !!expandedShows[show.id];
-                                const isSubscribed = !!getShowSubscription(show.title);
+                                const isSubscribed = isLibraryView || !!getShowSubscription(show.title);
                                 const isSubmitting = submittingShowId === show.id;
 
                                 return (
@@ -515,7 +698,7 @@ export default function PodcastsPage() {
                                         {/* Episodes List (Expanded State) */}
                                         {isExpanded && (
                                             <div className="border-t border-white/5 bg-brandDark/40 p-3 space-y-2">
-                                                {/* Subscription Controller inside accordion */}
+                                                {/* Subscription Toggle Controller */}
                                                 <div className="flex justify-between items-center bg-white/[0.02] border border-white/5 rounded-xl p-2.5 mb-2.5">
                                                     <span className="font-labels text-[9px] text-white/40 uppercase font-bold tracking-wide">
                                                         {isSubscribed ? "Subscription Active" : "Not Subscribed"}
@@ -550,17 +733,23 @@ export default function PodcastsPage() {
                                                     </Button>
                                                 </div>
 
-                                                {show.episodes.map(ep => {
+                                                {show.episodes.map((ep: any) => {
                                                     const isSelected = selectedEpisodeId === ep.id;
                                                     const isPlayingCurrent = isSelected && isCurrentEpisode && isPlaying;
-                                                    const dbEp = getEpisodeDbRecord(show.title, ep.title);
                                                     
-                                                    // Calculate visual progress from DB records
+                                                    // Resolve DB episodes progress
+                                                    const dbEp = isLibraryView 
+                                                        ? ep 
+                                                        : getEpisodeDbRecord(show.title, ep.title);
+                                                    
                                                     const epProgressPercent = dbEp && duration > 0 && isSelected
                                                         ? (currentTime / duration) * 100 
-                                                        : dbEp && dbEp.playback_position > 0 && ep.durationSeconds > 0
-                                                            ? (dbEp.playback_position / ep.durationSeconds) * 100
+                                                        : dbEp && dbEp.playback_position > 0 && (ep.durationSeconds || 30) > 0
+                                                            ? (dbEp.playback_position / (ep.durationSeconds || 30)) * 100
                                                             : 0;
+
+                                                    const displayEpNum = ep.episodeNumber || "EPISODE";
+                                                    const displayLevel = ep.level || "INTERMEDIATE";
 
                                                     return (
                                                         <div
@@ -587,10 +776,10 @@ export default function PodcastsPage() {
                                                                 <div className="space-y-0.5 min-w-0">
                                                                     <div className="flex items-center gap-1.5 flex-wrap">
                                                                         <span className="font-labels text-[8px] tracking-widest text-primaryAccent font-extrabold uppercase">
-                                                                            {ep.episodeNumber}
+                                                                            {displayEpNum}
                                                                         </span>
-                                                                        <Badge className={`text-[8px] font-bold py-0 px-1 px-1.5 border uppercase ${getLevelBadgeStyle(ep.level)}`}>
-                                                                            {ep.level}
+                                                                        <Badge className={`text-[8px] font-bold py-0 px-1 px-1.5 border uppercase ${getLevelBadgeStyle(displayLevel)}`}>
+                                                                            {displayLevel}
                                                                         </Badge>
                                                                         {dbEp?.is_played && (
                                                                             <span className="inline-flex items-center gap-0.5 px-1 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] rounded font-labels font-extrabold tracking-wide">
@@ -654,7 +843,7 @@ export default function PodcastsPage() {
 
                 {/* Right Sidebar: Active Player and Transcript (8 cols) */}
                 <div className="lg:col-span-8 space-y-6">
-                    {!selectedEpisode ? (
+                    {!selectedEpisodeData || !selectedShowData ? (
                         /* Welcome State */
                         <div className="glass-card rounded-[28px] border border-white/5 p-12 text-center flex flex-col items-center justify-center min-h-[500px] shadow-2xl relative overflow-hidden">
                             <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[radial-gradient(circle,rgba(56,97,251,0.08)_0%,rgba(56,97,251,0)_70%)] blur-[80px] pointer-events-none"></div>
@@ -667,7 +856,9 @@ export default function PodcastsPage() {
                                 Audio Immersion Center
                             </h2>
                             <p className="text-white/50 text-xs md:text-sm font-sans mt-2 max-w-sm leading-relaxed">
-                                Select a show and episode from the sidebar to start listening. Subscribe to save your playback progress and automatically resume exactly where you left off.
+                                {isLibraryView
+                                    ? "Select a show and episode from your library on the left to start listening, resume playback, and view transcripts."
+                                    : "Browse the catalog shows. Subscribe to add shows and track your playback positions in your personal library."}
                             </p>
                         </div>
                     ) : (
@@ -677,14 +868,14 @@ export default function PodcastsPage() {
                             <div className="glass-card rounded-[28px] overflow-hidden border border-white/5 relative shadow-2xl flex flex-col md:flex-row">
                                 <div 
                                     className="absolute inset-0 opacity-[0.03] scale-110 pointer-events-none bg-cover bg-center filter blur-xl"
-                                    style={{ backgroundImage: `url(${selectedShow?.coverUrl || ""})` }}
+                                    style={{ backgroundImage: `url(${selectedShowData.coverUrl || ""})` }}
                                 ></div>
 
                                 {/* Show Cover Image */}
                                 <div className="relative w-full md:w-52 h-44 md:h-auto shrink-0 border-b md:border-b-0 md:border-r border-white/5 shadow-md">
                                     <Image
-                                        src={selectedShow?.coverUrl || ""}
-                                        alt={selectedShow?.title || ""}
+                                        src={selectedShowData.coverUrl || ""}
+                                        alt={selectedShowData.title || ""}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 208px"
                                         className="object-cover"
@@ -698,22 +889,22 @@ export default function PodcastsPage() {
                                     <div className="space-y-2">
                                         <div className="flex gap-2 items-center flex-wrap">
                                             <Badge className="bg-primaryAccent/10 text-primaryAccent font-labels text-[9px] font-extrabold uppercase tracking-wider border border-primaryAccent/20">
-                                                {selectedShow?.title}
+                                                {selectedShowData.title}
                                             </Badge>
-                                            <Badge className={`font-labels text-[9px] font-bold tracking-wider uppercase border ${getLevelBadgeStyle(selectedEpisode.level)}`}>
-                                                {selectedEpisode.level}
+                                            <Badge className={`font-labels text-[9px] font-bold tracking-wider uppercase border ${getLevelBadgeStyle(selectedEpisodeData.level)}`}>
+                                                {selectedEpisodeData.level}
                                             </Badge>
                                             <span className="font-labels text-[9px] text-white/30 tracking-widest font-bold uppercase">
-                                                {selectedEpisode.episodeNumber}
+                                                {selectedEpisodeData.episodeNumber}
                                             </span>
                                         </div>
                                         
                                         <h2 className="font-heading text-xl md:text-2xl font-extrabold text-white tracking-tight leading-tight">
-                                            {selectedEpisode.title}
+                                            {selectedEpisodeData.title}
                                         </h2>
                                         
                                         <p className="text-white/60 font-sans text-xs leading-relaxed max-w-xl">
-                                            {selectedEpisode.description}
+                                            {selectedEpisodeData.description}
                                         </p>
                                     </div>
 
@@ -721,8 +912,8 @@ export default function PodcastsPage() {
                                     <div className="flex items-center gap-2.5 pt-2 border-t border-white/5">
                                         <div className="relative h-7 w-7 rounded-full overflow-hidden border border-white/10 shrink-0">
                                             <Image
-                                                src={selectedShow?.hostAvatarUrl || ""}
-                                                alt={selectedShow?.host || ""}
+                                                src={selectedShowData.hostAvatarUrl || ""}
+                                                alt={selectedShowData.host || ""}
                                                 fill
                                                 sizes="28px"
                                                 className="object-cover"
@@ -730,7 +921,7 @@ export default function PodcastsPage() {
                                         </div>
                                         <div className="text-left">
                                             <p className="font-labels text-[8px] text-white/30 tracking-wider uppercase font-extrabold">Host</p>
-                                            <p className="font-heading font-bold text-xs text-white/80">{selectedShow?.host}</p>
+                                            <p className="font-heading font-bold text-xs text-white/80">{selectedShowData.host}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -747,7 +938,7 @@ export default function PodcastsPage() {
                                     <input
                                         type="range"
                                         min="0"
-                                        max={(isCurrentEpisode ? duration : selectedEpisode.durationSeconds) || 1}
+                                        max={(isCurrentEpisode ? duration : selectedEpisodeData.durationSeconds) || 1}
                                         value={isCurrentEpisode ? currentTime : 0}
                                         onChange={(e) => {
                                             if (isCurrentEpisode) {
@@ -766,7 +957,7 @@ export default function PodcastsPage() {
                                     />
                                     
                                     <span className="font-labels text-[10px] text-white/50 w-10 font-bold">
-                                        {formatTime(isCurrentEpisode ? duration : selectedEpisode.durationSeconds)}
+                                        {formatTime(isCurrentEpisode ? duration : selectedEpisodeData.durationSeconds)}
                                     </span>
                                 </div>
 
@@ -832,7 +1023,7 @@ export default function PodcastsPage() {
 
                                     {/* Subscription Tracker Alert Status */}
                                     <div className="flex items-center justify-end text-right shrink-0 w-full sm:w-auto">
-                                        {selectedShow && getShowSubscription(selectedShow.title) ? (
+                                        {selectedShowData && selectedShowData.title && getShowSubscription(selectedShowData.title) ? (
                                             <span className="font-labels text-[9px] text-emerald-400 font-bold tracking-wide flex items-center gap-1 bg-emerald-500/5 border border-emerald-500/15 px-2.5 py-1.5 rounded-xl">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                                 DB Progress Sync Active
@@ -896,76 +1087,82 @@ export default function PodcastsPage() {
                                 </div>
 
                                 {/* Transcript Dialogue Body */}
-                                <div 
-                                    ref={transcriptContainerRef}
-                                    className="p-6 max-h-[450px] overflow-y-auto custom-scrollbar space-y-4 bg-brandDark/25 relative"
-                                >
-                                    {selectedEpisode.transcript.map((line, index) => {
-                                        const isActive = index === activeSegmentIndex;
-                                        return (
-                                            <div
-                                                key={index}
-                                                id={`segment-${index}`}
-                                                onClick={() => handleSegmentClick(line.start)}
-                                                className={`p-3 rounded-2xl border transition-all cursor-pointer duration-300 group ${
-                                                    isActive
-                                                        ? "bg-amber-500/10 border-amber-500/30 shadow-md shadow-amber-500/5 text-white"
-                                                        : "bg-white/[0.01] border-transparent hover:bg-white/5 hover:border-white/5"
-                                                }`}
-                                            >
-                                                <div className="flex gap-3 items-start">
-                                                    {/* Speaker Avatar */}
-                                                    {line.avatarUrl ? (
-                                                        <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/15 shrink-0 shadow-sm">
-                                                            <Image
-                                                                src={line.avatarUrl}
-                                                                alt={line.speaker}
-                                                                fill
-                                                                sizes="32px"
-                                                                className="object-cover"
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-                                                            <User className="h-4 w-4 text-white/50" />
-                                                        </div>
-                                                    )}
+                                {selectedEpisodeData.transcript && selectedEpisodeData.transcript.length > 0 ? (
+                                    <div 
+                                        ref={transcriptContainerRef}
+                                        className="p-6 max-h-[450px] overflow-y-auto custom-scrollbar space-y-4 bg-brandDark/25 relative"
+                                    >
+                                        {selectedEpisodeData.transcript.map((line: any, index: number) => {
+                                            const isActive = index === activeSegmentIndex;
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    id={`segment-${index}`}
+                                                    onClick={() => handleSegmentClick(line.start)}
+                                                    className={`p-3 rounded-2xl border transition-all cursor-pointer duration-300 group ${
+                                                        isActive
+                                                            ? "bg-amber-500/10 border-amber-500/30 shadow-md shadow-amber-500/5 text-white"
+                                                            : "bg-white/[0.01] border-transparent hover:bg-white/5 hover:border-white/5"
+                                                    }`}
+                                                >
+                                                    <div className="flex gap-3 items-start">
+                                                        {/* Speaker Avatar */}
+                                                        {line.avatarUrl ? (
+                                                            <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/15 shrink-0 shadow-sm">
+                                                                <Image
+                                                                    src={line.avatarUrl}
+                                                                    alt={line.speaker}
+                                                                    fill
+                                                                    sizes="32px"
+                                                                    className="object-cover"
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                                                                <User className="h-4 w-4 text-white/50" />
+                                                            </div>
+                                                        )}
 
-                                                    {/* Dialogue Content */}
-                                                    <div className="space-y-1 flex-1 min-w-0">
-                                                        <div className="flex items-center justify-between gap-2">
-                                                            <span className="font-heading font-extrabold text-xs text-primaryAccent uppercase tracking-wide">
-                                                                {line.speaker}
-                                                            </span>
-                                                            <span className="font-labels text-[8px] text-white/20 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                {line.start.toFixed(1)}s
-                                                            </span>
-                                                        </div>
+                                                        {/* Dialogue Content */}
+                                                        <div className="space-y-1 flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <span className="font-heading font-extrabold text-xs text-primaryAccent uppercase tracking-wide">
+                                                                    {line.speaker}
+                                                                </span>
+                                                                <span className="font-labels text-[8px] text-white/20 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    {line.start.toFixed(1)}s
+                                                                </span>
+                                                            </div>
 
-                                                        {translationMode === "parallel" ? (
-                                                            <div className="space-y-1">
+                                                            {translationMode === "parallel" ? (
+                                                                <div className="space-y-1">
+                                                                    <p className="text-sm font-sans leading-relaxed text-white font-medium">
+                                                                        {line.textTarget}
+                                                                    </p>
+                                                                    <p className="text-xs font-sans leading-relaxed text-white/50 border-t border-white/5 pt-1 mt-1">
+                                                                        {line.textEnglish}
+                                                                    </p>
+                                                                </div>
+                                                            ) : translationMode === "target" ? (
                                                                 <p className="text-sm font-sans leading-relaxed text-white font-medium">
                                                                     {line.textTarget}
                                                                 </p>
-                                                                <p className="text-xs font-sans leading-relaxed text-white/50 border-t border-white/5 pt-1 mt-1">
+                                                            ) : (
+                                                                <p className="text-sm font-sans leading-relaxed text-white/70">
                                                                     {line.textEnglish}
                                                                 </p>
-                                                            </div>
-                                                        ) : translationMode === "target" ? (
-                                                            <p className="text-sm font-sans leading-relaxed text-white font-medium">
-                                                                {line.textTarget}
-                                                            </p>
-                                                        ) : (
-                                                            <p className="text-sm font-sans leading-relaxed text-white/70">
-                                                                {line.textEnglish}
-                                                            </p>
-                                                        )}
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="p-12 text-center text-white/40 font-sans text-xs">
+                                        Interactive transcript is only available for catalog shows. Enjoy the audio immersion!
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
