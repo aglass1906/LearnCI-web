@@ -15,6 +15,7 @@ import {
     Heart,
     BookOpen,
     Layers,
+    Youtube,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -45,6 +46,11 @@ const sidebarLinks = [
         title: "Stories",
         href: "/portal/stories",
         icon: BookOpen,
+    },
+    {
+        title: "Video Immersion",
+        href: "/portal/watch",
+        icon: Youtube,
     },
     {
         title: "Vocab Review",
@@ -113,7 +119,7 @@ function SidebarContent({ pathname, setOpen }: SidebarContentProps) {
                 <nav className="grid gap-1.5 px-3">
                     {sidebarLinks.map((link, index) => {
                         const Icon = link.icon;
-                        const isActive = pathname === link.href;
+                        const isActive = pathname === link.href || (link.href !== "/portal" && pathname.startsWith(link.href + "/"));
 
                         return (
                             <Link
