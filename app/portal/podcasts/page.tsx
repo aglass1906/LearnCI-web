@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { 
     Play, Pause, Volume2, RotateCcw, RotateCw, 
-    Search, ChevronDown, ChevronUp, Headphones, 
-    Sparkles, Clock, User, Languages, ChevronRight 
+    Search, ChevronDown, Headphones, Sparkles, 
+    Clock, User, ChevronRight, Check, Plus, Trash2, Loader2
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useAudio } from "@/context/audio-context";
@@ -28,6 +28,13 @@ export default function PodcastsPage() {
         playTrack,
     } = useAudio();
 
+    // Auth & DB States
+    const [userId, setUserId] = useState<string | null>(null);
+    const [subscriptions, setSubscriptions] = useState<any[]>([]); // DB rows from podcast_shows
+    const [dbEpisodes, setDbEpisodes] = useState<any[]>([]);       // DB rows from podcast_episodes
+    const [loading, setLoading] = useState(true);
+    const [submittingShowId, setSubmittingShowId] = useState<string | null>(null);
+
     // UI States
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedShowId, setSelectedShowId] = useState<string | null>(null);
@@ -36,6 +43,58 @@ export default function PodcastsPage() {
     const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
 
     const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
+    const lastSavedTimeRef = useRef(0);
+
+    // 1. Fetch User Session
+    useEffect(() => {
+        const fetchSession = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    setUserId(session.user.id);
+                    await fetchPodcastData(session.user.id);
+                } else {
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error("Error fetching session:", err);
+                setLoading(false);
+            }
+        };
+        fetchSession();
+    }, []);
+
+    // 2. Fetch Podcast Data from DB
+    const fetchPodcastData = async (uid: string) => {
+        setLoading(true);
+        try {
+            // Fetch shows this user is subscribed to
+            const { data: showsData, error: showsError } = await (supabase.from("podcast_shows") as any)
+                .select("*")
+                .eq("user_id", uid);
+
+            if (showsError) throw showsError;
+            const subs = showsData || [];
+            setSubscriptions(subs);
+
+            if (subs.length > 0) {
+                // Fetch episodes progress linked to these shows
+                const showIds = subs.map((s: any) => s.id);
+                const { data: epsData, error: epsError } = await (supabase.from("podcast_episodes") as any)
+                    .select("*")
+                    .in("show_id", showIds);
+
+                if (epsError) throw epsError;
+                setDbEpisodes(epsData || []);
+            } else {
+                setDbEpisodes([]);
+            }
+        } catch (err) {
+            console.error("Error loading podcast database tables:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Sync UI selection with background playing track if it's a podcast
     useEffect(() => {
@@ -80,7 +139,6 @@ export default function PodcastsPage() {
             if (matchesShow || matchedEpisodes.length > 0) {
                 return {
                     ...show,
-                    // If show itself matches, keep all episodes, otherwise only matched ones
                     episodes: matchesShow ? show.episodes : matchedEpisodes
                 };
             }
@@ -118,7 +176,141 @@ export default function PodcastsPage() {
         }
     }, [activeSegmentIndex]);
 
+    // Periodic progress saving to database (every 5 seconds of active playback)
+    useEffect(() => {
+        if (!userId || !selectedEpisode || !selectedShow) return;
+        if (track?.id !== selectedEpisode.id || !isPlaying) return;
+
+        if (Math.abs(currentTime - lastSavedTimeRef.current) >= 5) {
+            saveEpisodeProgress(selectedShow.title, selectedEpisode.title, currentTime);
+        }
+    }, [currentTime, isPlaying, selectedEpisode, selectedShow, track, userId]);
+
+    // Save progress on pause or ended
+    useEffect(() => {
+        if (!isPlaying && currentTime > 0 && selectedEpisode && selectedShow && userId) {
+            saveEpisodeProgress(selectedShow.title, selectedEpisode.title, currentTime);
+        }
+    }, [isPlaying]);
+
     const isCurrentEpisode = track?.id === selectedEpisode?.id;
+
+    const getShowSubscription = (showTitle: string) => {
+        return subscriptions.find(s => s.title === showTitle) || null;
+    };
+
+    const getEpisodeDbRecord = (showTitle: string, episodeTitle: string) => {
+        const sub = getShowSubscription(showTitle);
+        if (!sub) return null;
+        return dbEpisodes.find(e => e.title === episodeTitle && e.show_id === sub.id) || null;
+    };
+
+    // DB Operations: Subscribe
+    const handleSubscribe = async (show: PodcastShow) => {
+        if (!userId) return;
+        setSubmittingShowId(show.id);
+        try {
+            // 1. Insert into podcast_shows
+            const { data: newShows, error: showErr } = await (supabase.from("podcast_shows") as any)
+                .insert({
+                    title: show.title,
+                    user_id: userId
+                })
+                .select();
+
+            if (showErr || !newShows || newShows.length === 0) {
+                throw new Error(showErr?.message || "Failed to create show subscription");
+            }
+
+            const dbShow = newShows[0];
+
+            // 2. Insert all episodes for this show into podcast_episodes
+            const epsToInsert = show.episodes.map(ep => ({
+                show_id: dbShow.id,
+                title: ep.title,
+                duration: ep.duration,
+                audio_url: ep.audioUrlPath,
+                playback_position: 0,
+                is_played: false
+            }));
+
+            const { data: newEps, error: epsErr } = await (supabase.from("podcast_episodes") as any)
+                .insert(epsToInsert)
+                .select();
+
+            if (epsErr) throw epsErr;
+
+            // Update local state
+            setSubscriptions(prev => [...prev, dbShow]);
+            if (newEps) {
+                setDbEpisodes(prev => [...prev, ...newEps]);
+            }
+        } catch (err) {
+            console.error("Error subscribing to podcast show:", err);
+        } finally {
+            setSubmittingShowId(null);
+        }
+    };
+
+    // DB Operations: Unsubscribe
+    const handleUnsubscribe = async (show: PodcastShow) => {
+        if (!userId) return;
+        const sub = getShowSubscription(show.title);
+        if (!sub) return;
+
+        setSubmittingShowId(show.id);
+        try {
+            // Delete episodes first (safe cascade)
+            await (supabase.from("podcast_episodes") as any)
+                .delete()
+                .eq("show_id", sub.id);
+
+            // Delete show
+            await (supabase.from("podcast_shows") as any)
+                .delete()
+                .eq("id", sub.id);
+
+            // Update local state
+            setSubscriptions(prev => prev.filter(s => s.id !== sub.id));
+            setDbEpisodes(prev => prev.filter(e => e.show_id !== sub.id));
+        } catch (err) {
+            console.error("Error unsubscribing from show:", err);
+        } finally {
+            setSubmittingShowId(null);
+        }
+    };
+
+    // DB Operations: Save Episode Playback Progress
+    const saveEpisodeProgress = async (showTitle: string, episodeTitle: string, position: number) => {
+        const sub = getShowSubscription(showTitle);
+        if (!sub) return;
+
+        const dbEp = getEpisodeDbRecord(showTitle, episodeTitle);
+        if (!dbEp) return;
+
+        try {
+            // Mark as completed if 90% of duration is reached
+            const isPlayed = position >= (duration || 30) * 0.9;
+            
+            const { error } = await (supabase.from("podcast_episodes") as any)
+                .update({
+                    playback_position: position,
+                    is_played: isPlayed
+                })
+                .eq("id", dbEp.id);
+
+            if (!error) {
+                lastSavedTimeRef.current = position;
+                setDbEpisodes(prev => prev.map(e => 
+                    e.id === dbEp.id 
+                        ? { ...e, playback_position: position, is_played: isPlayed } 
+                        : e
+                ));
+            }
+        } catch (err) {
+            console.error("Error saving playback position:", err);
+        }
+    };
 
     const toggleShowExpanded = (showId: string) => {
         setExpandedShows(prev => ({
@@ -132,6 +324,10 @@ export default function PodcastsPage() {
             .from("audio-stories")
             .getPublicUrl(episode.audioUrlPath);
 
+        // Fetch last saved position if subscribed
+        const dbEp = getEpisodeDbRecord(show.title, episode.title);
+        const savedPosition = dbEp ? dbEp.playback_position : 0;
+
         playTrack({
             id: episode.id,
             title: episode.title,
@@ -144,6 +340,13 @@ export default function PodcastsPage() {
                 episodeId: episode.id,
             }
         });
+
+        // Resume from saved playback position if available
+        if (savedPosition > 0) {
+            setTimeout(() => {
+                seek(savedPosition);
+            }, 350);
+        }
     };
 
     const togglePlay = () => {
@@ -167,10 +370,9 @@ export default function PodcastsPage() {
             if (!isPlaying) play();
         } else {
             handlePlayEpisode(selectedShow, selectedEpisode);
-            // Wait brief moment for audio element source setting to complete before seeking
             setTimeout(() => {
                 seek(segmentStart);
-            }, 300);
+            }, 350);
         }
     };
 
@@ -187,12 +389,23 @@ export default function PodcastsPage() {
         }
     };
 
-    const formatTime = (seconds: number) => {
-        if (isNaN(seconds)) return "0:00";
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, "0")}`;
-    };
+    // Main loading skeleton
+    if (loading && !userId) {
+        return (
+            <div className="space-y-8 animate-fade-in pb-24">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">
+                    <div className="space-y-2 w-1/3">
+                        <div className="h-8 bg-white/5 rounded-xl animate-pulse"></div>
+                        <div className="h-4 bg-white/5 rounded-lg animate-pulse w-2/3"></div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div className="lg:col-span-4 h-[65vh] bg-white/5 rounded-[28px] animate-pulse"></div>
+                    <div className="lg:col-span-8 h-[65vh] bg-white/5 rounded-[28px] animate-pulse"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-fade-in pb-24">
@@ -208,7 +421,7 @@ export default function PodcastsPage() {
                         </h1>
                     </div>
                     <p className="text-white/60 text-sm max-w-2xl font-sans">
-                        Immerse yourself in authentic conversational Spanish. Listen continuously, follow synchronized transcripts, and click sentences to repeat audio.
+                        Immerse yourself in conversational Spanish. Subscribe to shows to track progress across devices, bookmark playback positions, and view bilingual scripts.
                     </p>
                 </div>
             </div>
@@ -242,6 +455,9 @@ export default function PodcastsPage() {
                         ) : (
                             filteredPodcasts.map(show => {
                                 const isExpanded = !!expandedShows[show.id];
+                                const isSubscribed = !!getShowSubscription(show.title);
+                                const isSubmitting = submittingShowId === show.id;
+
                                 return (
                                     <div 
                                         key={show.id} 
@@ -270,9 +486,16 @@ export default function PodcastsPage() {
                                             </div>
                                             
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="font-heading font-extrabold text-sm text-white truncate group-hover:text-primaryAccent transition-colors">
-                                                    {show.title}
-                                                </h3>
+                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                    <h3 className="font-heading font-extrabold text-sm text-white truncate">
+                                                        {show.title}
+                                                    </h3>
+                                                    {isSubscribed && (
+                                                        <Badge className="bg-emerald-500/10 text-emerald-400 border-none text-[8px] py-0 px-1 font-labels tracking-widest font-extrabold uppercase shrink-0">
+                                                            SUBSCRIBED
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
                                                     <span className="font-labels text-[9px] text-white/55 font-bold">
                                                         {show.host}
@@ -284,17 +507,61 @@ export default function PodcastsPage() {
                                                 </div>
                                             </div>
 
-                                            <button className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-white/5 text-white/50 hover:text-white transition-colors shrink-0">
+                                            <div className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-white/5 text-white/50 hover:text-white transition-colors shrink-0">
                                                 {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                                            </button>
+                                            </div>
                                         </div>
 
                                         {/* Episodes List (Expanded State) */}
                                         {isExpanded && (
                                             <div className="border-t border-white/5 bg-brandDark/40 p-3 space-y-2">
+                                                {/* Subscription Controller inside accordion */}
+                                                <div className="flex justify-between items-center bg-white/[0.02] border border-white/5 rounded-xl p-2.5 mb-2.5">
+                                                    <span className="font-labels text-[9px] text-white/40 uppercase font-bold tracking-wide">
+                                                        {isSubscribed ? "Subscription Active" : "Not Subscribed"}
+                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        disabled={isSubmitting}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            isSubscribed ? handleUnsubscribe(show) : handleSubscribe(show);
+                                                        }}
+                                                        className={`h-7 px-2.5 rounded-lg text-[9px] font-labels tracking-wider font-extrabold uppercase transition-all ${
+                                                            isSubscribed 
+                                                                ? "text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/10" 
+                                                                : "bg-primaryAccent text-brandDark hover:scale-[1.02] active:scale-[0.98]"
+                                                        }`}
+                                                    >
+                                                        {isSubmitting ? (
+                                                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                                        ) : isSubscribed ? (
+                                                            <>
+                                                                <Trash2 className="h-3 w-3 mr-1" />
+                                                                Unsubscribe
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Plus className="h-3 w-3 mr-1" />
+                                                                Subscribe
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+
                                                 {show.episodes.map(ep => {
                                                     const isSelected = selectedEpisodeId === ep.id;
                                                     const isPlayingCurrent = isSelected && isCurrentEpisode && isPlaying;
+                                                    const dbEp = getEpisodeDbRecord(show.title, ep.title);
+                                                    
+                                                    // Calculate visual progress from DB records
+                                                    const epProgressPercent = dbEp && duration > 0 && isSelected
+                                                        ? (currentTime / duration) * 100 
+                                                        : dbEp && dbEp.playback_position > 0 && ep.durationSeconds > 0
+                                                            ? (dbEp.playback_position / ep.durationSeconds) * 100
+                                                            : 0;
+
                                                     return (
                                                         <div
                                                             key={ep.id}
@@ -302,13 +569,21 @@ export default function PodcastsPage() {
                                                                 setSelectedShowId(show.id);
                                                                 setSelectedEpisodeId(ep.id);
                                                             }}
-                                                            className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                                                            className={`p-3 rounded-xl border cursor-pointer transition-all relative overflow-hidden ${
                                                                 isSelected
                                                                     ? "bg-primaryAccent/10 border-primaryAccent/30 shadow-sm shadow-primaryAccent/5"
                                                                     : "bg-white/[0.01] border-transparent hover:bg-white/5 hover:border-white/5"
                                                             }`}
                                                         >
-                                                            <div className="flex items-start justify-between gap-3">
+                                                            {/* Micro progress indicator line */}
+                                                            {isSubscribed && epProgressPercent > 0 && (
+                                                                <div 
+                                                                    className="absolute bottom-0 left-0 h-0.5 bg-primaryAccent/70 transition-all"
+                                                                    style={{ width: `${Math.min(100, epProgressPercent)}%` }}
+                                                                ></div>
+                                                            )}
+
+                                                            <div className="flex items-start justify-between gap-3 relative z-10">
                                                                 <div className="space-y-0.5 min-w-0">
                                                                     <div className="flex items-center gap-1.5 flex-wrap">
                                                                         <span className="font-labels text-[8px] tracking-widest text-primaryAccent font-extrabold uppercase">
@@ -317,6 +592,11 @@ export default function PodcastsPage() {
                                                                         <Badge className={`text-[8px] font-bold py-0 px-1 px-1.5 border uppercase ${getLevelBadgeStyle(ep.level)}`}>
                                                                             {ep.level}
                                                                         </Badge>
+                                                                        {dbEp?.is_played && (
+                                                                            <span className="inline-flex items-center gap-0.5 px-1 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] rounded font-labels font-extrabold tracking-wide">
+                                                                                <Check className="h-2 w-2" /> PLAYED
+                                                                            </span>
+                                                                        )}
                                                                     </div>
                                                                     <h4 className="font-heading font-extrabold text-xs text-white truncate">
                                                                         {ep.title}
@@ -349,11 +629,16 @@ export default function PodcastsPage() {
                                                                     )}
                                                                 </button>
                                                             </div>
-                                                            <div className="flex justify-between items-center mt-2 font-labels text-[9px] text-white/40 font-semibold">
+                                                            <div className="flex justify-between items-center mt-2 font-labels text-[9px] text-white/40 font-semibold relative z-10">
                                                                 <span className="flex items-center gap-1">
                                                                     <Clock className="h-3 w-3" />
                                                                     {ep.duration}
                                                                 </span>
+                                                                {isSubscribed && dbEp && dbEp.playback_position > 0 && !dbEp.is_played && (
+                                                                    <span className="text-[8px] text-white/30 italic">
+                                                                        Saved: {formatTime(dbEp.playback_position)}
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     );
@@ -372,7 +657,6 @@ export default function PodcastsPage() {
                     {!selectedEpisode ? (
                         /* Welcome State */
                         <div className="glass-card rounded-[28px] border border-white/5 p-12 text-center flex flex-col items-center justify-center min-h-[500px] shadow-2xl relative overflow-hidden">
-                            {/* Decorative backing glows */}
                             <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-[radial-gradient(circle,rgba(56,97,251,0.08)_0%,rgba(56,97,251,0)_70%)] blur-[80px] pointer-events-none"></div>
                             
                             <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primaryAccent/20 to-accentTeal/10 flex items-center justify-center border border-white/10 shadow-lg mb-6 animate-pulse">
@@ -383,7 +667,7 @@ export default function PodcastsPage() {
                                 Audio Immersion Center
                             </h2>
                             <p className="text-white/50 text-xs md:text-sm font-sans mt-2 max-w-sm leading-relaxed">
-                                Select a podcast show and episode from the library sidebar to start listening, follow interactive scripts, and level up your comprehension.
+                                Select a show and episode from the sidebar to start listening. Subscribe to save your playback progress and automatically resume exactly where you left off.
                             </p>
                         </div>
                     ) : (
@@ -391,10 +675,9 @@ export default function PodcastsPage() {
                         <div className="space-y-6 animate-fade-in">
                             {/* Episode Card */}
                             <div className="glass-card rounded-[28px] overflow-hidden border border-white/5 relative shadow-2xl flex flex-col md:flex-row">
-                                {/* Blurred Backdrop */}
                                 <div 
                                     className="absolute inset-0 opacity-[0.03] scale-110 pointer-events-none bg-cover bg-center filter blur-xl"
-                                    style={{ backgroundImage: `url(${selectedShow?.coverUrl})` }}
+                                    style={{ backgroundImage: `url(${selectedShow?.coverUrl || ""})` }}
                                 ></div>
 
                                 {/* Show Cover Image */}
@@ -547,8 +830,19 @@ export default function PodcastsPage() {
                                         </Button>
                                     </div>
 
-                                    {/* Decorative spacer */}
-                                    <div className="hidden sm:block w-[85px]"></div>
+                                    {/* Subscription Tracker Alert Status */}
+                                    <div className="flex items-center justify-end text-right shrink-0 w-full sm:w-auto">
+                                        {selectedShow && getShowSubscription(selectedShow.title) ? (
+                                            <span className="font-labels text-[9px] text-emerald-400 font-bold tracking-wide flex items-center gap-1 bg-emerald-500/5 border border-emerald-500/15 px-2.5 py-1.5 rounded-xl">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                DB Progress Sync Active
+                                            </span>
+                                        ) : (
+                                            <span className="font-labels text-[9px] text-white/30 tracking-wide flex items-center gap-1 bg-white/[0.02] border border-white/5 px-2.5 py-1.5 rounded-xl">
+                                                Not Subscribed (Progress Local Only)
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -681,3 +975,10 @@ export default function PodcastsPage() {
         </div>
     );
 }
+
+const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
