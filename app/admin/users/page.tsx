@@ -836,143 +836,173 @@ export default function AdminUsers() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Users</h1>
-                <Button onClick={() => setCreateUserDialogOpen(true)} className="gap-2">
+        <div className="space-y-8 pb-12 relative z-10 max-w-7xl mx-auto">
+            {/* Header Command Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">
+                <div>
+                    <h1 className="font-heading text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
+                        <span className="h-2 w-2 rounded-full bg-primaryAccent animate-pulse"></span>
+                        User Management
+                    </h1>
+                    <p className="text-white/55 font-sans text-sm mt-1.5 max-w-xl">
+                        Review, modify roles, suspend, or manage credentials for all registered learners.
+                    </p>
+                </div>
+                <Button 
+                    onClick={() => setCreateUserDialogOpen(true)} 
+                    className="bg-[#FFA000] hover:bg-[#FFA000]/90 text-[#161925] font-bold font-labels tracking-wider uppercase rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-[#FFA000]/10 flex items-center gap-2 py-5 px-6"
+                >
                     <UserPlus className="h-4 w-4" />
                     Create User
                 </Button>
             </div>
 
             {fetchError && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-md border border-red-200 dark:bg-red-950/20 dark:border-red-900">
+                <div className="bg-red-500/10 text-red-400 p-4 rounded-xl border border-red-500/20 font-sans text-sm">
                     Error: {fetchError}
                 </div>
             )}
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>All Users ({users.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="relative overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs uppercase bg-gray-50 dark:bg-zinc-800">
-                                <tr>
-                                    <th className="px-6 py-3">User</th>
-                                    <th className="px-6 py-3">Role</th>
-                                    <th className="px-6 py-3">Status</th>
-                                    <th className="px-6 py-3">Verified</th>
-                                    <th className="px-6 py-3">Stats</th>
-                                    <th className="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.user_id} className={`bg-white border-b dark:bg-zinc-900 dark:border-zinc-800 ${user.is_banned ? 'opacity-75 bg-red-50 dark:bg-red-950/10' : ''}`}>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">{user.name || "N/A"}</span>
-                                                <span className="text-xs text-muted-foreground">{user.email || "No email"}</span>
+            {/* Users Table Card */}
+            <div className="glass-card border border-white/5 rounded-[24px] overflow-hidden">
+                <div className="p-6 border-b border-white/5">
+                    <h2 className="font-heading text-lg font-extrabold text-white">All Users ({users.length})</h2>
+                </div>
+                <div className="relative overflow-x-auto">
+                    <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-white/10 bg-white/[0.02]">
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold">User</th>
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold">Role</th>
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold">Status</th>
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold">Verified</th>
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold">Stats</th>
+                                <th className="px-6 py-4 font-labels text-[11px] tracking-wider text-white/40 uppercase font-extrabold text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {users.map((user) => (
+                                <tr 
+                                    key={user.user_id} 
+                                    className={`hover:bg-white/[0.02] transition-colors ${user.is_banned ? 'bg-red-500/[0.03] opacity-70' : ''}`}
+                                >
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-col">
+                                            <span className="font-semibold text-white text-sm">{user.name || "N/A"}</span>
+                                            <span className="text-xs text-white/40 mt-0.5">{user.email || "No email"}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <Switch
+                                                checked={user.is_admin || false}
+                                                onCheckedChange={() => handleAdminToggle(user.user_id, user.is_admin)}
+                                                disabled={user.user_id === currentUserId || processingId === user.user_id}
+                                                className="data-[state=checked]:bg-[#FFA000] data-[state=unchecked]:bg-white/10"
+                                            />
+                                            <span className={`text-xs font-semibold uppercase tracking-wider ${user.is_admin ? 'text-[#FFA000]' : 'text-white/60'}`}>
+                                                {user.is_admin ? "Admin" : "User"}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {user.is_banned ? (
+                                            <span className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold tracking-wider uppercase">
+                                                Suspended
+                                            </span>
+                                        ) : (
+                                            <span className="px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-bold tracking-wider uppercase">
+                                                Active
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {user.email_confirmed_at ? (
+                                            <span className="px-2.5 py-1 rounded-full bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/20 text-[10px] font-bold tracking-wider uppercase">
+                                                Verified
+                                            </span>
+                                        ) : (
+                                            <span className="px-2.5 py-1 rounded-full bg-white/5 text-white/40 border border-white/10 text-[10px] font-bold tracking-wider uppercase">
+                                                Unverified
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="text-xs space-y-1 text-white/85">
+                                            <div className="font-semibold text-white/90">
+                                                {user.current_language ? (
+                                                    <span className="capitalize">{user.current_language}</span>
+                                                ) : "-"} 
+                                                {user.current_level ? ` (${user.current_level})` : ""}
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Switch
-                                                    checked={user.is_admin || false}
-                                                    onCheckedChange={() => handleAdminToggle(user.user_id, user.is_admin)}
-                                                    disabled={user.user_id === currentUserId || processingId === user.user_id}
-                                                />
-                                                <span className="text-xs">{user.is_admin ? "Admin" : "User"}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {user.is_banned ? (
-                                                <Badge variant="destructive">Suspended</Badge>
-                                            ) : (
-                                                <Badge variant="outline" className="text-green-600 border-green-600">Active</Badge>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {user.email_confirmed_at ? (
-                                                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100">Verified</Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400">Unverified</Badge>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-xs space-y-1">
-                                                <div>{user.current_language || "-"} ({user.current_level || "-"})</div>
-                                                <div>{(user.total_minutes / 60).toFixed(1)} hrs</div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => { setSelectedUser(user); setEditDialogOpen(true); }}>
-                                                        <Pencil className="mr-2 h-4 w-4" />
-                                                        Edit Details
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => { setSelectedUser(user); setDetailsOpen(true); }}>
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View Details
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => { setSelectedUser(user); setPasswordDialogOpen(true); }}>
-                                                        <Key className="mr-2 h-4 w-4" />
-                                                        Change Password
-                                                    </DropdownMenuItem>
-                                                    {!user.email_confirmed_at && (
+                                            <div className="text-white/40">{(user.total_minutes / 60).toFixed(1)} hrs</div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="bg-[#1c1f2b] border border-white/10 text-white rounded-xl shadow-xl">
+                                                <DropdownMenuLabel className="text-white/40 font-labels text-[10px] uppercase tracking-wider">Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => { setSelectedUser(user); setEditDialogOpen(true); }} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                    <Pencil className="mr-2 h-4 w-4 text-white/60" />
+                                                    Edit Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => { setSelectedUser(user); setDetailsOpen(true); }} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                    <Eye className="mr-2 h-4 w-4 text-white/60" />
+                                                    View Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => { setSelectedUser(user); setPasswordDialogOpen(true); }} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                    <Key className="mr-2 h-4 w-4 text-white/60" />
+                                                    Change Password
+                                                </DropdownMenuItem>
+                                                {!user.email_confirmed_at && (
+                                                    <>
+                                                        <DropdownMenuItem onClick={() => handleVerifyEmail(user)} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                            <MailCheck className="mr-2 h-4 w-4 text-[#00E5FF]" />
+                                                            Verify Email
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleResendEmail(user)} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                            <MailCheck className="mr-2 h-4 w-4 text-[#00E5FF]" />
+                                                            Resend Verification
+                                                        </DropdownMenuItem>
+                                                    </>
+                                                )}
+                                                <DropdownMenuSeparator className="bg-white/5" />
+                                                <DropdownMenuItem onClick={() => handleSuspendToggle(user)} disabled={user.user_id === currentUserId} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-lg">
+                                                    {user.is_banned ? (
                                                         <>
-                                                            <DropdownMenuItem onClick={() => handleVerifyEmail(user)}>
-                                                                <MailCheck className="mr-2 h-4 w-4" />
-                                                                Verify Email
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleResendEmail(user)}>
-                                                                <MailCheck className="mr-2 h-4 w-4" />
-                                                                Resend Verification Email
-                                                            </DropdownMenuItem>
+                                                            <Shield className="mr-2 h-4 w-4 text-green-400" />
+                                                            <span className="text-green-400">Unsuspend User</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Ban className="mr-2 h-4 w-4 text-orange-400" />
+                                                            <span className="text-orange-400">Suspend User</span>
                                                         </>
                                                     )}
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleSuspendToggle(user)} disabled={user.user_id === currentUserId}>
-                                                        {user.is_banned ? (
-                                                            <>
-                                                                <Shield className="mr-2 h-4 w-4 text-green-600" />
-                                                                <span className="text-green-600">Unsuspend User</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Ban className="mr-2 h-4 w-4 text-orange-600" />
-                                                                <span className="text-orange-600">Suspend User</span>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => confirmDelete(user)}
-                                                        disabled={user.user_id === currentUserId}
-                                                        className="text-red-600 focus:text-red-600"
-                                                    >
-                                                        <Trash className="mr-2 h-4 w-4" />
-                                                        Delete User
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </CardContent>
-            </Card>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => confirmDelete(user)}
+                                                    disabled={user.user_id === currentUserId}
+                                                    className="text-red-400 focus:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 cursor-pointer rounded-lg"
+                                                >
+                                                    <Trash className="mr-2 h-4 w-4" />
+                                                    Delete User
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <CreateUserDialog
                 open={createUserDialogOpen}
