@@ -201,16 +201,16 @@ export default function ReviewPage() {
             </header>
 
             {/* Deck Summary Stats Row */}
-            <div className="grid grid-cols-3 gap-4">
-                <div className="glass-card rounded-2xl p-4 text-center border border-white/5">
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
                     <span className="block font-labels text-[8px] text-white/35 tracking-widest uppercase font-bold">Total Collection</span>
                     <span className="font-heading text-xl font-extrabold text-white mt-1 block">{cards.length} cards</span>
                 </div>
-                <div className="glass-card rounded-2xl p-4 text-center border border-white/5">
+                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
                     <span className="block font-labels text-[8px] text-accentTeal tracking-widest uppercase font-bold">Due for Review</span>
                     <span className="font-heading text-xl font-extrabold text-accentTeal mt-1 block">{dueCards.length} cards</span>
                 </div>
-                <div className="glass-card rounded-2xl p-4 text-center border border-white/5">
+                <div className="flex-1 glass-card rounded-2xl p-4 text-center border border-white/5">
                     <span className="block font-labels text-[8px] text-purple-400 tracking-widest uppercase font-bold">Reviewed Today</span>
                     <span className="font-heading text-xl font-extrabold text-purple-400 mt-1 block">{completedCount} cards</span>
                 </div>
@@ -244,11 +244,11 @@ export default function ReviewPage() {
                     </div>
 
                     {/* 3D Flashcard Container */}
-                    <div className="perspective-1000 w-full h-[320px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
-                        <div className={`relative w-full h-full duration-500 transform-style-3d transition-transform ${isFlipped ? "rotate-y-180" : ""}`}>
+                    <div className={`flip-card w-full h-80 cursor-pointer ${isFlipped ? "flipped" : ""}`} onClick={() => setIsFlipped(!isFlipped)}>
+                        <div className="flip-card-inner">
                             
                             {/* Card Front View (Target Word) */}
-                            <div className="absolute w-full h-full backface-hidden glass-card rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center bg-brandSurface/20">
+                            <div className="flip-card-front bg-brandSurface rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center">
                                 <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase">
                                     <span>Front (Target)</span>
                                     <Badge className="bg-white/5 border border-white/10 text-white/60 font-labels text-[8px] tracking-wider uppercase font-bold">
@@ -266,7 +266,11 @@ export default function ReviewPage() {
                                 </div>
 
                                 <div className="w-full flex justify-between items-center text-white/40 font-labels text-[9px] tracking-wider uppercase font-bold">
-                                    <span className="flex items-center gap-1 text-primaryAccent">
+                                    <span 
+                                        onClick={(e) => { e.stopPropagation(); playPronunciation(activeCard.word, activeCard.language); }}
+                                        className="flex items-center gap-1 text-primaryAccent hover:text-primaryAccent/80 transition-colors cursor-pointer animate-pulse"
+                                        title="Hear Pronunciation"
+                                    >
                                         <Volume2 className="h-4 w-4" /> Click speaker front
                                     </span>
                                     <span>Tap to reveal back</span>
@@ -274,7 +278,7 @@ export default function ReviewPage() {
                             </div>
 
                             {/* Card Back View (Definition & Examples) */}
-                            <div className="absolute w-full h-full backface-hidden rotate-y-180 glass-card rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center bg-brandSurface/40">
+                            <div className="flip-card-back bg-brandSurface rounded-[28px] p-8 border border-white/10 shadow-2xl flex flex-col justify-between items-center text-center">
                                 <div className="w-full flex justify-between items-start text-white/30 font-labels text-[8px] tracking-widest uppercase border-b border-white/5 pb-2">
                                     <span>Back (Recall)</span>
                                     <span className="text-accentTeal font-semibold">{activeCard.translation}</span>
@@ -288,19 +292,22 @@ export default function ReviewPage() {
                                         <p className="text-xs text-white/50 font-sans font-semibold italic">({activeCard.type})</p>
                                     </div>
                                     
-                                    <p className="text-xs text-white/80 font-sans leading-relaxed px-4">
-                                        {activeCard.definition}
-                                    </p>
+                                    {/* Scrollable content container to prevent overflow overlapping */}
+                                    <div className="overflow-y-auto max-h-[150px] space-y-3 pr-1 text-center w-full">
+                                        <p className="text-xs text-white/80 font-sans leading-relaxed px-4">
+                                            {activeCard.definition}
+                                        </p>
 
-                                    {activeCard.examples.length > 0 && (
-                                        <div className="bg-white/[0.01] border border-white/5 rounded-xl p-3 text-left space-y-1">
-                                            <p className="font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold">Context Example</p>
-                                            <p className="text-xs text-primaryAccent font-sans italic">{activeCard.examples[0].target}</p>
-                                            {activeCard.examples[0].english && (
-                                                <p className="text-[10px] text-white/40 font-sans">{activeCard.examples[0].english}</p>
-                                            )}
-                                        </div>
-                                    )}
+                                        {activeCard.examples.length > 0 && (
+                                            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-3 text-left space-y-1 mx-4">
+                                                <p className="font-labels text-[7px] text-white/30 tracking-widest uppercase font-extrabold">Context Example</p>
+                                                <p className="text-xs text-primaryAccent font-sans italic">{activeCard.examples[0].target}</p>
+                                                {activeCard.examples[0].english && (
+                                                    <p className="text-[10px] text-white/40 font-sans">{activeCard.examples[0].english}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="w-full text-right text-white/30 font-labels text-[8px] tracking-widest uppercase">
@@ -313,31 +320,31 @@ export default function ReviewPage() {
 
                     {/* Spaced Repetition Grading Cockpit Controls */}
                     {isFlipped ? (
-                        <div className="grid grid-cols-4 gap-3 animate-fade-in">
+                        <div className="flex flex-col sm:flex-row w-full gap-3 animate-fade-in">
                             <Button 
                                 onClick={(e) => { e.stopPropagation(); handleScoreCard(1); }}
-                                className="h-14 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
+                                className="flex-1 h-14 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>AGAIN</span>
                                 <span className="text-[7px] opacity-50">STUMBLED</span>
                             </Button>
                             <Button 
                                 onClick={(e) => { e.stopPropagation(); handleScoreCard(2); }}
-                                className="h-14 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500 text-amber-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
+                                className="flex-1 h-14 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500 text-amber-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>HARD</span>
                                 <span className="text-[7px] opacity-50">STRUGGLED</span>
                             </Button>
                             <Button 
                                 onClick={(e) => { e.stopPropagation(); handleScoreCard(4); }}
-                                className="h-14 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
+                                className="flex-1 h-14 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>GOOD</span>
                                 <span className="text-[7px] opacity-50">RECALLED</span>
                             </Button>
                             <Button 
                                 onClick={(e) => { e.stopPropagation(); handleScoreCard(5); }}
-                                className="h-14 bg-accentTeal/10 hover:bg-accentTeal/20 border border-accentTeal/30 hover:border-accentTeal text-accentTeal rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
+                                className="flex-1 h-14 bg-accentTeal/10 hover:bg-accentTeal/20 border border-accentTeal/30 hover:border-accentTeal text-accentTeal rounded-2xl font-labels text-[9px] font-extrabold tracking-widest uppercase flex flex-col justify-center items-center gap-1 transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 <span>EASY</span>
                                 <span className="text-[7px] opacity-50">INSTANT</span>

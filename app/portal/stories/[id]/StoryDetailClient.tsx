@@ -20,6 +20,7 @@ interface WordTiming {
 }
 
 interface StoryChapter {
+    id?: string;
     chapter_number: number;
     title_target_language: string;
     title_english: string;
@@ -32,7 +33,15 @@ interface StoryChapter {
     chapter_intro_word_timings?: WordTiming[];
     native_word_timings?: WordTiming[];
     vocabulary_note?: string;
+    script_target_language?: string;
+    script_english?: string;
 }
+
+const cleanScriptText = (text: string | null | undefined) => {
+    if (!text) return "";
+    // Remove speaker tags like [NARRATOR] and emotion tags like (neutral)
+    return text.replace(/\[.*?\]\s*(\(.*?\))?\s*/g, "");
+};
 
 interface DictionaryEntry {
     word: string;
@@ -52,7 +61,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [playbackRate, setPlaybackRate] = useState(1);
-    const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+    const [currentDeckIndex, setCurrentDeckIndex] = useState(0);
     
     // Vocab Lookup State
     const [selectedWord, setSelectedWord] = useState<string | null>(null);
@@ -66,24 +75,81 @@ export default function StoryDetailClient({ story }: { story: any }) {
     const textContainerRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
 
-    // Parse chapters
+    // Parse chapters and reading matter pages
     const chapters: StoryChapter[] = Array.isArray(story.chapters) ? story.chapters : [];
+    const readingMatterPages = Array.isArray(story.reading_matter_pages_json)
+        ? story.reading_matter_pages_json
+        : [];
+
+    const beforePages = useMemo(() => readingMatterPages.filter((p: any) => p.placement === 'beforeChapters' || p.placement === 'before'), [readingMatterPages]);
+    const afterPages = useMemo(() => readingMatterPages.filter((p: any) => p.placement === 'afterChapters' || p.placement === 'after' || !p.placement), [readingMatterPages]);
+
+    const deck = useMemo(() => {
+        const items: Array<
+            | { type: 'reading_matter'; id: string; titleTarget: string; titleNative: string; bodyTarget: string; bodyNative: string; audioUrl?: string; wordTimings?: any[] }
+            | { type: 'chapter'; id: string; chapter: StoryChapter; index: number }
+        > = [];
+
+        beforePages.forEach((p: any) => {
+            items.push({
+                type: 'reading_matter',
+                id: p.id || `before-${p.placement}-${Math.random()}`,
+                titleTarget: p.titleTarget || p.title_target || 'About the Story',
+                titleNative: p.titleNative || p.title_native || 'About the Story',
+                bodyTarget: p.bodyTarget || p.body_target || '',
+                bodyNative: p.bodyNative || p.body_native || '',
+                audioUrl: p.audioUrl || p.audio_url,
+                wordTimings: p.wordTimings || p.word_timings
+            });
+        });
+
+        chapters.forEach((ch: StoryChapter, i: number) => {
+            items.push({
+                type: 'chapter',
+                id: ch.id || `chapter-${i}`,
+                chapter: ch,
+                index: i
+            });
+        });
+
+        afterPages.forEach((p: any) => {
+            items.push({
+                type: 'reading_matter',
+                id: p.id || `after-${p.placement}-${Math.random()}`,
+                titleTarget: p.titleTarget || p.title_target || 'Appendix',
+                titleNative: p.titleNative || p.title_native || 'Appendix',
+                bodyTarget: p.bodyTarget || p.body_target || '',
+                bodyNative: p.bodyNative || p.body_native || '',
+                audioUrl: p.audioUrl || p.audio_url,
+                wordTimings: p.wordTimings || p.word_timings
+            });
+        });
+
+        return items;
+    }, [chapters, beforePages, afterPages]);
+
+    const currentItem = deck[currentDeckIndex] || { type: 'chapter', chapter: chapters[0], index: 0 };
+    const currentChapter = currentItem.type === 'chapter' ? currentItem.chapter : null;
+    const currentChapterIndex = currentItem.type === 'chapter' ? currentItem.index : -1;
+    
     const hasChapters = chapters.length > 0;
-    const currentChapter = hasChapters ? chapters[currentChapterIndex] : null;
+    const hasMultiplePages = deck.length > 1;
 
     const prevChapter = () => {
-        if (currentChapterIndex > 0) {
-            setCurrentChapterIndex(currentChapterIndex - 1);
-            setActiveSegment("intro");
+        if (currentDeckIndex > 0) {
+            const prevItem = deck[currentDeckIndex - 1];
+            setCurrentDeckIndex(currentDeckIndex - 1);
+            setActiveSegment(prevItem.type === 'chapter' ? "intro" : "content");
             setCurrentTime(0);
             setIsPlaying(false);
         }
     };
 
     const nextChapter = () => {
-        if (currentChapterIndex < chapters.length - 1) {
-            setCurrentChapterIndex(currentChapterIndex + 1);
-            setActiveSegment("intro");
+        if (currentDeckIndex < deck.length - 1) {
+            const nextItem = deck[currentDeckIndex + 1];
+            setCurrentDeckIndex(currentDeckIndex + 1);
+            setActiveSegment(nextItem.type === 'chapter' ? "intro" : "content");
             setCurrentTime(0);
             setIsPlaying(false);
         }
@@ -178,17 +244,41 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
     // Get current Audio Source URL
     const getAudioUrl = () => {
-        if (activeSegment === "intro" && currentChapter?.chapter_intro_audio_url) {
-            if (currentChapter.chapter_intro_audio_url.startsWith('http')) return currentChapter.chapter_intro_audio_url;
-            return supabase.storage.from("audio-stories").getPublicUrl(currentChapter.chapter_intro_audio_url).data.publicUrl;
+        const userId = (story.user_id || "").toLowerCase();
+        const storyId = (story.id || "").toLowerCase();
+
+        if (currentItem.type === 'reading_matter' && currentItem.audioUrl) {
+            if (currentItem.audioUrl.startsWith('http')) return currentItem.audioUrl;
+            
+            const path = currentItem.audioUrl.includes('/')
+                ? currentItem.audioUrl
+                : `${userId}/${storyId}/audio/${currentItem.audioUrl}`;
+            return supabase.storage.from("audio-stories").getPublicUrl(path).data.publicUrl;
         }
-        if (currentChapter?.native_audio_url) {
-            if (currentChapter.native_audio_url.startsWith('http')) return currentChapter.native_audio_url;
-            return supabase.storage.from("audio-stories").getPublicUrl(currentChapter.native_audio_url).data.publicUrl;
+
+        if (currentChapter) {
+            if (activeSegment === "intro" && currentChapter.chapter_intro_audio_url) {
+                if (currentChapter.chapter_intro_audio_url.startsWith('http')) return currentChapter.chapter_intro_audio_url;
+                
+                const path = currentChapter.chapter_intro_audio_url.includes('/')
+                    ? currentChapter.chapter_intro_audio_url
+                    : `${userId}/${storyId}/audio/${currentChapter.chapter_intro_audio_url}`;
+                return supabase.storage.from("audio-stories").getPublicUrl(path).data.publicUrl;
+            }
+
+            // Standard chapter content audio: fall back to chapter_XX.mp3 if native_audio_url is null
+            const chNum = String(currentChapter.chapter_number).padStart(2, '0');
+            const chapterAudioPath = currentChapter.native_audio_url || `${userId}/${storyId}/audio/chapter_${chNum}.mp3`;
+            
+            if (chapterAudioPath.startsWith('http')) return chapterAudioPath;
+            return supabase.storage.from("audio-stories").getPublicUrl(chapterAudioPath).data.publicUrl;
         }
+
         if (story.remote_audio_path) {
+            if (story.remote_audio_path.startsWith('http')) return story.remote_audio_path;
             return supabase.storage.from("audio-stories").getPublicUrl(story.remote_audio_path).data.publicUrl;
         }
+
         return null;
     };
 
@@ -219,10 +309,11 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 setActiveSegment("content");
                 setCurrentTime(0);
                 setIsPlaying(false);
-            } else if (hasChapters && currentChapterIndex < chapters.length - 1) {
-                // Main content ended, advance to next chapter
-                setCurrentChapterIndex(prev => prev + 1);
-                setActiveSegment("intro");
+            } else if (currentDeckIndex < deck.length - 1) {
+                // Main content ended, advance to next page in the deck
+                const nextItem = deck[currentDeckIndex + 1];
+                setCurrentDeckIndex(prev => prev + 1);
+                setActiveSegment(nextItem.type === 'chapter' ? "intro" : "content");
                 setCurrentTime(0);
                 setIsPlaying(false);
             } else {
@@ -239,9 +330,9 @@ export default function StoryDetailClient({ story }: { story: any }) {
             audio.removeEventListener("durationchange", handleDurationChange);
             audio.removeEventListener("ended", handleEnded);
         };
-    }, [hasChapters, currentChapterIndex, chapters.length, activeSegment]);
+    }, [deck, currentDeckIndex, activeSegment]);
 
-    // Handle segment/chapter swaps
+    // Handle segment/page swaps
     useEffect(() => {
         const audio = audioRef.current;
         if (audio) {
@@ -250,7 +341,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 audio.play().catch(console.error);
             }
         }
-    }, [currentChapterIndex, activeSegment, audioUrl]);
+    }, [currentDeckIndex, activeSegment, audioUrl]);
 
     const togglePlay = () => {
         if (!audioRef.current) return;
@@ -287,7 +378,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
     };
 
     // Dictionary Lookup Handler
-    const handleWordClick = (wordText: string, element: HTMLElement) => {
+    const handleWordClick = async (wordText: string, element: HTMLElement) => {
         const clean = wordText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, "").trim();
         setSelectedWord(wordText);
         
@@ -304,14 +395,50 @@ export default function StoryDetailClient({ story }: { story: any }) {
         if (dictionary[clean]) {
             setLookupData(dictionary[clean]);
         } else {
-            // Fallback definition
+            // Set temporary loading state
+            const cleanedWord = wordText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, "");
             setLookupData({
-                word: wordText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, ""),
-                translation: "Context Translation",
-                type: "Noun/Verb",
-                definition: `Click lookup for "${clean}". Acquire this word in context or add it to your Spaced Repetition deck to customize its definition.`,
+                word: cleanedWord,
+                translation: "Translating...",
+                type: "Looking up...",
+                definition: `Fetching translation for "${clean}"...`,
                 examples: []
             });
+
+            // Perform translation fetch via MyMemory API
+            try {
+                const langCodes: Record<string, string> = {
+                    spanish: 'es',
+                    french: 'fr',
+                    german: 'de',
+                    italian: 'it',
+                    portuguese: 'pt',
+                    mandarin: 'zh',
+                    japanese: 'ja'
+                };
+                const sourceLang = langCodes[story.language.toLowerCase()] || 'es';
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(clean)}&langpair=${sourceLang}|en`);
+                if (!res.ok) throw new Error("Translation request failed");
+                const data = await res.json();
+                const translation = data.responseData?.translatedText || "Translation not found";
+
+                setLookupData({
+                    word: cleanedWord,
+                    translation: translation,
+                    type: "Translation",
+                    definition: `Auto-translated "${clean}" from ${languageName} to English. Click "Add to SRS Deck" to save it to your spaced repetition study deck.`,
+                    examples: []
+                });
+            } catch (error) {
+                console.error("Translation error:", error);
+                setLookupData({
+                    word: cleanedWord,
+                    translation: "Context Translation",
+                    type: "Word",
+                    definition: `Could not reach translation service for "${clean}". Acquire this word in context or add it to your Spaced Repetition deck to customize its definition.`,
+                    examples: []
+                });
+            }
         }
     };
 
@@ -370,6 +497,9 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
     // Extract active chapter timings
     const activeTimings = useMemo(() => {
+        if (currentItem.type === 'reading_matter') {
+            return currentItem.wordTimings || [];
+        }
         if (activeSegment === "intro") {
             return currentChapter?.chapter_intro_word_timings || [];
         }
@@ -391,7 +521,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
             }
         }
         return [];
-    }, [activeSegment, currentChapter, story.word_timings_json]);
+    }, [activeSegment, currentChapter, story.word_timings_json, currentItem]);
 
     // Active Word Index in timings array
     const activeWordIndex = useMemo(() => {
@@ -400,9 +530,11 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
     // Align text and timings
     const richTextWords = useMemo(() => {
-        const text = activeSegment === "intro"
-            ? (currentChapter?.chapter_intro_text || "")
-            : (currentChapter?.text_target_language || story.target_text || "");
+        const text = currentItem.type === 'reading_matter'
+            ? (currentItem.bodyTarget || "")
+            : activeSegment === "intro"
+                ? (currentChapter?.chapter_intro_text || "")
+                : (currentChapter?.text_target_language || cleanScriptText(currentChapter?.script_target_language) || story.target_text || "");
 
         if (!text) return [];
 
@@ -431,7 +563,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 timing: matchedTiming
             };
         });
-    }, [activeSegment, currentChapter, story.target_text, activeTimings]);
+    }, [activeSegment, currentChapter, story.target_text, activeTimings, currentItem]);
 
     // Jump audio playhead to word timestamp
     const handleWordTimingJump = (start: number) => {
@@ -523,25 +655,28 @@ export default function StoryDetailClient({ story }: { story: any }) {
                     {/* Chapter & Translation Controls */}
                     <div className="glass-card rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 border border-white/5">
                         {/* Chapter selector */}
-                        {hasChapters && (
+                        {hasMultiplePages && (
                             <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={prevChapter} 
-                                    disabled={currentChapterIndex === 0}
+                                    disabled={currentDeckIndex === 0}
                                     className="rounded-lg text-white/60 hover:text-white hover:bg-white/5 border border-white/5"
                                 >
                                     <SkipBack className="h-4 w-4" />
                                 </Button>
-                                <div className="text-center font-heading text-sm font-bold">
-                                    Chapter {currentChapterIndex + 1} of {chapters.length}
+                                <div className="text-center font-heading text-sm font-bold truncate max-w-[200px]" title={currentItem.type === 'reading_matter' ? currentItem.titleTarget : `Chapter ${currentChapterIndex + 1} of ${chapters.length}`}>
+                                    {currentItem.type === 'reading_matter' 
+                                        ? currentItem.titleTarget 
+                                        : `Chapter ${currentChapterIndex + 1} of ${chapters.length}`
+                                    }
                                 </div>
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={nextChapter} 
-                                    disabled={currentChapterIndex === chapters.length - 1}
+                                    disabled={currentDeckIndex === deck.length - 1}
                                     className="rounded-lg text-white/60 hover:text-white hover:bg-white/5 border border-white/5"
                                 >
                                     <SkipForward className="h-4 w-4" />
@@ -629,7 +764,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             {/* Target Language Column */}
                                             <div className="space-y-4 pr-2">
                                                 <span className="font-labels text-[9px] text-accentTeal tracking-wider block font-bold uppercase mb-2">Target Prose</span>
-                                                <div className="flex flex-wrap gap-y-2">
+                                                <div className="leading-loose text-base md:text-lg whitespace-pre-wrap">
                                                     {richTextWords.map((item: any, idx: number) => {
                                                         if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
                                                         
@@ -657,13 +792,13 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             <div className="space-y-4 pt-6 md:pt-0 md:pl-8">
                                                 <span className="font-labels text-[9px] text-white/40 tracking-wider block font-bold uppercase mb-2">Parallel English</span>
                                                 <p className="text-white/55 font-sans leading-relaxed whitespace-pre-wrap">
-                                                    {currentChapter?.text_english || story.native_text || "No translation text available."}
+                                                    {currentItem.type === 'reading_matter' ? currentItem.bodyNative : (currentChapter?.text_english || cleanScriptText(currentChapter?.script_english) || story.native_text || "No translation text available.")}
                                                 </p>
                                             </div>
                                         </div>
                                     ) : (
                                         /* Standard Monolingual Mode (Interactive Click & Karaoke Highlights) */
-                                        <div className="flex flex-wrap gap-y-2">
+                                        <div className="leading-loose text-base md:text-lg whitespace-pre-wrap">
                                             {selectedLanguage === "target" ? (
                                                 richTextWords.map((item: any, idx: number) => {
                                                     if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
@@ -687,9 +822,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                                 })
                                             ) : (
                                                 /* English only view */
-                                                <p className="whitespace-pre-wrap leading-relaxed text-white/80 font-sans">
-                                                    {currentChapter?.text_english || story.native_text || ""}
-                                                </p>
+                                                currentItem.type === 'reading_matter' ? currentItem.bodyNative : (currentChapter?.text_english || cleanScriptText(currentChapter?.script_english) || story.native_text || "")
                                             )}
                                         </div>
                                     )}
@@ -810,12 +943,12 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
                                     {/* Core Playback Buttons */}
                                     <div className="flex items-center gap-3">
-                                        {hasChapters && (
+                                        {hasMultiplePages && (
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
                                                 onClick={prevChapter}
-                                                disabled={currentChapterIndex === 0}
+                                                disabled={currentDeckIndex === 0}
                                                 className="rounded-xl hover:bg-white/5 text-white/60 hover:text-white border border-white/5"
                                             >
                                                 <SkipBack className="h-4 w-4" />
@@ -834,12 +967,12 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             )}
                                         </Button>
 
-                                        {hasChapters && (
+                                        {hasMultiplePages && (
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
                                                 onClick={nextChapter}
-                                                disabled={currentChapterIndex === chapters.length - 1}
+                                                disabled={currentDeckIndex === deck.length - 1}
                                                 className="rounded-xl hover:bg-white/5 text-white/60 hover:text-white border border-white/5"
                                             >
                                                 <SkipForward className="h-4 w-4" />
@@ -869,21 +1002,23 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-8">
                     {/* Active word lookup card */}
                     <div id="vocab-lookup-box" className="glass-card rounded-[24px] p-6 border border-white/5 shadow-2xl min-h-[250px] flex flex-col justify-between relative overflow-hidden">
-                        <div className="absolute top-4 right-6 font-labels text-[8px] tracking-widest text-white/20 uppercase">
-                            Dictionary
+                        <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-4">
+                            <span className="font-labels text-[10px] tracking-widest text-white/40 uppercase font-bold">Dictionary Console</span>
+                            <BookOpen className="h-3.5 w-3.5 text-white/30" />
                         </div>
+
                         {lookupData ? (
-                            <div className="space-y-4 animate-fade-in">
+                            <div className="space-y-4 animate-fade-in flex-1 flex flex-col justify-between">
                                 <div>
-                                    <div className="flex justify-between items-start gap-2">
-                                        <h3 className="font-heading text-2xl font-extrabold text-accentTeal truncate">
+                                    <div className="flex flex-wrap justify-between items-center gap-3 w-full">
+                                        <h3 className="font-heading text-xl md:text-2xl font-extrabold text-accentTeal break-words" title={lookupData.word}>
                                             {lookupData.word}
                                         </h3>
-                                        <span className="px-2.5 py-0.5 rounded bg-accentTeal/10 border border-accentTeal/20 text-[8px] font-labels tracking-wider uppercase font-bold text-accentTeal whitespace-nowrap">
+                                        <span className="px-2.5 py-1 rounded-lg bg-accentTeal/10 border border-accentTeal/20 text-[9px] font-labels tracking-wider uppercase font-extrabold text-accentTeal whitespace-nowrap">
                                             {lookupData.type}
                                         </span>
                                     </div>
-                                    <p className="text-white/50 font-sans text-xs mt-1 font-semibold">{lookupData.translation}</p>
+                                    <p className="text-white/60 font-sans text-xs mt-2 font-semibold italic">{lookupData.translation}</p>
                                 </div>
                                 <div className="border-t border-white/5 my-2"></div>
                                 <p className="text-xs text-white/80 font-sans leading-relaxed">
@@ -941,7 +1076,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );
