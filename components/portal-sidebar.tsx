@@ -119,7 +119,9 @@ function SidebarContent({ pathname, setOpen }: SidebarContentProps) {
                 <nav className="grid gap-1.5 px-3">
                     {sidebarLinks.map((link, index) => {
                         const Icon = link.icon;
-                        const isActive = pathname === link.href || (link.href !== "/portal" && pathname.startsWith(link.href + "/"));
+                        const isActive = pathname 
+                            ? (pathname === link.href || (link.href !== "/portal" && pathname.startsWith(link.href + "/")))
+                            : false;
 
                         return (
                             <Link
