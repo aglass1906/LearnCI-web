@@ -7,11 +7,18 @@ import Image from "next/image";
 import { 
     Play, Pause, Volume2, RotateCcw, RotateCw, 
     Search, ChevronDown, Headphones, Sparkles, 
-    Clock, User, ChevronRight, Check, Plus, Trash2, Loader2, Bookmark
+    Clock, User, ChevronRight, Check, Plus, Trash2, Loader2, Bookmark, Settings, Database
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useAudio } from "@/context/audio-context";
 import { mockPodcasts, PodcastShow, PodcastEpisode } from "@/lib/mock-podcasts";
+
+const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || seconds === null || seconds === undefined) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+};
 
 export default function PodcastsPage() {
     const supabase = createClient();
@@ -30,10 +37,19 @@ export default function PodcastsPage() {
 
     // Auth & DB States
     const [userId, setUserId] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
     const [subscriptions, setSubscriptions] = useState<any[]>([]); // DB rows from podcast_shows
     const [dbEpisodes, setDbEpisodes] = useState<any[]>([]);       // DB rows from podcast_episodes
     const [loading, setLoading] = useState(true);
     const [submittingShowId, setSubmittingShowId] = useState<string | null>(null);
+
+    // Diagnostics States
+    const [showDiagnostics, setShowDiagnostics] = useState(false);
+    const [unfilteredShows, setUnfilteredShows] = useState<any[]>([]);
+    const [unfilteredError, setUnfilteredError] = useState<string | null>(null);
+    const [filteredError, setFilteredError] = useState<string | null>(null);
+    const [episodesError, setEpisodesError] = useState<string | null>(null);
+    const [seeding, setSeeding] = useState(false);
 
     // UI Navigation & Filters
     const [sidebarTab, setSidebarTab] = useState<"library" | "discover">("library");
@@ -53,6 +69,7 @@ export default function PodcastsPage() {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
                     setUserId(session.user.id);
+                    setUserEmail(session.user.email || "No Email");
                     await fetchPodcastData(session.user.id);
                 } else {
                     setLoading(false);
@@ -68,13 +85,20 @@ export default function PodcastsPage() {
     // 2. Fetch Podcast Data from DB
     const fetchPodcastData = async (uid: string) => {
         setLoading(true);
+        setFilteredError(null);
+        setEpisodesError(null);
+        setUnfilteredError(null);
+        
         try {
             // Fetch shows this user is subscribed to
             const { data: showsData, error: showsError } = await (supabase.from("podcast_shows") as any)
                 .select("*")
                 .eq("user_id", uid);
 
-            if (showsError) throw showsError;
+            if (showsError) {
+                setFilteredError(showsError.message);
+                throw showsError;
+            }
             const subs = showsData || [];
             setSubscriptions(subs);
 
@@ -85,21 +109,29 @@ export default function PodcastsPage() {
                     .select("*")
                     .in("show_id", showIds);
 
-                if (epsError) throw epsError;
+                if (epsError) {
+                    setEpisodesError(epsError.message);
+                    throw epsError;
+                }
                 setDbEpisodes(epsData || []);
-                
-                // Default to library view since there are subscriptions
                 setSidebarTab("library");
-                return subs;
             } else {
                 setDbEpisodes([]);
-                // No subscriptions, default to discover so they can find shows
                 setSidebarTab("discover");
-                return [];
             }
+
+            // DIAGNOSTICS: Fetch unfiltered shows to see if global data exists
+            const { data: unfilteredData, error: unfilteredErr } = await (supabase.from("podcast_shows") as any)
+                .select("*");
+            
+            if (unfilteredErr) {
+                setUnfilteredError(unfilteredErr.message);
+            } else {
+                setUnfilteredShows(unfilteredData || []);
+            }
+
         } catch (err) {
             console.error("Error loading podcast database tables:", err);
-            return [];
         } finally {
             setLoading(false);
         }
@@ -108,7 +140,6 @@ export default function PodcastsPage() {
     // Sync UI selection with background playing track if it's a podcast
     useEffect(() => {
         if (track && track.type === "podcast") {
-            // Check if the playing episode is in our database subscriptions
             let foundInDb = false;
             for (const sub of subscriptions) {
                 const dbEp = dbEpisodes.find(e => e.title === track.title && e.show_id === sub.id);
@@ -122,7 +153,6 @@ export default function PodcastsPage() {
                 }
             }
 
-            // Fallback: If not in DB, search the catalog (Discover tab)
             if (!foundInDb) {
                 for (const show of mockPodcasts) {
                     const ep = show.episodes.find(e => e.id === track.id);
@@ -148,7 +178,6 @@ export default function PodcastsPage() {
             const dbShow = subscriptions.find(s => s.id === selectedShowId);
             if (!dbShow) return null;
             
-            // Look up rich details from local catalog by title
             const catShow = mockPodcasts.find(m => m.title.toLowerCase() === dbShow.title.toLowerCase());
             return {
                 id: dbShow.id,
@@ -186,7 +215,6 @@ export default function PodcastsPage() {
             const dbEp = dbEpisodes.find(e => e.id === selectedEpisodeId && e.show_id === selectedShowData.id);
             if (!dbEp) return null;
 
-            // Look up rich transcript/metadata from local catalog by title
             const catEp = selectedShowData.catalogRecord?.episodes.find(
                 (e: any) => e.title.toLowerCase() === dbEp.title.toLowerCase()
             );
@@ -195,8 +223,8 @@ export default function PodcastsPage() {
                 episodeNumber: catEp?.episodeNumber || "EPISODE",
                 title: dbEp.title,
                 description: catEp?.description || "Subscribed episode from your database.",
-                duration: dbEp.duration,
-                durationSeconds: catEp?.durationSeconds || 30,
+                duration: catEp?.duration || formatTime(dbEp.duration) || "0:00",
+                durationSeconds: dbEp.duration || catEp?.durationSeconds || 30,
                 level: catEp?.level || "INTERMEDIATE",
                 audioUrl: dbEp.audio_url,
                 transcript: catEp?.transcript || [],
@@ -229,29 +257,45 @@ export default function PodcastsPage() {
         const query = searchQuery.toLowerCase();
         
         if (isLibraryView) {
-            // Load from database subscriptions
-            const dbShows = subscriptions.map(dbShow => {
+            return subscriptions.map(dbShow => {
                 const catShow = mockPodcasts.find(m => m.title.toLowerCase() === dbShow.title.toLowerCase());
-                const eps = dbEpisodes.filter(e => e.show_id === dbShow.id);
+                const rawEps = dbEpisodes.filter(e => e.show_id === dbShow.id);
                 
                 const matchesSearch = dbShow.title.toLowerCase().includes(query) ||
                                       (catShow && catShow.host.toLowerCase().includes(query)) ||
-                                      eps.some(e => e.title.toLowerCase().includes(query));
+                                      rawEps.some(e => e.title.toLowerCase().includes(query));
 
                 if (!query || matchesSearch) {
+                    const mappedEps = rawEps.map(dbEp => {
+                        const catEp = catShow?.episodes.find(
+                            (e: any) => e.title.toLowerCase() === dbEp.title.toLowerCase()
+                        );
+                        return {
+                            id: dbEp.id,
+                            episodeNumber: catEp?.episodeNumber || "EPISODE",
+                            title: dbEp.title,
+                            description: catEp?.description || "Subscribed episode from your database.",
+                            duration: catEp?.duration || formatTime(dbEp.duration) || "0:00",
+                            durationSeconds: dbEp.duration || catEp?.durationSeconds || 30,
+                            level: catEp?.level || "INTERMEDIATE",
+                            audioUrl: dbEp.audio_url,
+                            isDbRecord: true,
+                            dbRecord: dbEp,
+                            catalogRecord: catEp
+                        };
+                    });
+
                     return {
                         id: dbShow.id,
                         title: dbShow.title,
                         host: catShow?.host || "Podcast Host",
                         coverUrl: catShow?.coverUrl || "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=400&auto=format&fit=crop",
-                        episodes: eps
+                        episodes: mappedEps
                     };
                 }
                 return null;
             }).filter(Boolean);
-            return dbShows;
         } else {
-            // Load from Discover catalog
             if (!query) return mockPodcasts;
             return mockPodcasts.map(show => {
                 const matchesShow = show.title.toLowerCase().includes(query) || 
@@ -314,13 +358,6 @@ export default function PodcastsPage() {
 
     const isCurrentEpisode = track?.id === selectedEpisodeData?.id;
 
-    const toggleShowExpanded = (showId: string) => {
-        setExpandedShows(prev => ({
-            ...prev,
-            [showId]: !prev[showId]
-        }));
-    };
-
     const getShowSubscription = (showTitle: string) => {
         return subscriptions.find(s => s.title.toLowerCase() === showTitle.toLowerCase()) || null;
     };
@@ -336,11 +373,17 @@ export default function PodcastsPage() {
         if (!userId) return;
         setSubmittingShowId(show.id);
         try {
-            // 1. Insert into podcast_shows
+            const showId = crypto.randomUUID();
             const { data: newShows, error: showErr } = await (supabase.from("podcast_shows") as any)
                 .insert({
+                    id: showId,
                     title: show.title,
-                    user_id: userId
+                    user_id: userId,
+                    author: show.host || "",
+                    show_description: show.description || "",
+                    feed_url: `mock://${showId}`,
+                    artwork_url: show.coverUrl || null,
+                    language: "es"
                 })
                 .select();
 
@@ -350,16 +393,18 @@ export default function PodcastsPage() {
 
             const dbShow = newShows[0];
 
-            // Resolve episodes from local catalog if subscribing to a catalog show
             const catalogShow = mockPodcasts.find(m => m.title.toLowerCase() === show.title.toLowerCase());
             const episodesToInsert = catalogShow 
                 ? catalogShow.episodes.map(ep => ({
+                    id: crypto.randomUUID(),
                     show_id: dbShow.id,
                     title: ep.title,
-                    duration: ep.duration,
+                    episode_description: ep.description || "",
                     audio_url: ep.audioUrlPath,
+                    duration: ep.durationSeconds || 0,
                     playback_position: 0,
-                    is_played: false
+                    is_played: false,
+                    published_date: new Date().toISOString()
                 }))
                 : [];
 
@@ -374,10 +419,7 @@ export default function PodcastsPage() {
                 }
             }
 
-            // Update local state
             setSubscriptions(prev => [...prev, dbShow]);
-            
-            // Auto-switch to Library view and expand the newly subscribed show
             setSidebarTab("library");
             setSelectedShowId(dbShow.id);
             setExpandedShows(prev => ({ ...prev, [dbShow.id]: true }));
@@ -396,21 +438,17 @@ export default function PodcastsPage() {
 
         setSubmittingShowId(show.id);
         try {
-            // Delete episodes first
             await (supabase.from("podcast_episodes") as any)
                 .delete()
                 .eq("show_id", sub.id);
 
-            // Delete show
             await (supabase.from("podcast_shows") as any)
                 .delete()
                 .eq("id", sub.id);
 
-            // Update local state
             setSubscriptions(prev => prev.filter(s => s.id !== sub.id));
             setDbEpisodes(prev => prev.filter(e => e.show_id !== sub.id));
             
-            // If the active show was deleted, clear selections
             if (selectedShowId === sub.id) {
                 setSelectedShowId(null);
                 setSelectedEpisodeId(null);
@@ -453,13 +491,72 @@ export default function PodcastsPage() {
         }
     };
 
+    // Diagnostic Action: Seed Sample Database Records instantly
+    const seedSampleData = async () => {
+        if (!userId) return;
+        setSeeding(true);
+        try {
+            // Seed Clara's show "The Midnight Lounge"
+            const claraShow = mockPodcasts[0];
+            
+            // Delete existing first to prevent duplicates
+            const sub = getShowSubscription(claraShow.title);
+            if (sub) {
+                await (supabase.from("podcast_episodes") as any).delete().eq("show_id", sub.id);
+                await (supabase.from("podcast_shows") as any).delete().eq("id", sub.id);
+            }
+
+            const showId = crypto.randomUUID();
+            const { data: newShows, error: showErr } = await (supabase.from("podcast_shows") as any)
+                .insert({
+                    id: showId,
+                    title: claraShow.title,
+                    user_id: userId,
+                    author: claraShow.host || "",
+                    show_description: claraShow.description || "",
+                    feed_url: `mock://${showId}`,
+                    artwork_url: claraShow.coverUrl || null,
+                    language: "es"
+                })
+                .select();
+
+            if (showErr || !newShows || newShows.length === 0) throw showErr || new Error("Insert failed");
+            const dbShow = newShows[0];
+
+            const episodesToInsert = claraShow.episodes.map(ep => ({
+                id: crypto.randomUUID(),
+                show_id: dbShow.id,
+                title: ep.title,
+                episode_description: ep.description || "",
+                audio_url: ep.audioUrlPath,
+                duration: ep.durationSeconds || 0,
+                playback_position: 5.0, // Seed with 5 seconds progress
+                is_played: false,
+                published_date: new Date().toISOString()
+            }));
+
+            const { data: newEps, error: epsErr } = await (supabase.from("podcast_episodes") as any)
+                .insert(episodesToInsert)
+                .select();
+
+            if (epsErr) throw epsErr;
+
+            // Reload all data
+            await fetchPodcastData(userId);
+        } catch (err) {
+            console.error("Failed to seed sample data:", err);
+            alert("Failed to seed sample data. Check console or diagnostics.");
+        } finally {
+            setSeeding(false);
+        }
+    };
+
     const getEpisodeAudioUrl = (episode: any) => {
         if (!episode) return "";
         const url = episode.audioUrl;
         if (url.startsWith("http")) {
             return url;
         }
-        // Build public URL from relative path inside bucket
         const { data: { publicUrl } } = supabase.storage
             .from("audio-stories")
             .getPublicUrl(url);
@@ -484,7 +581,6 @@ export default function PodcastsPage() {
             }
         });
 
-        // Resume from saved playback position if available
         const savedPosition = episode.isDbRecord ? episode.dbRecord?.playback_position : 0;
         if (savedPosition > 0) {
             setTimeout(() => {
@@ -531,6 +627,13 @@ export default function PodcastsPage() {
             default:
                 return "bg-white/10 text-white/60 border-white/10";
         }
+    };
+
+    const toggleShowExpanded = (showId: string) => {
+        setExpandedShows(prev => ({
+            ...prev,
+            [showId]: !prev[showId]
+        }));
     };
 
     // Main loading skeleton
@@ -1169,13 +1272,81 @@ export default function PodcastsPage() {
                 </div>
 
             </div>
+
+            {/* Collapsible Database Diagnostics Console */}
+            <div className="mt-8 border-t border-white/5 pt-6 max-w-7xl mx-auto">
+                <button
+                    onClick={() => setShowDiagnostics(!showDiagnostics)}
+                    className="flex items-center gap-1.5 text-[10px] font-labels font-extrabold tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto uppercase py-2"
+                >
+                    <Settings className="h-3 w-3" />
+                    {showDiagnostics ? "Hide DB Diagnostics" : "Show DB Diagnostics"}
+                </button>
+                
+                {showDiagnostics && (
+                    <div className="mt-4 glass-card rounded-2xl p-5 border border-white/5 bg-[#0D0F1A]/80 shadow-2xl space-y-4 animate-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                            <Database className="h-4.5 w-4.5 text-primaryAccent" />
+                            <span className="font-heading font-extrabold text-sm text-white">
+                                Database Integration Diagnostics
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+                            <div className="space-y-2 bg-white/[0.01] border border-white/5 p-3.5 rounded-xl">
+                                <h4 className="font-labels font-extrabold uppercase text-[9px] text-white/40 tracking-wider">Session Details</h4>
+                                <p className="text-white/70"><strong className="text-white/40 font-semibold">User ID:</strong> {userId || "Not Loaded (No active session)"}</p>
+                                <p className="text-white/70"><strong className="text-white/40 font-semibold">Session Email:</strong> {userEmail || "Not Loaded"}</p>
+                            </div>
+
+                            <div className="space-y-2 bg-white/[0.01] border border-white/5 p-3.5 rounded-xl">
+                                <h4 className="font-labels font-extrabold uppercase text-[9px] text-white/40 tracking-wider">Table Status (Rows found in DB)</h4>
+                                <p className="text-white/70">
+                                    <strong className="text-white/40 font-semibold">podcast_shows (For your user):</strong> {subscriptions.length} rows 
+                                    {filteredError && <span className="text-red-400 ml-1">({filteredError})</span>}
+                                </p>
+                                <p className="text-white/70">
+                                    <strong className="text-white/40 font-semibold">podcast_shows (Unfiltered/All users):</strong> {unfilteredShows.length} rows
+                                    {unfilteredError && <span className="text-red-400 ml-1">({unfilteredError})</span>}
+                                </p>
+                                <p className="text-white/70">
+                                    <strong className="text-white/40 font-semibold">podcast_episodes (Tracked progress):</strong> {dbEpisodes.length} rows
+                                    {episodesError && <span className="text-red-400 ml-1">({episodesError})</span>}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Interactive Seeding Actions */}
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-white/5 justify-between items-center">
+                            <div className="text-left max-w-md">
+                                <h4 className="font-heading font-bold text-xs text-white/80">Need test data?</h4>
+                                <p className="text-[11px] text-white/40 font-sans mt-0.5">
+                                    If your database table is empty, click the seed button to instantly register the first show and episodes under your account in Supabase.
+                                </p>
+                            </div>
+                            
+                            <Button
+                                size="sm"
+                                disabled={seeding || !userId}
+                                onClick={seedSampleData}
+                                className="bg-primaryAccent text-brandDark font-labels text-[10px] font-extrabold tracking-wider uppercase px-4 py-2 hover:scale-[1.02] active:scale-[0.98] transition-all shrink-0 w-full sm:w-auto"
+                            >
+                                {seeding ? (
+                                    <>
+                                        <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                                        Seeding...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                        Seed Sample Show to DB
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
-
-const formatTime = (seconds: number) => {
-    if (isNaN(seconds)) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
