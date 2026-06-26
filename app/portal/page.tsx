@@ -32,23 +32,32 @@ export default function MobilePortal() {
     const [activityRefreshTrigger, setActivityRefreshTrigger] = useState(0);
 
     const checkUser = useCallback(async () => {
+        console.log("[Portal] checkUser starting...");
         try {
             const { data: { session } } = await supabase.auth.getSession();
+            console.log("[Portal] getSession completed, session found:", !!session);
             if (!session) {
+                console.log("[Portal] No session found, redirecting to /login");
                 router.push("/login");
             } else {
                 setUser(session.user);
-                // Fetch profile
-                const { data: profileData, error: profileError } = await supabase
+                console.log("[Portal] Fetching profile for user:", session.user.id);
+                
+                // Fetch profile using limit(1) to avoid PGRST116 and potential .single() accept header hangs
+                const { data: profilesList, error: profileError } = await supabase
                     .from("profiles")
                     .select("*")
                     .eq("user_id", session.user.id)
-                    .single();
+                    .limit(1);
 
-                if (profileError) {
-                    if (profileError.code === 'PGRST116') {
-                        console.log("No profile found. Creating defaults...");
-                        const { data: newProfile, error: createError } = await supabase
+                const profileData: any = profilesList && profilesList.length > 0 ? profilesList[0] : null;
+                console.log("[Portal] Profile query completed. Found:", !!profileData, "Error:", profileError);
+
+                if (profileError || !profileData) {
+                    // Try to auto-create profile if none exists
+                    if (!profileData) {
+                        console.log("[Portal] No profile found. Creating defaults...");
+                        const { data: newProfilesList, error: createError } = await supabase
                             .from("profiles")
                             .insert({
                                 id: session.user.id,
@@ -58,62 +67,70 @@ export default function MobilePortal() {
                                 updated_at: new Date().toISOString()
                             } as any)
                             .select()
-                            .single();
+                            .limit(1);
 
-                        if (createError) {
-                            console.error("Failed to auto-create profile:", createError);
+                        const newProfile: any = newProfilesList && newProfilesList.length > 0 ? newProfilesList[0] : null;
+                        console.log("[Portal] Profile creation completed. Success:", !!newProfile, "Error:", createError);
+
+                        if (createError || !newProfile) {
+                            console.error("[Portal] Failed to auto-create profile:", createError || "No profile returned");
                         } else {
-                            console.log("Profile auto-created:", newProfile);
+                            console.log("[Portal] Profile auto-created:", newProfile);
                             setProfile(newProfile as any);
                             setCurrentHours(0);
                             setNextMilestone(25);
                         }
                     } else {
-                        console.error("Profile fetch error:", profileError);
+                        console.error("[Portal] Profile fetch error:", profileError);
                     }
                 } else {
                     setProfile(profileData as any);
 
-                    if (profileData) {
-                        const data = profileData as any;
-                        const totalMins = (data.total_minutes || 0) + ((data.starting_hours || 0) * 60);
-                        const hrs = totalMins / 60;
-                        setCurrentHours(hrs);
-                        const next = (Math.floor(hrs / 25) + 1) * 25;
-                        setNextMilestone(next);
-                    }
+                    const totalMins = (profileData.total_minutes || 0) + ((profileData.starting_hours || 0) * 60);
+                    const hrs = totalMins / 60;
+                    setCurrentHours(hrs);
+                    const next = (Math.floor(hrs / 25) + 1) * 25;
+                    setNextMilestone(next);
+                    console.log("[Portal] Profile loaded. Hours:", hrs, "Next milestone:", next);
                 }
 
-                // Fetch latest check-in from daily_feedback
-                const { data: checkInData, error: checkInError } = await supabase
+                console.log("[Portal] Fetching latest check-in for user:", session.user.id);
+                // Fetch latest check-in from daily_feedback using limit(1) instead of .single() to avoid hangs
+                const { data: checkInList, error: checkInError } = await supabase
                     .from("daily_feedback")
                     .select("*")
                     .eq("user_id", session.user.id)
                     .order("date", { ascending: false })
-                    .limit(1)
-                    .single();
+                    .limit(1);
 
-                if (checkInError && checkInError.code !== 'PGRST116') {
-                    console.error("Check-in fetch error:", checkInError);
+                const checkInData = checkInList && checkInList.length > 0 ? checkInList[0] : null;
+                console.log("[Portal] Check-in query completed. Found:", !!checkInData, "Error:", checkInError);
+
+                if (checkInError) {
+                    console.error("[Portal] Check-in fetch error:", checkInError);
                 }
 
                 setLatestCheckIn(checkInData);
 
                 if (checkInData) {
-                    const data = checkInData as any;
                     // @ts-ignore
-                    const checkInDate = new Date(data.date).toDateString();
+                    const checkInDate = new Date(checkInData.date).toDateString();
                     const today = new Date().toDateString();
                     if (checkInDate === today) {
                         setTodaysCheckIn(checkInData);
+                        console.log("[Portal] Checked in today:", checkInData);
                     } else {
                         setTodaysCheckIn(null);
+                        console.log("[Portal] Not checked in today (last check-in was:", checkInDate, ")");
                     }
+                } else {
+                    setTodaysCheckIn(null);
                 }
             }
         } catch (error) {
-            console.error("Critical error in checkUser:", error);
+            console.error("[Portal] Critical error in checkUser:", error);
         } finally {
+            console.log("[Portal] checkUser completed, setting loading to false");
             setLoading(false);
         }
     }, [supabase, router]);
