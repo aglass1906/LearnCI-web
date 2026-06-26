@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI | Podcast Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .karaoke-active {
+            background: rgba(255, 199, 136, 0.15);
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.1);
+            border-left: 2px solid #ffc788;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .glow-gold:hover {
+            box-shadow: 0 0 15px #ffc788;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#e0e1f3",
+                      "surface-container": "#1c1f2b",
+                      "on-error": "#690005",
+                      "inverse-on-surface": "#2d303d",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-lowest": "#0b0e19",
+                      "surface-container-high": "#262936",
+                      "danger": "#EF4444",
+                      "surface-variant": "#313441",
+                      "on-secondary": "#00363d",
+                      "tertiary-container": "#a1b1ff",
+                      "glass-border": "rgba(255, 255, 255, 0.1)",
+                      "outline": "#a18d79",
+                      "error": "#ffb4ab",
+                      "on-tertiary-container": "#0035bd",
+                      "on-secondary-fixed-variant": "#004f58",
+                      "on-tertiary-fixed-variant": "#0035bd",
+                      "text-muted": "rgba(255, 255, 255, 0.7)",
+                      "inverse-primary": "#875200",
+                      "surface-container-highest": "#313441",
+                      "secondary": "#bdf4ff",
+                      "error-container": "#93000a",
+                      "success": "#10B981",
+                      "background": "#10131f",
+                      "on-primary-container": "#673e00",
+                      "surface-bright": "#363946",
+                      "surface": "#10131f",
+                      "secondary-fixed": "#9cf0ff",
+                      "on-background": "#e0e1f3",
+                      "outline-variant": "#544433",
+                      "inverse-surface": "#e0e1f3",
+                      "surface-container-low": "#181b27",
+                      "surface-elevated": "#23283B",
+                      "primary": "#ffc788",
+                      "tertiary-fixed-dim": "#b8c3ff",
+                      "tertiary": "#c6ceff",
+                      "on-secondary-container": "#00616d",
+                      "primary-fixed-dim": "#ffb865",
+                      "secondary-container": "#00e3fd",
+                      "on-surface-variant": "#d9c3ad",
+                      "on-primary-fixed": "#2b1700",
+                      "on-tertiary-fixed": "#001355",
+                      "on-primary-fixed-variant": "#663d00",
+                      "on-primary": "#482a00",
+                      "on-secondary-fixed": "#001f24",
+                      "secondary-fixed-dim": "#00daf3",
+                      "primary-container": "#ffa000",
+                      "tertiary-fixed": "#dde1ff",
+                      "glass-fill": "rgba(255, 255, 255, 0.04)",
+                      "surface-dim": "#10131f",
+                      "text-dim": "rgba(255, 255, 255, 0.4)",
+                      "on-tertiary": "#002487",
+                      "primary-fixed": "#ffddba",
+                      "surface-tint": "#ffb865"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "xs": "4px",
+                      "gutter": "24px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Outfit"],
+                      "headline-md": ["Outfit"],
+                      "badge-caption": ["Lexend"],
+                      "body-base": ["Inter"],
+                      "body-prose": ["Inter"],
+                      "display-lg": ["Outfit"],
+                      "label-caps": ["Lexend"],
+                      "headline-lg-mobile": ["Outfit"]
+              },
+              "fontSize": {
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                      "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-base overflow-hidden">
+<!-- Ambient Background -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-[40%] -right-[10%] w-[50%] h-[50%] bg-secondary/10 rounded-full blur-[120px]"></div>
+</div>
+<!-- Navigation Rail -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-2xl z-50">
+<div class="flex flex-col h-full py-lg">
+<div class="px-lg mb-xl">
+<span class="font-headline-md text-headline-md text-primary">LearnCI</span>
+</div>
+<nav class="flex-1 space-y-2 px-md">
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-base text-body-base">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-body-base text-body-base">Library</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-body-base text-body-base">SRS Deck</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl bg-primary/10 text-primary border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">live_tv</span>
+<span class="font-body-base text-body-base">Media Hub</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-glass-border">
+<div class="flex items-center gap-md mb-md">
+<img class="w-10 h-10 rounded-full border border-primary/30" data-alt="A cinematic close-up of a stylish learner profile avatar in a premium dark glassmorphism aesthetic, featuring soft teal highlights on a high-tech interface background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN2YBgDgDXV2hGO5mtmogSnwoVEyrJ6MydKoHcd8w9VWhI_bPoiNZwDrqmEQ5C__Jbs9dJFqhndcRLeNuvKCYB28yM6Bm3Hm2-Ad9SH_L5Cdpyb7VKHvDEWRCHl9QrLuTMaac0xJkkLBioMXSyWU2zsrn82WUcULhO-1lFRmDqhBjEN_FdDtxi-7ejCZ0ftYd7TsD_Ez7ozW0wEG4g1KiRL16d25TqyA0-8voE5kGx3KSYOzWmgtm3jYiH77RSimmvPkSmdspyobk"/>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface">Welcome back</p>
+<p class="text-[10px] text-text-muted">Level B2 Upper Intermediate</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-sm rounded-lg font-label-caps text-label-caps glow-gold transition-all duration-300">
+                    Start Daily Goal
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 h-screen flex flex-col relative">
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-glass-fill backdrop-blur-md border-b border-glass-border z-40 flex items-center justify-between px-lg">
+<h1 class="font-headline-sm text-headline-sm text-on-surface">Podcast Listening Portal</h1>
+<div class="flex items-center gap-md">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-dim">search</span>
+<input class="bg-surface-container-high/50 border-none rounded-full pl-10 pr-lg py-2 text-sm focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Search shows or episodes..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-on-surface">notifications</span>
+</button>
+</div>
+</header>
+<!-- Split View Layout -->
+<div class="flex-1 mt-20 pb-28 flex overflow-hidden">
+<!-- Left Column: Podcast Library -->
+<section class="w-full md:w-5/12 lg:w-4/12 border-r border-glass-border flex flex-col bg-surface-container-lowest/20">
+<div class="p-lg flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm">Podcast Shows</h2>
+<button class="text-primary text-xs font-label-caps">View All</button>
+</div>
+<div class="flex-1 overflow-y-auto px-lg space-y-md">
+<!-- Show Card 1 -->
+<div class="glass-panel p-md rounded-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-l-4 border-primary group">
+<div class="flex gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Podcast cover art for 'The Midnight Lounge' in a high-tech dark cinematic style. Deep purple and neon gold hues with a stylized microphone icon emerging from abstract sound waves." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc2fZSWW-F6H6RFlnk2Gw4PApvTBa_bPTKUtsf1TfRi9FXGW-U6GIkRRj6cd1zyUuSlT6DAOsGSBsvJ-Ig9CRNc_SVqlFzT1tljeIAn3ADDohSAc2oRbDxcJZAl13zjGRwYPTaoIzkXmH-F9ZbVrKSrf-AtCdxPcXfgc5_V9HhrOCVo4Ku-bQfGvEiaR9KYAiP9LkSRkVu7ga2mO5t01iHa4s8kyOFw3kdP6Z0OgX7t-vn9YUfgvBR3Fz368gDTE_9u_cxalceKBw"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-sm text-on-surface leading-tight">The Midnight Lounge</h3>
+<p class="text-xs text-text-muted mt-1">Host: Clara Vernet</p>
+<div class="flex items-center gap-xs mt-2 text-primary">
+<span class="material-symbols-outlined text-[14px]">equalizer</span>
+<span class="text-[10px] font-label-caps">12 Episodes Available</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Show Card 2 -->
+<div class="glass-panel p-md rounded-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-l-4 border-transparent hover:border-glass-border">
+<div class="flex gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Podcast cover art for 'Tech Frontiers' showing a futuristic cityscape at night with glowing teal lines and bioluminescent foliage. 3D digital art style, premium dark atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBag_F7dwJje7zHEKyZsKBfZRX_Wjp50D7a0sEmGCIY2_kEp5jaa7Wg7L6ZO844rfSFbr8vFEVJZzO_fHfhmlDlIKVKWQmUSGGM-br7_O4eAg2tz6v3NFEf1egp6irpX7vGbOUqDIbQO5KvmkLH--dUMSxk19XgbothHsluhRb3vGQGGzJ1FvvJbH8vIXkP3NPwt65VLkWOJa8STknCMcphNH0eM8W_UKIW7lyASuEIrLxVAgDla5i5t7wqjafG09JKvpcB5zKapQ"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-sm text-on-surface leading-tight">Tech Frontiers</h3>
+<p class="text-xs text-text-muted mt-1">Host: Marcus Chen</p>
+<div class="flex items-center gap-xs mt-2 text-text-dim">
+<span class="material-symbols-outlined text-[14px]">equalizer</span>
+<span class="text-[10px] font-label-caps">8 Episodes Available</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Show Card 3 -->
+<div class="glass-panel p-md rounded-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-l-4 border-transparent hover:border-glass-border">
+<div class="flex gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Podcast cover art for 'Cultural Echoes' with abstract swirling golden dust particles on a deep navy background. Cinematic lighting, professional studio look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb4nZiL0ZGnAqPzPz8-7pib007JWB9gBWkhyD9uKaxo_bNyAp-jtTHH2cw_870y-q2-sgZ_G-Ns08oeKMIy_79ZGVyKeWjqfE4YuzIFMbj2U4wNJ6yLZ5mcIAWhe0rodg5tqVKol-0W7zo3KV85WkTa4I4TF4775Li3r_p81Mbe0zWEsz5-5qXT5nGMvqN-lHDAZKHOVmabCirPlLqiNYFNvE4hVDxnHOv6Y5eOORlC4m_VlPPhKFtGl-Su2w5V_V6BgTDTbWHb_M"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-sm text-on-surface leading-tight">Cultural Echoes</h3>
+<p class="text-xs text-text-muted mt-1">Host: Elena Rodriguez</p>
+<div class="flex items-center gap-xs mt-2 text-text-dim">
+<span class="material-symbols-outlined text-[14px]">equalizer</span>
+<span class="text-[10px] font-label-caps">24 Episodes Available</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Show Card 4 -->
+<div class="glass-panel p-md rounded-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-l-4 border-transparent hover:border-glass-border opacity-60">
+<div class="flex gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 grayscale">
+<img class="w-full h-full object-cover" data-alt="Podcast cover art for 'Global Trends' with minimalist geometric patterns in muted silver and charcoal. Premium corporate aesthetic with sharp lines and high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_lfZVkL9tYZNDs6KJeYCBfFZRu4pIWO8Z8dlgfwc4kfUky2TMPVyTPNDr1IKo17IPHWuNlScgP_TGFA7SKayWMvMkfVHNTVZXYZRPpLaRaywY0h76B4sCjAOr-tlS2OcIOQgnj_6lbYIfAvwx8-uyqF9tVmxleg1-mPX4zEH4LrDqztW9oFTZ3HSbS2kKJlPnOYb3NWjgLcF0WttL53fF3du5XkR93dm5mUeqOBWVvcTGEFBAsOCuqT6Wn6wbW8zMpg3QpJQ6wUU"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-sm text-on-surface leading-tight">Global Trends</h3>
+<p class="text-xs text-text-muted mt-1">Host: Sarah Jenkins</p>
+<div class="flex items-center gap-xs mt-2 text-text-dim">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span class="text-[10px] font-label-caps">Premium Only</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Episode Player & Transcript -->
+<section class="flex-1 flex flex-col relative">
+<!-- Episode Header -->
+<div class="p-lg flex flex-col md:flex-row gap-lg bg-surface-container-low/20">
+<div class="w-32 h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden glass-panel shrink-0 shadow-2xl relative group">
+<img class="w-full h-full object-cover" data-alt="Close up of a premium podcast episode cover. A glowing orange orb representing a sun setting over a digital ocean of code. High-quality 3D render, cinematic depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFJWO23Umd5kai1bPeNQ8MlYf5EVHcD9UfTcMzn033jKlV3oUaoQFulGPSQUyta5vjltLdw7klZoAHXIj-XRLDplS767BJI1TLccJcQ2qdDsqYyqLKW0pluJi7G-uVYOd-VUpG9B_GOQy4o1n-Zq-VELfGXRcwiAhJvaszQn74xz-8IHtAyBYdPFVQyt-yDIFUnmcJbitBtTccOfVXCosr3NUYzBU3FsfciFjJjaxXF2Zwmtw5De1qJuYaNcCRgvlt_j90FeOJ32s"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-on-primary">play_circle</span>
+</div>
+</div>
+<div class="flex flex-col justify-center">
+<div class="flex items-center gap-sm mb-sm">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-[10px] font-label-caps tracking-widest">INTERMEDIATE</span>
+<span class="text-text-muted text-[10px] font-label-caps">EPISODE 04</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary mb-md">Future Cities &amp; Language Evolution</h2>
+<p class="text-body-base text-text-muted max-w-2xl leading-relaxed">
+                            Join Clara and special guest Dr. Aris Thorne as they discuss how urban density in the next century will reshape how we communicate and the vocabulary of urban survival.
+                        </p>
+</div>
+</div>
+<!-- Transcript Area -->
+<div class="flex-1 overflow-hidden flex flex-col px-lg pt-lg">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-md">
+<h3 class="font-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">description</span>
+                                Interactive Transcript
+                            </h3>
+<span class="text-[10px] font-label-caps text-success flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                                Live Sync On
+                            </span>
+</div>
+<div class="flex gap-sm">
+<button class="p-2 rounded-lg hover:bg-white/5 text-text-muted" title="Translate Toggle">
+<span class="material-symbols-outlined">translate</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/5 text-text-muted" title="Download Text">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-lg pb-10 pr-2">
+<!-- Host Line -->
+<div class="flex gap-lg">
+<div class="flex flex-col items-center shrink-0">
+<img class="w-10 h-10 rounded-full border border-primary/20 mb-2" data-alt="Portrait of Clara, a podcast host with a modern, artistic look. Sharp lighting, dark background, premium cinematic quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVB87JVowNsHDMp8b7Xs2fBwhVfiCeGNr0ptnGfZDZ9tlfshwmZi1NNQHSK2Ll8_LtiIz2LiW7XTJZSnVVM6PH4wpCHE-G2TVR32S2SruYpJHck6YNhwXDCducHFtWlNgbySdb6-rjlOeTaSFSkGjS1-cBedYJpP32evtm-30Ay1o7Lqw7Ms4SvOH5tnAeOVJ1Y9AfK3gmgB6wSJNZstPoNmKmHj6_iRasRXfd1OScVCkDccGdmWpPGXDH6Oz8z0onbEGPE3HvpCg"/>
+<span class="text-[8px] font-label-caps text-text-dim">CLARA</span>
+</div>
+<div class="flex-1 py-2 px-4 rounded-xl transition-all duration-500">
+<p class="text-body-prose text-text-muted leading-relaxed">
+                                    Welcome back everyone to the Midnight Lounge. Today we have a very special guest joining us from the Tokyo Research Lab.
+                                </p>
+</div>
+</div>
+<!-- Guest Line (Active) -->
+<div class="flex gap-lg">
+<div class="flex flex-col items-center shrink-0">
+<img class="w-10 h-10 rounded-full border border-secondary/20 mb-2" data-alt="Portrait of Dr. Aris Thorne, a tech researcher. Cool blue studio lighting, professional and intellectual look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVzc929jbNeLhd762s4Jrd5ktpQhi39aSYX3Seqy6-5FqemxhReP1SlkuDPC4acfP3UhThT5K9T55jiFdag81DXnTxhdrv6jCNxNVvnbaPg3z06C4VuZ76S3zBWQ_FtUPaK-9ak56LCJi_6XSGwM3aBhDCvjeMvNlEhSdzz3hRolYCfzJnBDHSMaHnjwPjuKvtl5IcLFwyZMZXKjZikmHZj7w_YiqYY4HYtBowdW2BiDD4uCjioFYjQBC6nZoT8axjJtUwxnmDJNg"/>
+<span class="text-[8px] font-label-caps text-text-dim uppercase">Dr. Aris</span>
+</div>
+<div class="flex-1 py-2 px-4 rounded-xl karaoke-active transition-all duration-500">
+<p class="text-body-prose text-on-surface font-medium leading-relaxed">
+                                    It's a pleasure to be here. We've been looking at how <span class="bg-primary/20 text-primary px-1 rounded">megacities</span> create their own dialects within months, not decades.
+                                </p>
+</div>
+</div>
+<!-- Host Line -->
+<div class="flex gap-lg opacity-40">
+<div class="flex flex-col items-center shrink-0">
+<img class="w-10 h-10 rounded-full border border-primary/20 mb-2" data-alt="Portrait of Clara, a podcast host with a modern, artistic look. Sharp lighting, dark background, premium cinematic quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6U786QscATz7iyvftJ7B3G2QnQ1YT84rY2zb5Tymv-FryzXQ1KyvbYS7RLN8LOjBtq7JOiWe1vn9zBrbmZSQKwZbZmlhO5nnDbP1ROJtbAVNZwXbTPHrpDCE3sL4GiSEmzU-Ye0O_QhFHYSGKGObnNILNMbyFkNN_Qa141O9PNzpvONwRotQFfsqBT6wQlbn2WzSuxRnfVzgHu2aFXy4H1djX1ik6i0iRk8m61RaKNdppH-pcObg-_9PIRGz6Rnu5ctHDp68oviw"/>
+<span class="text-[8px] font-label-caps text-text-dim">CLARA</span>
+</div>
+<div class="flex-1 py-2 px-4 rounded-xl">
+<p class="text-body-prose text-text-muted leading-relaxed">
+                                    That's fascinating. Is it driven by technology or simply the sheer volume of social interactions?
+                                </p>
+</div>
+</div>
+<!-- Guest Line -->
+<div class="flex gap-lg opacity-40">
+<div class="flex flex-col items-center shrink-0">
+<img class="w-10 h-10 rounded-full border border-secondary/20 mb-2" data-alt="Portrait of Dr. Aris Thorne, a tech researcher. Cool blue studio lighting, professional and intellectual look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLfvRfcbNl8I5S3eToEl3wwJ9qQf1I3Db-RoUr2hQQZhTLzAHUZlktMQZabv2XrFnp9ICFV2p5uP1rF7o_9VuQMcqXO_YULTZPLZ1dhcD8oQRJgREVNHxIOTUCzY0bm_BE1Z5bMI4idfMzHIhQNjppq3nPXHl8sxxchD_KDclzT-KilOsKvQgPJBrgBQYALuxdLGA4gc0FTYOUTsNbHV1dQ1oe4Ufc9C0LePcOfyNlOUESPglM8D1hmoJC2xJVI9qHLVWUUDJK7mA"/>
+<span class="text-[8px] font-label-caps text-text-dim uppercase">Dr. Aris</span>
+</div>
+<div class="flex-1 py-2 px-4 rounded-xl">
+<p class="text-body-prose text-text-muted leading-relaxed">
+                                    A bit of both, but mostly the digital layer we live in now. Words like 'ghosting' or 'glitching' have taken on entirely physical meanings in these hubs.
+                                </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Audio Cockpit -->
+<footer class="fixed bottom-0 right-0 left-0 lg:left-64 h-24 bg-surface-container/80 backdrop-blur-2xl border-t border-glass-border flex items-center px-lg z-50">
+<div class="flex-1 flex items-center gap-lg">
+<!-- Now Playing Small -->
+<div class="hidden md:flex items-center gap-md w-1/4">
+<img class="w-12 h-12 rounded-lg" data-alt="Small thumbnail of the 'Future Cities' podcast episode cover art, high detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBevfQntXNUl0uoZYIYJxS35uRHpMr4h2dda8oudaGitAkMNFvE_-XPa5_xIW6kiCppd1-cu_atgn6fHg6pBb7n1bKWYwGJPhkoqq778Yn6PCuo18bYO6eI0ZpxnJ1efkbQrvt7HLk1bRdl-Ut2Ko3Zc4StxHrpNOyg8hKf_pPoZJPFFZ-GwEdHcA91Sl9Vje0Mhua_gkka_zxnnjWEGZeIljZscFJL5Adow4qfTqbIa7wkwKgDgz2A-RurjiDOiH3t-VFdFtob6eE"/>
+<div class="overflow-hidden">
+<h4 class="text-xs font-bold truncate">Future Cities &amp; Language</h4>
+<p class="text-[10px] text-text-muted truncate">The Midnight Lounge</p>
+</div>
+</div>
+<!-- Controls -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="flex items-center gap-lg">
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">shuffle</span>
+</button>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">replay_10</span>
+</button>
+<button class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center glow-gold hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">forward_30</span>
+</button>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">repeat</span>
+</button>
+</div>
+<div class="w-full max-w-xl flex items-center gap-md">
+<span class="text-[10px] font-label-caps text-text-dim">12:45</span>
+<div class="flex-1 h-1.5 bg-white/5 rounded-full relative group cursor-pointer">
+<div class="absolute inset-y-0 left-0 w-[45%] bg-primary rounded-full">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform"></div>
+</div>
+</div>
+<span class="text-[10px] font-label-caps text-text-dim">28:30</span>
+</div>
+</div>
+<!-- Settings -->
+<div class="hidden md:flex items-center justify-end gap-md w-1/4">
+<div class="flex bg-white/5 rounded-lg p-1 border border-glass-border">
+<button class="px-2 py-1 text-[10px] font-label-caps text-text-muted hover:text-on-surface">0.75x</button>
+<button class="px-2 py-1 text-[10px] font-label-caps bg-primary/20 text-primary rounded">1.0x</button>
+<button class="px-2 py-1 text-[10px] font-label-caps text-text-muted hover:text-on-surface">1.5x</button>
+<button class="px-2 py-1 text-[10px] font-label-caps text-text-muted hover:text-on-surface">2.0x</button>
+</div>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</footer>
+</main>
+<!-- Interactive Layer Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simple animation for the transcript scrolling or highlighting
+            const transcriptLines = document.querySelectorAll('.flex-1.overflow-y-auto > div');
+            let currentActive = 1;
+
+            // Micro-interaction: Playback Progress simulation
+            const progressBar = document.querySelector('.flex-1.h-1\.5.bg-white\/5');
+            const progressFill = progressBar.querySelector('div');
+            let width = 45;
+
+            setInterval(() => {
+                if(width < 100) {
+                    width += 0.05;
+                    progressFill.style.width = width + '%';
+                }
+            }, 1000);
+
+            // Hover effects on glass cards
+            const cards = document.querySelectorAll('.glass-panel');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-4px)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body></html>

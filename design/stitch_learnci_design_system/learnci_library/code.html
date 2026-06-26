@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI | Stories Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #10131f;
+            color: #e0e1f3;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.3);
+        }
+        .glow-teal {
+            box-shadow: 0 0 15px rgba(0, 227, 253, 0.3);
+        }
+        .text-glow-teal {
+            text-shadow: 0 0 8px rgba(0, 227, 253, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#e0e1f3",
+                        "surface-container": "#1c1f2b",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d303d",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0b0e19",
+                        "surface-container-high": "#262936",
+                        "danger": "#EF4444",
+                        "surface-variant": "#313441",
+                        "on-secondary": "#00363d",
+                        "tertiary-container": "#a1b1ff",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                        "outline": "#a18d79",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#0035bd",
+                        "on-secondary-fixed-variant": "#004f58",
+                        "on-tertiary-fixed-variant": "#0035bd",
+                        "text-muted": "rgba(255, 255, 255, 0.7)",
+                        "inverse-primary": "#875200",
+                        "surface-container-highest": "#313441",
+                        "secondary": "#bdf4ff",
+                        "error-container": "#93000a",
+                        "success": "#10B981",
+                        "background": "#10131f",
+                        "on-primary-container": "#673e00",
+                        "surface-bright": "#363946",
+                        "surface": "#10131f",
+                        "secondary-fixed": "#9cf0ff",
+                        "on-background": "#e0e1f3",
+                        "outline-variant": "#544433",
+                        "inverse-surface": "#e0e1f3",
+                        "surface-container-low": "#181b27",
+                        "surface-elevated": "#23283B",
+                        "primary": "#ffc788",
+                        "tertiary-fixed-dim": "#b8c3ff",
+                        "tertiary": "#c6ceff",
+                        "on-secondary-container": "#00616d",
+                        "primary-fixed-dim": "#ffb865",
+                        "secondary-container": "#00e3fd",
+                        "on-surface-variant": "#d9c3ad",
+                        "on-primary-fixed": "#2b1700",
+                        "on-tertiary-fixed": "#001355",
+                        "on-primary-fixed-variant": "#663d00",
+                        "on-primary": "#482a00",
+                        "on-secondary-fixed": "#001f24",
+                        "secondary-fixed-dim": "#00daf3",
+                        "primary-container": "#ffa000",
+                        "tertiary-fixed": "#dde1ff",
+                        "glass-fill": "rgba(255, 255, 255, 0.04)",
+                        "surface-dim": "#10131f",
+                        "text-dim": "rgba(255, 255, 255, 0.4)",
+                        "on-tertiary": "#002487",
+                        "primary-fixed": "#ffddba",
+                        "surface-tint": "#ffb865"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "badge-caption": ["Lexend"],
+                        "body-base": ["Inter"],
+                        "body-prose": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "label-caps": ["Lexend"],
+                        "headline-lg-mobile": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Atmospheric Background Glows -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-24 -left-24 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="absolute top-1/2 -right-48 w-[600px] h-[600px] bg-secondary-container/10 rounded-full blur-[150px]"></div>
+<div class="absolute -bottom-48 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-tertiary/10 rounded-full blur-[100px]"></div>
+</div>
+<!-- Side Navigation (Shared Component Identity) -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-2xl z-40 py-lg">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md text-primary">LearnCI</h1>
+<p class="text-text-muted text-xs mt-1">Level B2 Upper Intermediate</p>
+</div>
+<nav class="flex-grow space-y-1 px-md">
+<!-- Library is active -->
+<a class="flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 bg-primary/10 text-primary border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-body-base text-body-base">Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 text-text-muted hover:text-on-surface hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">dashboard</span>
+<span class="font-body-base text-body-base">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 text-text-muted hover:text-on-surface hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">style</span>
+<span class="font-body-base text-body-base">SRS Deck</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 text-text-muted hover:text-on-surface hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">live_tv</span>
+<span class="font-body-base text-body-base">Media Hub</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 text-text-muted hover:text-on-surface hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+</nav>
+<div class="px-lg mt-auto">
+<button class="w-full py-md bg-primary text-on-primary font-bold rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all glow-gold">
+                Start Daily Goal
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 min-h-screen relative z-10 px-md md:px-lg py-xl max-w-container-max mx-auto">
+<!-- Header Section -->
+<header class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-lg">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Story Library</h2>
+<p class="text-text-muted font-body-base mt-2">Immerse yourself in native content curated for your level.</p>
+</div>
+<div class="hidden md:flex items-center gap-sm">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young professional learner with a focused expression, high-quality digital photography style with soft bokeh background and cool blue studio lighting that aligns with a cinematic premium UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTBG8VP-uYnu9y6mjI-sdCovKdmg22gw2QI-HKVcVO868XxDf8gI0qFta_9whdrqWZb1Lj5KqirgmlA8FCaUDMVxzReIn7aqFff04s0mVCqlD3f1Mt_bkidWazf3D7djAWtjhTo6_W4F1bOc98GirVeW2c5nwHJCRCkEhABg9LJVo6VFDWRC2iJJ4ctYod7uYKrTuxHc7FUHy0Hf7tNv33420QqFEW9g3Mn322ufLR_V2csw-0suCU2YFZlxQcEa0ZRWBDfR_UefM"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a cheerful language student, high-end digital photography, warm golden hour lighting that complements the premium dark glassmorphism UI theme, showing diverse cultural representation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFwOn2yIQF0y1qUdGy8t_GjDD41jGfXmD8FswSvJOvCtpXRdB2N6ACckgSS1evIg7EQQajVdXCpcKedA702RU_DxA0nYVNtJGMx3fsEkECxc9oCszDm-NRuye6AX5A__SD8WXxKwMJsi4msstt8fUVKjE1Buj1l4luIEoMMvU7BfiFCtgiwnW6Muu78G-ivEnofGJx87n9y1MP3v-pm5J91ZyEAoPa-x5Av3foz0iKsvIFsOKCptd9vl8mWzdB2gRuCMLRgjl6Wb4"/>
+</div>
+</div>
+<span class="text-xs text-text-muted font-label-caps">12k ACTIVE LEARNERS</span>
+</div>
+</header>
+<!-- Filter Bar -->
+<div class="glass-card rounded-2xl p-md mb-xl flex flex-wrap items-center justify-between gap-md">
+<div class="flex flex-wrap items-center gap-sm">
+<!-- Language Filter -->
+<div class="relative group">
+<button class="flex items-center gap-xs px-lg py-sm bg-white/5 hover:bg-white/10 rounded-xl border border-glass-border transition-all font-label-caps text-label-caps text-on-surface">
+                        Language: <span class="text-primary">Spanish</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<!-- Simple Dropdown Mockup (Hidden) -->
+</div>
+<!-- Level Filter -->
+<div class="relative group">
+<button class="flex items-center gap-xs px-lg py-sm bg-white/5 hover:bg-white/10 rounded-xl border border-glass-border transition-all font-label-caps text-label-caps text-on-surface">
+                        Level: <span class="text-primary">B1 - Intermediate</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="h-8 w-px bg-glass-border mx-sm hidden sm:block"></div>
+<button class="px-md py-sm text-text-muted hover:text-on-surface transition-colors font-label-caps text-label-caps">
+                    ALL GENRES
+                </button>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-text-dim text-lg">search</span>
+<input class="w-full bg-white/5 border border-glass-border rounded-xl py-sm pl-11 pr-md focus:outline-none focus:border-primary/50 text-body-base placeholder:text-text-dim transition-all" placeholder="Search stories..." type="text"/>
+</div>
+</div>
+<!-- Story Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Card 1 -->
+<div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 shadow-xl flex flex-col">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A cinematic low-angle shot of a misty cobblestone street in Barcelona at twilight. The scene is illuminated by warm street lamps casting long shadows, creating a mysterious and immersive atmosphere. The color palette features deep blues, oranges, and soft teals to match the premium dark UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa3LqS723fUnRtnTKgq58MCCaCMvd4jO0pT5dyCDiSeidy5mvaLG-oMa-E4-oN1FMTKlr8ZTZ-_g79Jt093DjndTwjpbq8BQnB9cWeTiMchY58y56oZDJiYx7Vv7WbE6OW6wh2wKXlAy6ODvPqCUJFIk_XpaSqTzq5yeUcunhG2A0r9qMiuKDxk1DXo0jrWpFPkofBiQwz6wa7kXt31ISqo6oDS7-qHtKXgLAi1fot0Eq7nF8qoQugEUyxnI6xK37I0OAyutPQD88"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-md left-md">
+<span class="bg-primary/20 backdrop-blur-md text-primary px-sm py-1 rounded-lg font-label-caps text-[10px] border border-primary/30 tracking-widest">SPANISH B1</span>
+</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors">Sombras en Barcelona</h3>
+<p class="text-text-muted text-body-base mt-sm line-clamp-2">Follow Mateo as he discovers a hidden secret in the Gothic Quarter of Barcelona. A mystery thriller designed for intermediate learners.</p>
+<div class="mt-auto pt-lg flex items-center justify-between border-t border-glass-border">
+<div class="flex items-center gap-sm text-text-dim text-xs font-label-caps">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">layers</span>3 Chapters</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">schedule</span>18 Mins</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center glow-teal hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 shadow-xl flex flex-col">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A breathtaking landscape of the Japanese countryside during cherry blossom season, with Mount Fuji in the background. The lighting is soft and ethereal, mimicking a high-end anime aesthetic with vibrant pinks, deep purples, and glowing highlights that synchronize with the tech-focused brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV0gRv62Ypq4-wv0KYNGMdqe5bigRRgU2kGinqE1MYbGazlpqN1IvHVMi7HceZbzPFIvjOPa5qcwUiDy67X7KmOr_-K8mV2Hbfi7iaZ00GHHygpNXumXpDg9mM62tLqJPlB2hPE4Ev5Syjy4YBhr4MGg8K4Ds9HHHj-GHKRPSxxAIokjG-JxVXvC5OWD9bzCuVcm1mwUKs9n1PVx7zlf_UQPAUV2sbc1iDfFmrCAqXIPP2CQdWbywyrTSCRrNRPo8TcfdNFn8hxws"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-md left-md">
+<span class="bg-secondary-container/20 backdrop-blur-md text-secondary-container px-sm py-1 rounded-lg font-label-caps text-[10px] border border-secondary-container/30 tracking-widest">JAPANESE N3</span>
+</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-secondary-container transition-colors">The Wind's Whisper</h3>
+<p class="text-text-muted text-body-base mt-sm line-clamp-2">A poetic journey through rural Japan, exploring the connection between nature and local folklore through simple yet rich storytelling.</p>
+<div class="mt-auto pt-lg flex items-center justify-between border-t border-glass-border">
+<div class="flex items-center gap-sm text-text-dim text-xs font-label-caps">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">layers</span>5 Chapters</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">schedule</span>24 Mins</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center glow-teal hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 shadow-xl flex flex-col">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A stylized, neon-lit view of the Eiffel Tower at night from a Parisian cafe window. The rain creates beautiful reflections on the glass, blending urban grit with romantic elegance. The color palette is dominated by electric blues, magenta, and deep navy, fitting a futuristic language hacking vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKTs-wnQZl1J-EODdfq-u07weHQWZ5PENCPdV9TH234UzVnDQ0-L4haOQqIk1nfJZE2G0tX-dMbwxMG_3fvMi6QrpBmQE5-PZs1JKvOaKDcc55X27TEf4rPWPsjC1mmVWOEY84188qHSgG2MTEY6FSUCMpoh-HFJzbovSURR8Rxx47gyKcpNv8p3L-R6Zs31egyxXf8GdxVtxqrAheGp45IyQv2d3ySqFoL-JvFGmpD9SRtIBzK410mh9CuKRhVMqqremTEZ1NbtU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-md left-md">
+<span class="bg-tertiary/20 backdrop-blur-md text-tertiary px-sm py-1 rounded-lg font-label-caps text-[10px] border border-tertiary/30 tracking-widest">FRENCH A2</span>
+</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-tertiary transition-colors">Café de l'Inconnu</h3>
+<p class="text-text-muted text-body-base mt-sm line-clamp-2">Practice your everyday French through the interactions at a small Parisian café where nothing is quite as it seems.</p>
+<div class="mt-auto pt-lg flex items-center justify-between border-t border-glass-border">
+<div class="flex items-center gap-sm text-text-dim text-xs font-label-caps">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">layers</span>2 Chapters</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">schedule</span>12 Mins</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center glow-teal hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 shadow-xl flex flex-col">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A macro shot of a vintage typewriter with glowing paper, in a room filled with floating dust motes illuminated by a single shaft of golden light. This scholarly yet magical atmosphere uses rich brown and gold tones, aligning with the premium educational 'hacking' aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiEwMJiZmYj7_QNAJpTifgKoqKaGLSRs0DhU8q-rDasRJMRxd1804mdG6oF3wjYsppI--Em54sDZasjJiTKHmXDR-HqSK4HYOKQYQWx2FjZGFGZkxQM67lb6X9fMYqrxvjC-oyhoKs9aTs8L4ev1uCnVp4ETTrQFF9gl3yjkFP5Zh2ckoMUmTArAqkOGHqhur91j1zxX4ijXa1K0WhxP9vvvyBIizAtayhrEC-S_Ws-wjYfBH2ubYNGlD_HGNZKbLDPC3is1ApzEk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-md left-md">
+<span class="bg-primary/20 backdrop-blur-md text-primary px-sm py-1 rounded-lg font-label-caps text-[10px] border border-primary/30 tracking-widest">SPANISH C1</span>
+</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors">El Laberinto de Papel</h3>
+<p class="text-text-muted text-body-base mt-sm line-clamp-2">A high-level literary journey into the works of magical realism, featuring complex structures and sophisticated vocabulary.</p>
+<div class="mt-auto pt-lg flex items-center justify-between border-t border-glass-border">
+<div class="flex items-center gap-sm text-text-dim text-xs font-label-caps">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">layers</span>8 Chapters</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">schedule</span>45 Mins</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center glow-teal hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 shadow-xl flex flex-col">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A vibrant Tokyo cityscape at night, looking down a busy street filled with neon signs and futuristic billboards. The image has a slight cinematic motion blur, emphasizing a high-tech, fast-paced environment. Teal and pink neon lighting dominates, perfectly matching the design system's glowing interactive states." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBowfs7RKxSNud9dOfVkIw6AgJJjCRE-ydYTZPyy94CndejYWxpljuuxvxpaIfwBXje-W6Z88PJ0R0M4EoPK8DfoaUmXX0vhySW9wjZDe0FDztQ09o3zt2kcGuNFA9RqfTaak0uidpcIDO4OSsYcEWjbjpGbw20ofPwiO2_1yxgRrbfIevQLBQBjFsCThjs7PH8TlAwXQRWEnx1VB5i2fRFTbwt9Idf4qxwCxBVUlbeQrXMJqXaQfZvZ1w8tIkyOIw_0SaoiddeDCQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-md left-md">
+<span class="bg-secondary-container/20 backdrop-blur-md text-secondary-container px-sm py-1 rounded-lg font-label-caps text-[10px] border border-secondary-container/30 tracking-widest">JAPANESE B2</span>
+</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-secondary-container transition-colors">Neo-Tokyo Nights</h3>
+<p class="text-text-muted text-body-base mt-sm line-clamp-2">A sci-fi adventure exploring urban slang and modern technological terms in a near-future cyberpunk setting.</p>
+<div class="mt-auto pt-lg flex items-center justify-between border-t border-glass-border">
+<div class="flex items-center gap-sm text-text-dim text-xs font-label-caps">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">layers</span>4 Chapters</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">schedule</span>30 Mins</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center glow-teal hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State / Add More Card -->
+<div class="border-2 border-dashed border-glass-border rounded-3xl flex flex-col items-center justify-center p-xl gap-md group cursor-pointer hover:border-primary/50 transition-all bg-white/2">
+<div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-text-dim group-hover:text-primary text-3xl">add</span>
+</div>
+<div class="text-center">
+<h4 class="font-headline-sm text-headline-sm text-text-muted group-hover:text-on-surface">Request a Topic</h4>
+<p class="text-text-dim text-body-base mt-xs">Can't find what you need? We create stories based on user requests.</p>
+</div>
+</div>
+</div>
+<!-- Footer / Pagination -->
+<footer class="mt-xl pt-xl border-t border-glass-border flex flex-col md:flex-row items-center justify-between gap-lg">
+<p class="text-text-dim text-xs font-label-caps">SHOWING 5 OF 128 STORIES</p>
+<div class="flex items-center gap-xs">
+<button class="w-10 h-10 rounded-xl bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-xl bg-primary text-on-primary font-bold flex items-center justify-center glow-gold">1</button>
+<button class="w-10 h-10 rounded-xl bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all">2</button>
+<button class="w-10 h-10 rounded-xl bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all">3</button>
+<span class="px-sm text-text-dim">...</span>
+<button class="w-10 h-10 rounded-xl bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</footer>
+</main>
+<!-- Mobile Navigation (Bottom Bar) -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-low/80 backdrop-blur-xl border-t border-glass-border flex lg:hidden items-center justify-around z-50 px-md">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-[10px] font-label-caps">LIBRARY</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">DASHBOARD</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">style</span>
+<span class="text-[10px] font-label-caps">SRS</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-label-caps">SETTINGS</span>
+</button>
+</nav>
+<script>
+        // Simple Micro-interactions
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

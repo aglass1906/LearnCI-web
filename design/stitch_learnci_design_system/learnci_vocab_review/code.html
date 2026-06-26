@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI | Vocab SRS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-surface": "#e0e1f3",
+                  "surface-container": "#1c1f2b",
+                  "on-error": "#690005",
+                  "inverse-on-surface": "#2d303d",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-lowest": "#0b0e19",
+                  "surface-container-high": "#262936",
+                  "danger": "#EF4444",
+                  "surface-variant": "#313441",
+                  "on-secondary": "#00363d",
+                  "tertiary-container": "#a1b1ff",
+                  "glass-border": "rgba(255, 255, 255, 0.1)",
+                  "outline": "#a18d79",
+                  "error": "#ffb4ab",
+                  "on-tertiary-container": "#0035bd",
+                  "on-secondary-fixed-variant": "#004f58",
+                  "on-tertiary-fixed-variant": "#0035bd",
+                  "text-muted": "rgba(255, 255, 255, 0.7)",
+                  "inverse-primary": "#875200",
+                  "surface-container-highest": "#313441",
+                  "secondary": "#bdf4ff",
+                  "error-container": "#93000a",
+                  "success": "#10B981",
+                  "background": "#10131f",
+                  "on-primary-container": "#673e00",
+                  "surface-bright": "#363946",
+                  "surface": "#10131f",
+                  "secondary-fixed": "#9cf0ff",
+                  "on-background": "#e0e1f3",
+                  "outline-variant": "#544433",
+                  "inverse-surface": "#e0e1f3",
+                  "surface-container-low": "#181b27",
+                  "surface-elevated": "#23283B",
+                  "primary": "#ffc788",
+                  "tertiary-fixed-dim": "#b8c3ff",
+                  "tertiary": "#c6ceff",
+                  "on-secondary-container": "#00616d",
+                  "primary-fixed-dim": "#ffb865",
+                  "secondary-container": "#00e3fd",
+                  "on-surface-variant": "#d9c3ad",
+                  "on-primary-fixed": "#2b1700",
+                  "on-tertiary-fixed": "#001355",
+                  "on-primary-fixed-variant": "#663d00",
+                  "on-primary": "#482a00",
+                  "on-secondary-fixed": "#001f24",
+                  "secondary-fixed-dim": "#00daf3",
+                  "primary-container": "#ffa000",
+                  "tertiary-fixed": "#dde1ff",
+                  "glass-fill": "rgba(255, 255, 255, 0.04)",
+                  "surface-dim": "#10131f",
+                  "text-dim": "rgba(255, 255, 255, 0.4)",
+                  "on-tertiary": "#002487",
+                  "primary-fixed": "#ffddba",
+                  "surface-tint": "#ffb865"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "sm": "8px",
+                  "xs": "4px",
+                  "gutter": "24px",
+                  "xl": "32px",
+                  "md": "16px",
+                  "base": "4px",
+                  "lg": "24px",
+                  "container-max": "1280px"
+          },
+          "fontFamily": {
+                  "headline-sm": ["Outfit"],
+                  "headline-md": ["Outfit"],
+                  "badge-caption": ["Lexend"],
+                  "body-base": ["Inter"],
+                  "body-prose": ["Inter"],
+                  "display-lg": ["Outfit"],
+                  "label-caps": ["Lexend"],
+                  "headline-lg-mobile": ["Outfit"]
+          },
+          "fontSize": {
+                  "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                  "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                  "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                  "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                  "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                  "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                  "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #10131f;
+      color: #e0e1f3;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .flip-card-container {
+      perspective: 1500px;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .flip-card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1.5rem;
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    .glow-gold {
+      box-shadow: 0 0 20px rgba(255, 199, 136, 0.15);
+    }
+
+    .glow-teal {
+      box-shadow: 0 0 20px rgba(0, 227, 253, 0.15);
+    }
+
+    .glow-green {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .bg-blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 100%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.15;
+    }
+
+    .karaoke-highlight {
+      background: rgba(255, 160, 0, 0.2);
+      box-shadow: 0 0 8px rgba(255, 160, 0, 0.3);
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background min-h-screen font-body-base text-on-surface">
+<!-- Atmospheric Background Blobs -->
+<div class="bg-blob top-[-10%] left-[-10%] bg-secondary-container"></div>
+<div class="bg-blob bottom-[-10%] right-[-10%] bg-primary"></div>
+<div class="bg-blob top-[20%] right-[10%] bg-tertiary"></div>
+<!-- TopNavBar (Shared Component Logic) -->
+<nav class="fixed top-0 w-full z-50 bg-glass-fill backdrop-blur-md border-b border-glass-border shadow-xl">
+<div class="flex justify-between items-center px-lg py-md max-w-container-max mx-auto h-20">
+<div class="font-display-lg text-display-lg font-extrabold text-primary tracking-tighter">
+        LearnCI
+      </div>
+<div class="hidden lg:flex items-center space-x-xl">
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Dashboard</a>
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Stories</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-headline-sm text-headline-sm" href="#">Vocab SRS</a>
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Watch TV</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-sm rounded-full hover:bg-white/5 transition-all text-primary">search</button>
+<div class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up studio portrait of a learner with a warm smile, softly lit from the side with a teal and gold rim light, maintaining the premium dark glassmorphism aesthetic of the app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGFzPDUqnGbQxIzf1iTuwDCM1u5h56YH-uxuDh2z5rOrxe8e92UXzdbsvlByv5JSig8HdTj7895geZ89PDyMPTrK3vbXpeVZqJLXvik7PeujoVayWLXtS_6DCIi2T3AzJ-i5cFu1D9MBrfxh4HgCRrQ8VfcaeXbQCQmmqotNwh3Mu4eSiDAwo-m8umwLk1HyZgy4ggRLxQV647BtU7VE5b18IyBA4haEEeinsfaiLWK5LA-ttNu8-eC1jXbXrKy4NEbGloDIzD3E4"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Hidden on Mobile, Logic Mapping) -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-2xl pt-24 z-40">
+<div class="px-lg mb-xl">
+<h2 class="text-primary font-headline-md text-headline-md">Welcome back</h2>
+<p class="text-text-muted text-xs font-badge-caption uppercase tracking-wider">Level B2 Upper Intermediate</p>
+</div>
+<nav class="flex-1 space-y-xs px-md">
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-text-muted hover:text-on-surface hover:bg-white/5 transition-all cursor-pointer group">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-base">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-text-muted hover:text-on-surface hover:bg-white/5 transition-all cursor-pointer group">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-body-base">Library</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg bg-primary/10 text-primary border-r-4 border-primary transition-all cursor-pointer group">
+<span class="material-symbols-outlined">style</span>
+<span class="font-body-base">SRS Deck</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-text-muted hover:text-on-surface hover:bg-white/5 transition-all cursor-pointer group">
+<span class="material-symbols-outlined">live_tv</span>
+<span class="font-body-base">Media Hub</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-text-muted hover:text-on-surface hover:bg-white/5 transition-all cursor-pointer group">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-base">Settings</span>
+</div>
+</nav>
+<div class="p-lg">
+<button class="w-full bg-primary text-on-primary py-md rounded-xl font-headline-sm hover:-translate-y-0.5 active:scale-95 transition-all glow-gold">
+        Start Daily Goal
+      </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 pt-28 pb-12 px-gutter min-h-screen flex flex-col items-center">
+<!-- Progress Header -->
+<div class="w-full max-w-2xl glass-panel rounded-2xl p-lg mb-xl animate-fade-in">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface">7/20 Cards Reviewed</span>
+<span class="font-badge-caption text-secondary">35% Complete</span>
+</div>
+<div class="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full glow-teal transition-all duration-700 ease-out" style="width: 35%"></div>
+</div>
+</div>
+<!-- SRS Study Interface -->
+<div class="w-full max-w-2xl flex-1 flex flex-col items-center justify-center">
+<!-- 3D Flip Card -->
+<div class="flip-card-container w-full h-[400px] mb-xl">
+<div class="flip-card-inner glass-panel rounded-3xl" id="flashcard" onclick="toggleFlip()">
+<!-- Front Side -->
+<div class="flip-card-front glass-panel border-secondary-container/40">
+<span class="text-text-dim font-label-caps mb-md">[Noun / Masculine]</span>
+<h1 class="font-display-lg text-[64px] font-extrabold text-white tracking-tight">el guarda</h1>
+<div class="mt-xl flex items-center gap-sm text-secondary-container/80 animate-pulse">
+<span class="material-symbols-outlined">touch_app</span>
+<span class="font-body-base italic">Click to flip</span>
+</div>
+</div>
+<!-- Back Side -->
+<div class="flip-card-back glass-panel border-primary/40">
+<span class="text-text-dim font-label-caps mb-sm">Definition</span>
+<h2 class="font-headline-md text-3xl text-primary mb-xl">the guard / sentinel</h2>
+<div class="w-16 h-px bg-white/10 mb-xl"></div>
+<div class="text-center space-y-md px-xl">
+<p class="font-body-prose text-white leading-relaxed">
+<span class="karaoke-highlight">El guarda</span> dormía plácidamente.
+              </p>
+<p class="font-body-base text-text-muted italic">
+                "The guard was sleeping peacefully."
+              </p>
+</div>
+<div class="mt-auto pb-lg flex gap-md">
+<button class="material-symbols-outlined text-secondary hover:scale-110 transition-transform">volume_up</button>
+<button class="material-symbols-outlined text-secondary hover:scale-110 transition-transform">bookmark</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Control Panel / SRS Buttons -->
+<div class="w-full opacity-0 translate-y-10 transition-all duration-500 pointer-events-none" id="controls">
+<div class="grid grid-cols-4 gap-md w-full">
+<!-- Again -->
+<button class="group flex flex-col items-center gap-xs">
+<div class="w-full py-md rounded-xl border border-danger/40 bg-danger/5 text-danger font-headline-sm hover:bg-danger/10 transition-all hover:-translate-y-1">
+              Again
+            </div>
+<span class="font-badge-caption text-text-dim uppercase">1m</span>
+</button>
+<!-- Hard -->
+<button class="group flex flex-col items-center gap-xs">
+<div class="w-full py-md rounded-xl border border-primary/40 bg-primary/5 text-primary font-headline-sm hover:bg-primary/10 transition-all hover:-translate-y-1">
+              Hard
+            </div>
+<span class="font-badge-caption text-text-dim uppercase">12h</span>
+</button>
+<!-- Good -->
+<button class="group flex flex-col items-center gap-xs">
+<div class="w-full py-md rounded-xl bg-success text-white font-headline-sm glow-green transition-all hover:-translate-y-1 active:scale-95">
+              Good
+            </div>
+<span class="font-badge-caption text-text-dim uppercase">3d</span>
+</button>
+<!-- Easy -->
+<button class="group flex flex-col items-center gap-xs">
+<div class="w-full py-md rounded-xl border border-secondary-container/40 bg-secondary-container/5 text-secondary-container font-headline-sm hover:bg-secondary-container/10 transition-all hover:-translate-y-1">
+              Easy
+            </div>
+<span class="font-badge-caption text-text-dim uppercase">7d</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<script>
+    function toggleFlip() {
+      const card = document.getElementById('flashcard');
+      const controls = document.getElementById('controls');
+      
+      card.classList.toggle('is-flipped');
+      
+      if (card.classList.contains('is-flipped')) {
+        controls.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+      } else {
+        controls.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+      }
+    }
+
+    // Add keydown listener for accessibility (Space to flip)
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleFlip();
+      }
+    });
+  </script>
+</body></html>

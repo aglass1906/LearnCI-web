@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI | Password Recovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#ffddba",
+                    "on-primary": "#482a00",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e0e1f3",
+                    "surface-container-low": "#181b27",
+                    "tertiary-container": "#a1b1ff",
+                    "secondary-fixed-dim": "#00daf3",
+                    "secondary-fixed": "#9cf0ff",
+                    "error-container": "#93000a",
+                    "primary-container": "#ffa000",
+                    "danger": "#EF4444",
+                    "surface": "#10131f",
+                    "on-surface": "#e0e1f3",
+                    "secondary": "#bdf4ff",
+                    "tertiary-fixed-dim": "#b8c3ff",
+                    "on-tertiary-fixed-variant": "#0035bd",
+                    "glass-border": "rgba(255, 255, 255, 0.1)",
+                    "surface-bright": "#363946",
+                    "primary": "#ffc788",
+                    "surface-container-lowest": "#0b0e19",
+                    "text-muted": "rgba(255, 255, 255, 0.7)",
+                    "on-tertiary-fixed": "#001355",
+                    "tertiary": "#c6ceff",
+                    "on-background": "#e0e1f3",
+                    "surface-container": "#1c1f2b",
+                    "surface-elevated": "#23283B",
+                    "primary-fixed-dim": "#ffb865",
+                    "background": "#10131f",
+                    "surface-container-highest": "#313441",
+                    "surface-tint": "#ffb865",
+                    "tertiary-fixed": "#dde1ff",
+                    "outline": "#a18d79",
+                    "inverse-on-surface": "#2d303d",
+                    "success": "#10B981",
+                    "secondary-container": "#00e3fd",
+                    "on-primary-fixed-variant": "#663d00",
+                    "surface-variant": "#313441",
+                    "error": "#ffb4ab",
+                    "outline-variant": "#544433",
+                    "on-surface-variant": "#d9c3ad",
+                    "text-dim": "rgba(255, 255, 255, 0.4)",
+                    "surface-dim": "#10131f",
+                    "on-primary-container": "#673e00",
+                    "surface-container-high": "#262936",
+                    "glass-fill": "rgba(255, 255, 255, 0.04)",
+                    "on-tertiary": "#002487",
+                    "inverse-primary": "#875200",
+                    "on-secondary-fixed-variant": "#004f58",
+                    "on-error": "#690005",
+                    "on-secondary": "#00363d",
+                    "on-tertiary-container": "#0035bd",
+                    "on-secondary-fixed": "#001f24",
+                    "on-secondary-container": "#00616d",
+                    "on-primary-fixed": "#2b1700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Lexend"],
+                    "body-base": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"],
+                    "body-prose": ["Inter"],
+                    "headline-sm": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "badge-caption": ["Lexend"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0b0e19;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gold-glow {
+            text-shadow: 0 0 15px rgba(255, 199, 136, 0.6);
+        }
+
+        .btn-gold-glow {
+            box-shadow: 0 0 15px rgba(255, 160, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold-glow:hover {
+            box-shadow: 0 0 25px rgba(255, 160, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .bg-blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        .blob-gold { background: #ffc788; top: -10%; right: -10%; }
+        .blob-teal { background: #00daf3; bottom: -10%; left: -10%; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .success-overlay {
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-overlay.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-gutter font-body-base text-on-surface">
+<!-- Background Atmospheric Elements -->
+<div class="bg-blob blob-gold"></div>
+<div class="bg-blob blob-teal"></div>
+<!-- Main Recovery Container -->
+<main class="relative w-full max-w-md">
+<!-- Password Recovery Card -->
+<div class="glass-panel p-xl rounded-xl shadow-2xl flex flex-col items-center gap-xl relative z-10" id="recoveryCard">
+<!-- Lock Icon -->
+<div class="w-16 h-16 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20 animate-float">
+<span class="material-symbols-outlined text-4xl text-primary gold-glow" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<!-- Content Header -->
+<div class="text-center space-y-base">
+<h1 class="font-display-lg text-display-lg text-primary tracking-tighter">Reset Your Password</h1>
+<p class="text-text-muted font-body-base max-w-xs mx-auto">Enter your email address and we'll send you a secure link to get back into your account.</p>
+</div>
+<!-- Form -->
+<form class="w-full space-y-lg" id="recoveryForm" onsubmit="handleRecovery(event)">
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-text-dim px-xs uppercase" for="email">Email Address</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-text-dim group-focus-within:text-primary transition-colors" data-icon="mail">mail</span>
+<input class="w-full bg-surface-container-lowest/50 border border-glass-border rounded-xl py-md pl-12 pr-md text-on-surface placeholder:text-text-dim focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all" id="email" placeholder="name@example.com" required="" type="email"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-caps text-label-caps py-md rounded-xl btn-gold-glow flex items-center justify-center gap-sm group" type="submit">
+<span>Send Recovery Link</span>
+<span class="material-symbols-outlined text-md group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Links -->
+<div class="pt-md border-t border-glass-border w-full text-center">
+<a class="text-text-dim hover:text-primary text-label-caps font-label-caps transition-colors flex items-center justify-center gap-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="keyboard_backspace">keyboard_backspace</span>
+                    Back to Sign In
+                </a>
+</div>
+</div>
+<!-- Success State Overlay (Green Glass Banner) -->
+<div class="success-overlay absolute inset-0 z-20 flex items-center justify-center px-lg" id="successOverlay">
+<div class="bg-success/10 backdrop-blur-2xl border border-success/30 p-lg rounded-xl flex items-center gap-md shadow-[0_0_40px_rgba(16,185,129,0.1)] w-full">
+<div class="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-success" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-success">Link Sent!</p>
+<p class="text-text-muted font-body-base">Recovery email sent! Check your inbox.</p>
+</div>
+<button class="ml-auto text-text-dim hover:text-on-surface" onclick="resetState()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</main>
+<!-- UI Interaction Script -->
+<script>
+        function handleRecovery(event) {
+            event.preventDefault();
+            const form = document.getElementById('recoveryForm');
+            const card = document.getElementById('recoveryCard');
+            const overlay = document.getElementById('successOverlay');
+            
+            // Visual feedback on button click
+            const btn = form.querySelector('button');
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="progress_activity">progress_activity</span>';
+            
+            setTimeout(() => {
+                // Dim the main card content
+                card.style.opacity = '0.3';
+                card.style.filter = 'blur(4px)';
+                card.style.pointerEvents = 'none';
+                
+                // Show success banner
+                overlay.classList.add('active');
+            }, 800);
+        }
+
+        function resetState() {
+            const form = document.getElementById('recoveryForm');
+            const card = document.getElementById('recoveryCard');
+            const overlay = document.getElementById('successOverlay');
+            const btn = form.querySelector('button');
+            
+            overlay.classList.remove('active');
+            card.style.opacity = '1';
+            card.style.filter = 'none';
+            card.style.pointerEvents = 'auto';
+            
+            // Reset button
+            btn.innerHTML = '<span>Send Recovery Link</span><span class="material-symbols-outlined text-md group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>';
+            form.reset();
+        }
+    </script>
+</body></html>

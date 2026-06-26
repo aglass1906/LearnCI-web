@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LinguistOS | User Audit Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "glass-fill": "rgba(255, 255, 255, 0.04)",
+                    "surface-container-high": "#262936",
+                    "on-tertiary": "#002487",
+                    "inverse-primary": "#875200",
+                    "on-secondary-fixed-variant": "#004f58",
+                    "on-error": "#690005",
+                    "on-secondary": "#00363d",
+                    "on-tertiary-container": "#0035bd",
+                    "on-secondary-fixed": "#001f24",
+                    "on-secondary-container": "#00616d",
+                    "on-primary-fixed": "#2b1700",
+                    "primary-fixed-dim": "#ffb865",
+                    "surface-container-highest": "#313441",
+                    "background": "#10131f",
+                    "surface-tint": "#ffb865",
+                    "outline": "#a18d79",
+                    "tertiary-fixed": "#dde1ff",
+                    "success": "#10B981",
+                    "secondary-container": "#00e3fd",
+                    "on-primary-fixed-variant": "#663d00",
+                    "inverse-on-surface": "#2d303d",
+                    "surface-variant": "#313441",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#d9c3ad",
+                    "outline-variant": "#544433",
+                    "text-dim": "rgba(255, 255, 255, 0.4)",
+                    "surface-dim": "#10131f",
+                    "on-primary-container": "#673e00",
+                    "primary": "#ffc788",
+                    "surface-container-lowest": "#0b0e19",
+                    "text-muted": "rgba(255, 255, 255, 0.7)",
+                    "on-tertiary-fixed": "#001355",
+                    "tertiary": "#c6ceff",
+                    "on-background": "#e0e1f3",
+                    "surface-elevated": "#23283B",
+                    "surface-container": "#1c1f2b",
+                    "primary-fixed": "#ffddba",
+                    "on-primary": "#482a00",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e0e1f3",
+                    "surface-container-low": "#181b27",
+                    "tertiary-container": "#a1b1ff",
+                    "secondary-fixed": "#9cf0ff",
+                    "secondary-fixed-dim": "#00daf3",
+                    "error-container": "#93000a",
+                    "primary-container": "#ffa000",
+                    "danger": "#EF4444",
+                    "surface": "#10131f",
+                    "on-surface": "#e0e1f3",
+                    "secondary": "#bdf4ff",
+                    "tertiary-fixed-dim": "#b8c3ff",
+                    "on-tertiary-fixed-variant": "#0035bd",
+                    "surface-bright": "#363946",
+                    "glass-border": "rgba(255, 255, 255, 0.1)"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "container-max": "1280px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Outfit"],
+                    "label-caps": ["Lexend"],
+                    "body-base": ["Inter"],
+                    "headline-lg-mobile": ["Outfit"],
+                    "body-prose": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "badge-caption": ["Lexend"],
+                    "headline-sm": ["Outfit"]
+            },
+            "fontSize": {
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.3);
+        }
+        .glow-gold:hover {
+            box-shadow: 0 0 25px rgba(255, 199, 136, 0.5);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .active-user-gradient {
+            background: linear-gradient(90deg, rgba(255, 199, 136, 0.1) 0%, rgba(255, 199, 136, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-base overflow-hidden">
+<!-- Ambient Background Globs -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 blur-[100px] rounded-full"></div>
+<div class="absolute top-[40%] left-[30%] w-[30%] h-[30%] bg-tertiary/5 blur-[150px] rounded-full"></div>
+</div>
+<div class="flex h-screen w-full">
+<!-- Sidebar Navigation -->
+<aside class="flex flex-col h-full py-lg px-md bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-xl h-screen w-64 fixed left-0 top-0">
+<div class="mb-xl px-sm">
+<h1 class="font-display-lg text-display-lg font-extrabold text-primary tracking-tight">LinguistOS</h1>
+<p class="text-on-surface-variant/70 font-body-base">System Operator</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<div class="flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 cursor-pointer text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] active:scale-95">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-body-base">Pipeline</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 cursor-pointer text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] active:scale-95">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-body-base">Stories</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 cursor-pointer text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] active:scale-95">
+<span class="material-symbols-outlined">database</span>
+<span class="font-body-base">Database</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 cursor-pointer text-primary font-bold border-r-2 border-primary bg-glass-fill hover:translate-y-[-2px] active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-body-base">Users</span>
+</div>
+</nav>
+<div class="mt-auto space-y-xs pt-lg border-t border-glass-border/20">
+<button class="w-full bg-primary text-on-primary py-sm px-md rounded-lg font-bold glow-gold mb-md transition-all active:scale-95">
+                    Generate API Key
+                </button>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col h-screen">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center h-16 px-lg bg-background/10 backdrop-blur-md border-b border-glass-border z-40">
+<div class="flex items-center gap-md w-1/2">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low/50 border border-glass-border rounded-xl py-2 pl-10 pr-4 text-on-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search system logs or users..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">terminal</span></button>
+<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">dark_mode</span></button>
+</div>
+<div class="flex items-center gap-sm border-l border-glass-border pl-lg">
+<img class="w-8 h-8 rounded-full border border-primary/30 object-cover" data-alt="A cinematic, high-detail portrait of a professional system administrator in a dark tech-focused environment, dramatic neon backlighting in teal and gold, wearing tactical tech-wear, futuristic interface reflections on their face, ultra-realistic texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDovLnhv82I2Q93JwyGUeQWvr2adVKfoPFuQ4G2ktK3LMCuoxlG5y5MTotlC7qXvMfWV-rd1TJU_N_pD5nl4MJOpIWsBtWj-34KgJ8BunW8sGs3VjkpoC9NaBLEoNVE2GGYBy7VOAGT4SJrQS-tK8hXirlgHRX8DRK2OS357eaUgnm6R0CZ-TlwNQGSSULYr11DiOJ4ja8Lb2a8LfYYpiV0DWQqaSKIeTqz29bSj6en4l9k-OIKfHWqA89rWWtcp3cPzTSNoLh_j3c"/>
+<span class="font-headline-sm text-on-surface">Alex Chen</span>
+</div>
+</div>
+</header>
+<!-- Dual Pane Layout -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Pane: User List -->
+<section class="w-80 border-r border-glass-border bg-surface-container-low/20 overflow-y-auto">
+<div class="p-md border-b border-glass-border flex justify-between items-center bg-surface-container-lowest/30">
+<h2 class="font-headline-sm text-primary">Registered Users</h2>
+<span class="text-badge-caption text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">1,248 Total</span>
+</div>
+<div class="p-xs">
+<!-- User Item (Active) -->
+<div class="p-md rounded-xl active-user-gradient border border-primary/20 mb-xs cursor-pointer transition-all hover:bg-glass-fill">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of a young professional female language student, looking focused, wearing modern minimalist headphones, soft cinematic lighting with purple and teal hues, background showing a blurred futuristic library interior." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp8Q98_MnCI8UknecfhssmXd8fJXLMWcYc4Kaw4raLu5IBvzB7sx7vHN3enzTCXSqrK5wBDgAnOpVrFfCbO8Alh7aS76TpzdTMH2rQm3chPB2eyETNgV_9cooLjPipMa4FFx2OXbcXTJ84aSvppvlY4QJxDQk5fTAJqbHR5_ObVTAM_ZqBLgICdkLlW__PcYYXvJ6vS-u6LV1RmYjtZQSO2LAh0dhUO1hywu-5wqvKQEW1XHbct7twbKkwUTipLmbxee93GmgYbq0"/>
+<div class="flex-1 overflow-hidden">
+<h3 class="font-headline-sm text-on-surface truncate">Elena Vance</h3>
+<p class="text-badge-caption text-text-muted truncate">Japanese • Advanced • Level 42</p>
+</div>
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+</div>
+</div>
+<!-- User Item (Inactive) -->
+<div class="p-md rounded-xl border border-transparent hover:border-glass-border mb-xs cursor-pointer transition-all hover:bg-glass-fill group">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="A portrait of a male student with a sharp technical look, wearing a dark hoodie, cinematic side lighting in warm gold tones, sharp focus on eyes, futuristic workspace background blurred." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-mh_D5DCxGmcatnWUvTbCZJRnF8Bl_8MO9HxlujvbflgpF1y4CtU-OOZ5NOZ5ocpVE8fZXe0F5XYhrGf2-Iuipq1FninFTN2lcUsi5DQZDjqlb2Jk7t-8NPnvX16r-cn4epL7bAsCspRr6KTrBy0OO_vRfiOhR3cbSSoenkP7Irn5YNPlY1t48LqpbB-EEwr5GYSAJDg-5BCp6ketaOai7-HgvAYx4MjW7a6W4k_nQkuRLWuTD9j0JGMKTNGP_pxbVBLk3J9Lpkg"/>
+<div class="flex-1 overflow-hidden">
+<h3 class="font-headline-sm text-on-surface-variant truncate">Marcus Thorne</h3>
+<p class="text-badge-caption text-text-dim truncate">Spanish • Beginner • Level 12</p>
+</div>
+<span class="w-2 h-2 rounded-full bg-on-surface-variant/30"></span>
+</div>
+</div>
+<!-- User Item (Inactive) -->
+<div class="p-md rounded-xl border border-transparent hover:border-glass-border mb-xs cursor-pointer transition-all hover:bg-glass-fill group">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="A portrait of an older woman with an elegant, studious appearance, soft warm lighting against a cool blue background, wearing stylish glasses, looking at a translucent holographic screen." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPAlq-vKczbE324uG7FbHyR-EjnXbiZFYLlYE0pAEZQL9HXK8zo1zyu-wuhDYJehG4iTnNFM7f1oklAvDh3WV2Hp6AYoB0h8LB7r4kuvbAG7oYrKZCfJuzPLRF62lsKEYxF3_nCM2N1RUFzAX5aKqe97qixsSUj1ff4X5kIjjEmCVCCknqBqUUKCq8lU5Ph1CyCJpDyZ2ZswvCOdICWXxpRX4SmcDb7jOsFO1GxZQ-CG0WJ5WnguxRjDrOD7YSYgw2uL-OYNtXcQc"/>
+<div class="flex-1 overflow-hidden">
+<h3 class="font-headline-sm text-on-surface-variant truncate">Isabella Rossi</h3>
+<p class="text-badge-caption text-text-dim truncate">Italian • Intermediate • Level 28</p>
+</div>
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+</div>
+</div>
+<!-- More users... -->
+<div class="p-md rounded-xl border border-transparent hover:border-glass-border mb-xs cursor-pointer transition-all hover:bg-glass-fill group opacity-80">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<h3 class="font-headline-sm text-on-surface-variant truncate">Jonas K.</h3>
+<p class="text-badge-caption text-text-dim truncate">German • Advanced • Level 35</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Pane: User Audit Details -->
+<section class="flex-1 overflow-y-auto p-lg space-y-lg custom-scrollbar">
+<!-- Profile Header Section -->
+<div class="glass-card rounded-2xl p-xl flex items-start gap-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-lg">
+<div class="bg-primary/10 border border-primary/20 rounded-full px-4 py-1 text-primary text-label-caps glow-gold">
+                                PRO OPERATOR STATUS
+                            </div>
+</div>
+<img class="w-32 h-32 rounded-2xl border-2 border-primary/20 object-cover shadow-2xl" data-alt="A close-up studio portrait of Elena Vance, high-fashion technical photography, deep blue eyes, subtle skin texture, cinematic moody lighting with a gold rim-light effect, futuristic UI elements subtly overlaid on the periphery of the frame." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN3d_xczDPiJ38KeUrdfs8U3yFoVUXlm4RNkXGoyTncNN7uHPcFAfXuuJy9pWtBS6yZnInIGNNUkN2mMgYAAxX8YM7GtVIFDCuBBptfsjgkazef0vEyPFmqI0dJM4N98FMkxI750H0K9_d6wplQA4UH425d-uDVZf9Xh1Cfgl3377EjOfxBVKI1RNs47bjNhhxZR_fqnf8uN2VMwhMd1Dvw6El_tqATYbMi6Adt2L1P96GPu5K8cjQIgSSLZO68JdeNRZB3B1ro8o"/>
+<div class="space-y-sm">
+<h2 class="font-display-lg text-display-lg text-on-surface">Elena Vance</h2>
+<p class="text-body-prose text-text-muted max-w-lg">Advanced Japanese learner specializing in technical engineering vocabulary. Active in the system for 432 days with a 98% retention rate.</p>
+<div class="flex gap-md pt-sm">
+<div class="bg-surface-container-high px-md py-sm rounded-xl border border-glass-border">
+<p class="text-badge-caption text-text-dim uppercase tracking-widest">Global Rank</p>
+<p class="font-headline-md text-secondary">#142</p>
+</div>
+<div class="bg-surface-container-high px-md py-sm rounded-xl border border-glass-border">
+<p class="text-badge-caption text-text-dim uppercase tracking-widest">Hacking XP</p>
+<p class="font-headline-md text-primary">84,200</p>
+</div>
+<div class="bg-surface-container-high px-md py-sm rounded-xl border border-glass-border">
+<p class="text-badge-caption text-text-dim uppercase tracking-widest">Active Streak</p>
+<p class="font-headline-md text-tertiary">154 Days</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid for Activity & Mindset -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Activity Log (Column Span 8) -->
+<div class="col-span-8 glass-card rounded-2xl p-lg space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">monitoring</span>
+                                    Recent Activity Audit
+                                </h3>
+<button class="text-badge-caption text-primary border border-primary/30 px-3 py-1 rounded-full hover:bg-primary/10 transition-colors">Export Logs</button>
+</div>
+<div class="space-y-sm">
+<!-- Activity Row -->
+<div class="flex items-center justify-between p-md bg-white/2 rounded-xl border border-glass-border hover:bg-white/5 transition-all">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">neurology</span>
+</div>
+<div>
+<p class="font-body-base text-on-surface">SRS Technical Kanji Drill</p>
+<p class="text-badge-caption text-text-dim">Module: Infrastructure & Heavy Machinery</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-secondary">45m</p>
+<p class="text-badge-caption text-text-dim">14:22 PM Today</p>
+</div>
+</div>
+<!-- Activity Row -->
+<div class="flex items-center justify-between p-md bg-white/2 rounded-xl border border-glass-border hover:bg-white/5 transition-all">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<div>
+<p class="font-body-base text-on-surface">Immersive Reading: 'Cyber-Noir' Novel</p>
+<p class="text-badge-caption text-text-dim">3,200 Words Analyzed</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-tertiary">1h 12m</p>
+<p class="text-badge-caption text-text-dim">09:15 AM Today</p>
+</div>
+</div>
+<!-- Activity Row -->
+<div class="flex items-center justify-between p-md bg-white/2 rounded-xl border border-glass-border hover:bg-white/5 transition-all">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">headset_mic</span>
+</div>
+<div>
+<p class="font-body-base text-on-surface">Shadowing Session: News Broadcast</p>
+<p class="text-badge-caption text-text-dim">Pronunciation Accuracy: 92%</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-primary">20m</p>
+<p class="text-badge-caption text-text-dim">22:45 PM Yesterday</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Milestone Checklist (Column Span 4) -->
+<div class="col-span-4 glass-card rounded-2xl p-lg flex flex-col">
+<h3 class="font-headline-sm text-on-surface mb-md">Milestone Check-ins</h3>
+<div class="space-y-md flex-1">
+<div class="flex items-start gap-md group">
+<div class="mt-1 w-5 h-5 rounded border-2 border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-primary" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<div>
+<p class="font-body-base text-on-surface leading-tight">Master 500 N1 Kanji</p>
+<p class="text-badge-caption text-text-dim">Completed Oct 12</p>
+</div>
+</div>
+<div class="flex items-start gap-md group">
+<div class="mt-1 w-5 h-5 rounded border-2 border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-primary" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<div>
+<p class="font-body-base text-on-surface leading-tight">100 Hour Listening Block</p>
+<p class="text-badge-caption text-text-dim">Completed Nov 04</p>
+</div>
+</div>
+<div class="flex items-start gap-md group">
+<div class="mt-1 w-5 h-5 rounded border-2 border-glass-border bg-transparent flex items-center justify-center hover:border-primary transition-colors cursor-pointer"></div>
+<div>
+<p class="font-body-base text-on-surface-variant leading-tight">Pass Simulation J1 Exam</p>
+<p class="text-badge-caption text-text-dim">Current Progress: 72%</p>
+</div>
+</div>
+<div class="flex items-start gap-md group">
+<div class="mt-1 w-5 h-5 rounded border-2 border-glass-border bg-transparent flex items-center justify-center hover:border-primary transition-colors cursor-pointer"></div>
+<div>
+<p class="font-body-base text-on-surface-variant leading-tight">Professional Presentation</p>
+<p class="text-badge-caption text-text-dim">In Planning Phase</p>
+</div>
+</div>
+</div>
+<div class="mt-lg pt-lg border-t border-glass-border/30">
+<div class="flex justify-between items-end mb-xs">
+<p class="text-badge-caption text-text-muted">OVERALL PROGRESS</p>
+<p class="text-headline-sm text-primary">82%</p>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary glow-gold" style="width: 82%"></div>
+</div>
+</div>
+</div>
+<!-- Mindset Feedback (Column Span 12) -->
+<div class="col-span-12 glass-card rounded-2xl p-lg">
+<h3 class="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">psychology</span>
+                                Daily Mindset Feedbacks
+                            </h3>
+<div class="grid grid-cols-3 gap-md">
+<div class="p-md bg-white/2 rounded-xl border border-glass-border space-y-sm">
+<div class="flex justify-between items-center">
+<div class="flex gap-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div></div></div></div></div></div></section></div></main></div></body></html>

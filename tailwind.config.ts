@@ -9,7 +9,13 @@ const config: Config = {
     darkMode: "class",
     theme: {
         extend: {
+            fontFamily: {
+                sans: ["var(--font-sans)", "sans-serif"],
+                heading: ["var(--font-heading)", "sans-serif"],
+                labels: ["var(--font-labels)", "sans-serif"],
+            },
             colors: {
+                // Core Tailwind HSL variables linked to globals.css (enables shadcn components)
                 border: "rgb(var(--border))",
                 input: "rgb(var(--input))",
                 ring: "rgb(var(--ring))",
@@ -43,11 +49,22 @@ const config: Config = {
                     DEFAULT: "rgb(var(--card))",
                     foreground: "rgb(var(--card-foreground))",
                 },
+
+                // Premium Dark Mode / Glassmorphic Hex Bindings from Google Stitch
+                brandDark: "#10131f",
+                brandSurface: "#23283B",
+                accentTeal: "#00E5FF",
+                primaryAccent: "#FFA000",
+                glowPurple: "#3861FB",
+                
+                glassFill: "rgba(255, 255, 255, 0.04)",
+                glassBorder: "rgba(255, 255, 255, 0.1)",
             },
             borderRadius: {
                 lg: "var(--radius)",
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
+                xl: "1.5rem",
             },
             keyframes: {
                 "accordion-down": {

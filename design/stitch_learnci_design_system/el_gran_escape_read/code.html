@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI - Story Player</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gold-glow-text {
+            background: rgba(255, 160, 0, 0.2);
+            box-shadow: 0 0 12px rgba(255, 160, 0, 0.3);
+            border-radius: 4px;
+            padding: 0 4px;
+            color: #ffc788;
+            transition: all 0.3s ease;
+        }
+        .primary-glow-btn {
+            box-shadow: 0 0 0px rgba(255, 199, 136, 0);
+            transition: all 0.3s ease;
+        }
+        .primary-glow-btn:hover {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.5);
+            transform: translateY(-2px);
+        }
+        body {
+            background-color: #10131f;
+            color: #e0e1f3;
+            overflow-x: hidden;
+        }
+        .bg-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.15;
+        }
+        .waveform-bar {
+            height: 100%;
+            background: #ffc788;
+            transition: width 0.1s linear;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-surface": "#e0e1f3",
+                "surface-container": "#1c1f2b",
+                "on-error": "#690005",
+                "inverse-on-surface": "#2d303d",
+                "on-error-container": "#ffdad6",
+                "surface-container-lowest": "#0b0e19",
+                "surface-container-high": "#262936",
+                "danger": "#EF4444",
+                "surface-variant": "#313441",
+                "on-secondary": "#00363d",
+                "tertiary-container": "#a1b1ff",
+                "glass-border": "rgba(255, 255, 255, 0.1)",
+                "outline": "#a18d79",
+                "error": "#ffb4ab",
+                "on-tertiary-container": "#0035bd",
+                "on-secondary-fixed-variant": "#004f58",
+                "on-tertiary-fixed-variant": "#0035bd",
+                "text-muted": "rgba(255, 255, 255, 0.7)",
+                "inverse-primary": "#875200",
+                "surface-container-highest": "#313441",
+                "secondary": "#bdf4ff",
+                "error-container": "#93000a",
+                "success": "#10B981",
+                "background": "#10131f",
+                "on-primary-container": "#673e00",
+                "surface-bright": "#363946",
+                "surface": "#10131f",
+                "secondary-fixed": "#9cf0ff",
+                "on-background": "#e0e1f3",
+                "outline-variant": "#544433",
+                "inverse-surface": "#e0e1f3",
+                "surface-container-low": "#181b27",
+                "surface-elevated": "#23283B",
+                "primary": "#ffc788",
+                "tertiary-fixed-dim": "#b8c3ff",
+                "tertiary": "#c6ceff",
+                "on-secondary-container": "#00616d",
+                "primary-fixed-dim": "#ffb865",
+                "secondary-container": "#00e3fd",
+                "on-surface-variant": "#d9c3ad",
+                "on-primary-fixed": "#2b1700",
+                "on-tertiary-fixed": "#001355",
+                "on-primary-fixed-variant": "#663d00",
+                "on-primary": "#482a00",
+                "on-secondary-fixed": "#001f24",
+                "secondary-fixed-dim": "#00daf3",
+                "primary-container": "#ffa000",
+                "tertiary-fixed": "#dde1ff",
+                "glass-fill": "rgba(255, 255, 255, 0.04)",
+                "surface-dim": "#10131f",
+                "text-dim": "rgba(255, 255, 255, 0.4)",
+                "on-tertiary": "#002487",
+                "primary-fixed": "#ffddba",
+                "surface-tint": "#ffb865"
+            },
+            "fontFamily": {
+                "headline-sm": ["Outfit"],
+                "headline-md": ["Outfit"],
+                "badge-caption": ["Lexend"],
+                "body-base": ["Inter"],
+                "body-prose": ["Inter"],
+                "display-lg": ["Outfit"],
+                "label-caps": ["Lexend"],
+                "headline-lg-mobile": ["Outfit"]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="font-body-base text-on-surface bg-background min-h-screen">
+<!-- Atmospheric Background Blobs -->
+<div class="bg-blob bg-primary -top-24 -left-24"></div>
+<div class="bg-blob bg-secondary bottom-0 -right-24"></div>
+<!-- Navigation (Suppressed FAB/Nav logic as per transactional story focus) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-glass-fill backdrop-blur-md border-b border-glass-border">
+<div class="max-w-container-max mx-auto px-lg py-md flex items-center justify-between">
+<button class="flex items-center gap-2 text-text-muted hover:text-primary transition-colors group">
+<span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+<span class="font-label-caps text-label-caps">BACK TO LIBRARY</span>
+</button>
+<div class="flex items-center gap-sm">
+<span class="font-headline-md text-headline-md font-extrabold text-primary tracking-tighter uppercase">LearnCI</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-text-muted hover:text-on-surface"><span class="material-symbols-outlined">settings</span></button>
+<div class="w-8 h-8 rounded-full border border-glass-border overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A cinematic, close-up portrait of a young professional learner wearing stylish glasses in a high-tech study environment. The lighting is moody with cool teal and warm amber highlights reflecting off the glass surfaces. The style is hyper-realistic with deep focus, matching the premium glassmorphism dark mode aesthetic of a high-end educational application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRPN8oQ6oZhMBxX6_gmDKZKLXukMTz5KRUx75JlfSfbWNW4n7aSBiUdt8WcoW-K4FJahPRdES49GsbwvIfGB5DHPyjLbjkQQFymOareFGwMcfNvzydXd2RLdH0jpcC3jo0IZlGNxxYpuKwFUvfFq181oPe2HdlQCYgGQUKl3HZOsKzjnSsomOH0MIlhY_4O33wzSNJj344fNuWKFO-dRoojOdvJcrKys7ddjjPvhoZ28EMRoWbgILmT28FXfG6P4rltGdHCXhO5HY"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 max-w-container-max mx-auto px-lg">
+<!-- Story Header -->
+<section class="mb-xl">
+<div class="relative h-64 md:h-80 w-full rounded-xl overflow-hidden shadow-2xl mb-md">
+<img class="w-full h-full object-cover" data-alt="A sprawling, cinematic landscape illustration of a futuristic city at night during a heavy downpour. Neon signs in teal and gold reflect off wet pavement. A lone figure in a dark trench coat stands on a bridge overlooking the cybernetic metropolis. The mood is mysterious and atmospheric, utilizing a rich dark palette with vibrant light-emitting accents, perfect for a story called El Gran Escape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACmYzymr6a9sFjcNfXgr0O5MHbGgHPuKCDu4rbXddPsF02BdxZO7tVr9hkLTvaKpRPTJ3ZS5GGzrAqO8k2fhdW1JaatuDXBFNFTmURTnNyQqjC1iHq7rvGFBYfZGxPxYNqqIQfBEKCJzwDCwoGKYC0SN-h7Crh1memiqZz50YA2kBATpqfuuPnfRwllDvkUfyuJI5wyNKWZuIhZy2MLi-30pT8SMF7btkHEpmA8E7eaa4rEGUnZyz5LgicV_fTPzfgx1RW0oP1-0o"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<h1 class="font-display-lg text-display-lg font-extrabold text-on-surface drop-shadow-lg">El Gran Escape</h1>
+<p class="text-primary font-label-caps text-label-caps tracking-widest mt-1">CAPÍTULO 1: LA SOMBRA EN LA LLUVIA</p>
+</div>
+</div>
+<!-- Chapter Intro Card -->
+<div class="glass-card p-lg rounded-xl flex flex-col md:flex-row items-center gap-lg">
+<div class="text-center md:text-left flex-1">
+<p class="font-body-prose text-body-prose italic text-primary-fixed mb-1">"A veces la libertad se encuentra en los rincones más oscuros de la ciudad."</p>
+<p class="font-body-base text-body-base italic text-text-muted">"Sometimes freedom is found in the darkest corners of the city."</p>
+</div>
+<div class="flex gap-md border-l border-glass-border pl-lg">
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-text-dim">DIFFICULTY</p>
+<p class="font-headline-sm text-headline-sm text-secondary">B2</p>
+</div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-text-dim">DURATION</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">12m</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Story Prose Card -->
+<div class="lg:col-span-8 glass-card p-xl rounded-xl min-h-[600px] relative overflow-hidden">
+<div class="prose prose-invert max-w-none">
+<p class="font-body-prose text-body-prose leading-relaxed mb-6 text-on-surface">
+                        La lluvia golpeaba con fuerza contra el cristal del viejo almacén. El detective Mateo 
+                        <span class="gold-glow-text cursor-help" data-term="estaba">estaba</span> cansado de perseguir sombras. 
+                        Durante años, el sindicato de los Ojos Rojos había operado bajo el radar, moviendo secretos 
+                        como si fueran mercancía común. 
+                    </p>
+<p class="font-body-prose text-body-prose leading-relaxed mb-6 text-on-surface">
+                        Mientras la ciudad <span class="gold-glow-text cursor-help" data-term="dormía">dormía</span> plácidamente 
+                        bajo el manto de neón, Mateo preparaba su equipo. Sabía que esta era su única oportunidad para 
+                        infiltrarse en el servidor central. Un solo error y todo el plan se desmoronaría como un castillo 
+                        de naipes en una tormenta.
+                    </p>
+<p class="font-body-prose text-body-prose leading-relaxed mb-6 text-on-surface">
+                        Revisó su reloj. Las 03:00 AM. La hora en que la vigilancia era más débil. Con un suspiro profundo, 
+                        se ajustó el auricular y se deslizó hacia la oscuridad, dejando atrás la seguridad de la luz. 
+                        El destino de la red estaba ahora en sus manos, y el tiempo corría más rápido que la sangre en sus venas.
+                    </p>
+</div>
+<!-- Interactive Micro-interaction: Karaoke logic simulation -->
+<script>
+                    const terms = document.querySelectorAll('.gold-glow-text');
+                    terms.forEach(term => {
+                        term.addEventListener('mouseenter', () => {
+                            term.style.transform = 'scale(1.1)';
+                        });
+                        term.addEventListener('mouseleave', () => {
+                            term.style.transform = 'scale(1)';
+                        });
+                    });
+                </script>
+</div>
+<!-- Vocabulary Sidebar -->
+<aside class="lg:col-span-4 sticky top-24 space-y-lg">
+<div class="glass-card p-lg rounded-xl border-primary/20">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">menu_book</span>
+                            Vocabulary Lookup
+                        </h3>
+<span class="font-badge-caption text-badge-caption bg-primary/10 text-primary px-2 py-1 rounded">2 NEW</span>
+</div>
+<!-- Entry: Estaba -->
+<div class="mb-lg p-md bg-white/5 rounded-lg border border-white/5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">estaba</p>
+<span class="font-label-caps text-[10px] text-secondary-container bg-secondary-container/10 px-2 py-0.5 rounded">VERB (IMPERFECT)</span>
+</div>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+</button>
+</div>
+<p class="text-text-muted mb-4">Past tense of "estar" (to be). Used for descriptions, states of being, or ongoing actions in the past.</p>
+<button class="w-full py-2 bg-primary text-on-primary font-label-caps text-label-caps rounded-lg primary-glow-btn flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                            ADD TO SRS
+                        </button>
+</div>
+<!-- Entry: Dormía -->
+<div class="p-md bg-white/5 rounded-lg border border-white/5 opacity-80">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">dormía</p>
+<span class="font-label-caps text-[10px] text-secondary-container bg-secondary-container/10 px-2 py-0.5 rounded">VERB (IMPERFECT)</span>
+</div>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<p class="text-text-muted mb-4">Was sleeping. From the verb "dormir".</p>
+<button class="w-full py-2 border border-primary text-primary font-label-caps text-label-caps rounded-lg hover:bg-primary/10 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">check</span>
+                            IN SRS DECK
+                        </button>
+</div>
+</div>
+<!-- Learning Progress Micro-widget -->
+<div class="glass-card p-lg rounded-xl">
+<p class="font-label-caps text-label-caps text-text-dim mb-4">STORY COMPREHENSION</p>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-secondary h-full w-3/4 rounded-full shadow-[0_0_10px_rgba(189,244,255,0.5)]"></div>
+</div>
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-secondary">75% MASTERED</span>
+<span class="text-text-dim">450 WORDS</span>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Floating Audio Player Dock -->
+<footer class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-50">
+<div class="glass-card p-md rounded-2xl shadow-2xl flex flex-col md:flex-row items-center gap-md px-lg">
+<!-- Controls Group -->
+<div class="flex items-center gap-lg">
+<button class="text-text-muted hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">replay_10</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center primary-glow-btn">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="text-text-muted hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">forward_10</span>
+</button>
+</div>
+<!-- Waveform & Progress -->
+<div class="flex-1 w-full md:w-auto">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-caps text-[10px] text-text-dim">01:42</span>
+<span class="font-label-caps text-[10px] text-text-dim">12:05</span>
+</div>
+<div class="h-6 w-full flex items-end gap-[2px] cursor-pointer group">
+<!-- Fake Waveform -->
+<div class="bg-primary h-2 w-full rounded-t-sm opacity-60 group-hover:opacity-100 transition-opacity"></div>
+<div class="bg-primary h-4 w-full rounded-t-sm opacity-60"></div>
+<div class="bg-primary h-5 w-full rounded-t-sm opacity-60"></div>
+<div class="bg-primary h-3 w-full rounded-t-sm opacity-60"></div>
+<div class="bg-primary h-6 w-full rounded-t-sm opacity-100 shadow-[0_0_8px_rgba(255,199,136,0.8)]"></div>
+<div class="bg-white/10 h-4 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-2 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-5 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-3 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-6 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-4 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-2 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-5 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-1 w-full rounded-t-sm"></div>
+<div class="bg-white/10 h-3 w-full rounded-t-sm"></div>
+</div>
+</div>
+<!-- Secondary Controls -->
+<div class="flex items-center gap-md border-l border-glass-border pl-md">
+<div class="relative group">
+<button class="font-label-caps text-label-caps text-secondary hover:text-secondary-container flex items-center gap-1 transition-colors">
+                        1.0x <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<!-- Speed Picker (Hidden by default) -->
+<div class="absolute bottom-full left-0 mb-4 bg-surface-container border border-glass-border rounded-lg shadow-xl hidden group-hover:block w-20 p-2">
+<button class="w-full text-left p-1 hover:bg-white/5 rounded font-label-caps text-xs">0.8x</button>
+<button class="w-full text-left p-1 hover:bg-white/5 rounded font-label-caps text-xs">1.0x</button>
+<button class="w-full text-left p-1 hover:bg-white/5 rounded font-label-caps text-xs">1.2x</button>
+<button class="w-full text-left p-1 hover:bg-white/5 rounded font-label-caps text-xs">1.5x</button>
+</div>
+</div>
+<button class="text-text-muted hover:text-on-surface">
+<span class="material-symbols-outlined">subtitles</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Interactive script for playback simulation -->
+<script>
+        // Simple script to toggle play icon
+        const playBtn = document.querySelector('footer button.bg-primary');
+        let isPlaying = false;
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playBtn.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${isPlaying ? 'pause' : 'play_arrow'}</span>`;
+        });
+
+        // Hover effect for highlighted words to trigger sidebar update simulation
+        const highlightedWords = document.querySelectorAll('.gold-glow-text');
+        highlightedWords.forEach(word => {
+            word.addEventListener('click', () => {
+                // In a real app, this would refresh the sidebar content
+                word.classList.add('animate-pulse');
+                setTimeout(() => word.classList.remove('animate-pulse'), 1000);
+            });
+        });
+    </script>
+</body></html>

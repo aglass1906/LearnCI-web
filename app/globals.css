@@ -4,55 +4,66 @@
 
 @layer base {
   :root {
-    --background: 255 255 255;
-    --foreground: 15 23 42;
-    /* Slate 900 */
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-    --primary: 99 102 241;
-    /* Indigo 500 - Vibrant Purple/Blue */
-    --primary-foreground: 210 210 255;
-    --secondary: 210 230 255;
-    /* Light Cyan */
-    --secondary-foreground: 15 23 42;
-    --muted: 241 245 249;
-    --muted-foreground: 100 116 139;
-    --accent: 240 250 255;
-    --accent-foreground: 15 23 42;
+    /* Premium Dark Theme Base Colors (Hex equivalent: #10131f) */
+    --background: 228 32% 9%;
+    --foreground: 237 43% 92%;
+    
+    /* Card & Surface Elevated (Hex equivalent: #23283B) */
+    --card: 228 26% 18%;
+    --card-foreground: 237 43% 92%;
+    
+    --popover: 228 32% 9%;
+    --popover-foreground: 237 43% 92%;
+    
+    /* Primary Accent: Gold/Fire (#FFA000) */
+    --primary: 38 100% 50%;
+    --primary-foreground: 228 32% 9%;
+    
+    /* Secondary Accent: Neon Teal (#00E5FF) */
+    --secondary: 186 100% 50%;
+    --secondary-foreground: 228 32% 9%;
+    
+    /* Muted states */
+    --muted: 228 26% 18%;
+    --muted-foreground: 237 20% 70%;
+    
+    --accent: 228 26% 25%;
+    --accent-foreground: 237 43% 92%;
+    
+    /* Destructive/Danger */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40 40;
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 99 102 241;
+    
+    /* Border & Inputs */
+    --border: 228 20% 20%;
+    --input: 228 20% 20%;
+    --ring: 38 100% 50%;
+    
     --radius: 0.75rem;
+
+    /* Custom Hex Variables for exact script injections */
+    --brand-dark: #10131f;
+    --brand-surface: #23283B;
+    --accent-teal: #00E5FF;
+    --primary-accent: #FFA000;
+    --glow-purple: #3861FB;
   }
 
-
-
+  /* Support dark-theme classes explicitly to avoid flash errors */
   .dark {
-    --background: 2 6 23;
-    /* Slate 950 */
-    --foreground: 248 250 252;
-    --card: 15 23 42;
-    --card-foreground: 248 250 252;
-    --popover: 15 23 42;
-    --popover-foreground: 248 250 252;
-    --primary: 99 102 241;
-    /* Indigo 500 */
-    --primary-foreground: 255 255 255;
-    --secondary: 30 41 59;
-    --secondary-foreground: 248 250 252;
-    --muted: 30 41 59;
-    --muted-foreground: 148 163 184;
-    --accent: 30 41 59;
-    --accent-foreground: 248 250 252;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40 40;
-    --border: 30 41 59;
-    --input: 30 41 59;
-    --ring: 129 140 248;
+    --background: 228 32% 9%;
+    --foreground: 237 43% 92%;
+    --card: 228 26% 18%;
+    --card-foreground: 237 43% 92%;
+    --popover: 228 32% 9%;
+    --popover-foreground: 237 43% 92%;
+    --primary: 38 100% 50%;
+    --primary-foreground: 228 32% 9%;
+    --secondary: 186 100% 50%;
+    --secondary-foreground: 228 32% 9%;
+    --border: 228 20% 20%;
+    --input: 228 20% 20%;
+    --ring: 38 100% 50%;
   }
 }
 
@@ -62,6 +73,83 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background-color: #10131f;
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism frosted utility */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card-hover:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  /* Active selections glows */
+  .glow-active {
+    border-color: #FFA000;
+    box-shadow: 0 0 15px rgba(255, 160, 0, 0.3);
+  }
+
+  .glow-teal-active {
+    border-color: #00E5FF;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  }
+
+  /* 3D Flip Card animations helper */
+  .flip-card {
+    perspective: 1000px;
+  }
+
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 0.75rem;
+  }
+
+  .flip-card-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Karaoke word-highlight base styling */
+  .word-highlight {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .word-highlight.active {
+    background-color: rgba(255, 160, 0, 0.2);
+    color: #FFA000;
+    border-radius: 4px;
+    padding: 0 2px;
+    box-shadow: 0 0 8px rgba(255, 160, 0, 0.4);
   }
 }

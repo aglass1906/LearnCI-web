@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LinguistOS | Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Lexend:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "glass-fill": "rgba(255, 255, 255, 0.04)",
+                    "surface-container-high": "#262936",
+                    "on-tertiary": "#002487",
+                    "inverse-primary": "#875200",
+                    "on-secondary-fixed-variant": "#004f58",
+                    "on-error": "#690005",
+                    "on-secondary": "#00363d",
+                    "on-tertiary-container": "#0035bd",
+                    "on-secondary-fixed": "#001f24",
+                    "on-secondary-container": "#00616d",
+                    "on-primary-fixed": "#2b1700",
+                    "primary-fixed-dim": "#ffb865",
+                    "surface-container-highest": "#313441",
+                    "background": "#10131f",
+                    "surface-tint": "#ffb865",
+                    "outline": "#a18d79",
+                    "tertiary-fixed": "#dde1ff",
+                    "success": "#10B981",
+                    "secondary-container": "#00e3fd",
+                    "on-primary-fixed-variant": "#663d00",
+                    "inverse-on-surface": "#2d303d",
+                    "surface-variant": "#313441",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#d9c3ad",
+                    "outline-variant": "#544433",
+                    "text-dim": "rgba(255, 255, 255, 0.4)",
+                    "surface-dim": "#10131f",
+                    "on-primary-container": "#673e00",
+                    "primary": "#ffc788",
+                    "surface-container-lowest": "#0b0e19",
+                    "text-muted": "rgba(255, 255, 255, 0.7)",
+                    "on-tertiary-fixed": "#001355",
+                    "tertiary": "#c6ceff",
+                    "on-background": "#e0e1f3",
+                    "surface-elevated": "#23283B",
+                    "surface-container": "#1c1f2b",
+                    "primary-fixed": "#ffddba",
+                    "on-primary": "#482a00",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e0e1f3",
+                    "surface-container-low": "#181b27",
+                    "tertiary-container": "#a1b1ff",
+                    "secondary-fixed": "#9cf0ff",
+                    "secondary-fixed-dim": "#00daf3",
+                    "error-container": "#93000a",
+                    "primary-container": "#ffa000",
+                    "danger": "#EF4444",
+                    "surface": "#10131f",
+                    "on-surface": "#e0e1f3",
+                    "secondary": "#bdf4ff",
+                    "tertiary-fixed-dim": "#b8c3ff",
+                    "on-tertiary-fixed-variant": "#0035bd",
+                    "surface-bright": "#363946",
+                    "glass-border": "rgba(255, 255, 255, 0.1)"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "container-max": "1280px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Outfit"],
+                    "label-caps": ["Lexend"],
+                    "body-base": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "headline-sm": ["Outfit"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.3);
+        }
+        .glow-teal {
+            box-shadow: 0 0 15px rgba(189, 244, 255, 0.3);
+        }
+        body {
+            background-color: #10131f;
+            color: #e0e1f3;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="font-body-base overflow-x-hidden">
+<!-- Atmospheric Background Layers -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+<div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-[20%] -right-[10%] w-[40%] h-[60%] bg-secondary/10 rounded-full blur-[150px]"></div>
+<div class="absolute -bottom-[10%] left-[20%] w-[60%] h-[40%] bg-tertiary/10 rounded-full blur-[120px]"></div>
+</div>
+<!-- Side Navigation Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 backdrop-blur-xl border-r border-glass-border shadow-xl flex flex-col py-lg px-md z-50 bg-surface-container-low/40">
+<div class="mb-xl px-sm">
+<h1 class="font-display-lg text-display-lg font-extrabold text-primary tracking-tight">LinguistOS</h1>
+<p class="font-label-caps text-badge-caption text-text-dim uppercase tracking-widest mt-xs">System Operator</p>
+</div>
+<nav class="flex-1 space-y-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-2 border-primary bg-glass-fill transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-body-base text-body-base">Pipeline</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-body-base text-body-base">Stories</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-body-base text-body-base">Database</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-base text-body-base">Users</span>
+</a>
+</nav>
+<div class="mt-auto space-y-sm pt-lg border-t border-glass-border">
+<button class="w-full py-md px-lg rounded-full bg-primary text-on-primary font-label-caps text-label-caps glow-gold active:scale-95 transition-all">
+                GENERATE API KEY
+            </button>
+<div class="flex flex-col gap-xs mt-md">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-base text-body-base">Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="h-16 px-lg flex justify-between items-center backdrop-blur-md border-b border-glass-border sticky top-0 z-40 bg-background/10">
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="absolute inset-y-0 left-md flex items-center text-text-dim group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-low border-glass-border rounded-full pl-xl pr-md py-xs text-body-base focus:ring-1 focus:ring-primary focus:border-primary w-64 transition-all" placeholder="Search system logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md text-on-surface-variant">
+<button class="hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:text-primary transition-colors">
+</button></div></div></header></main></body></html>

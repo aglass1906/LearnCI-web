@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile Settings | LearnCI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lexend:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#e0e1f3",
+                    "surface-container": "#1c1f2b",
+                    "on-error": "#690005",
+                    "inverse-on-surface": "#2d303d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#0b0e19",
+                    "surface-container-high": "#262936",
+                    "danger": "#EF4444",
+                    "surface-variant": "#313441",
+                    "on-secondary": "#00363d",
+                    "tertiary-container": "#a1b1ff",
+                    "glass-border": "rgba(255, 255, 255, 0.1)",
+                    "outline": "#a18d79",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#0035bd",
+                    "on-secondary-fixed-variant": "#004f58",
+                    "on-tertiary-fixed-variant": "#0035bd",
+                    "text-muted": "rgba(255, 255, 255, 0.7)",
+                    "inverse-primary": "#875200",
+                    "surface-container-highest": "#313441",
+                    "secondary": "#bdf4ff",
+                    "error-container": "#93000a",
+                    "success": "#10B981",
+                    "background": "#10131f",
+                    "on-primary-container": "#673e00",
+                    "surface-bright": "#363946",
+                    "surface": "#10131f",
+                    "secondary-fixed": "#9cf0ff",
+                    "on-background": "#e0e1f3",
+                    "outline-variant": "#544433",
+                    "inverse-surface": "#e0e1f3",
+                    "surface-container-low": "#181b27",
+                    "surface-elevated": "#23283B",
+                    "primary": "#ffc788",
+                    "tertiary-fixed-dim": "#b8c3ff",
+                    "tertiary": "#c6ceff",
+                    "on-secondary-container": "#00616d",
+                    "primary-fixed-dim": "#ffb865",
+                    "secondary-container": "#00e3fd",
+                    "on-surface-variant": "#d9c3ad",
+                    "on-primary-fixed": "#2b1700",
+                    "on-tertiary-fixed": "#001355",
+                    "on-primary-fixed-variant": "#663d00",
+                    "on-primary": "#482a00",
+                    "on-secondary-fixed": "#001f24",
+                    "secondary-fixed-dim": "#00daf3",
+                    "primary-container": "#ffa000",
+                    "tertiary-fixed": "#dde1ff",
+                    "glass-fill": "rgba(255, 255, 255, 0.04)",
+                    "surface-dim": "#10131f",
+                    "text-dim": "rgba(255, 255, 255, 0.4)",
+                    "on-tertiary": "#002487",
+                    "primary-fixed": "#ffddba",
+                    "surface-tint": "#ffb865"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "badge-caption": ["Lexend"],
+                    "body-base": ["Inter"],
+                    "body-prose": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "label-caps": ["Lexend"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #10131f;
+            color: #e0e1f3;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.4;
+            border-radius: 50%;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #ffc788;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -7px;
+            box-shadow: 0 0 10px rgba(255, 199, 136, 0.5);
+        }
+
+        .btn-gold-glow:hover {
+            box-shadow: 0 0 15px #ffc788;
+            transform: translateY(-2px);
+        }
+
+        .word-highlight {
+            background: rgba(255, 160, 0, 0.15);
+            box-shadow: 0 0 8px rgba(255, 160, 0, 0.1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-body-base text-body-base">
+<!-- Atmospheric Background Blobs -->
+<div class="bg-blob w-[500px] h-[500px] bg-[#00e3fd] -top-24 -left-24"></div>
+<div class="bg-blob w-[600px] h-[600px] bg-[#ffa000] -bottom-32 -right-32"></div>
+<div class="bg-blob w-[400px] h-[400px] bg-[#c6ceff] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"></div>
+<!-- Navigation Shell (Desktop SideNav) -->
+<nav class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-2xl py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tighter">LearnCI</h1>
+</div>
+<div class="px-md space-y-base flex-1">
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 duration-200">dashboard</span>
+<span class="font-body-base">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 duration-200">auto_stories</span>
+<span class="font-body-base">Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 duration-200">style</span>
+<span class="font-body-base">SRS Deck</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 duration-200">live_tv</span>
+<span class="font-body-base">Media Hub</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl bg-primary/10 text-primary border-r-4 border-primary transition-all group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 duration-200" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-body-base font-bold">Settings</span>
+</a>
+</div>
+<div class="mt-auto px-lg border-t border-glass-border pt-lg">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full border border-primary/30" data-alt="A high-quality, cinematic portrait of a professional linguist in a modern, glass-walled office with subtle teal and gold ambient lighting. The person has a friendly expression and is wearing sleek, technical-looking glasses. The aesthetic is clean, premium, and futuristic, following the dark-mode glassmorphism theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Jhx3ip-hDRFSQTcm_tKuCNkmr4muSY_E8VSIjpH8qNd0sN5jTk06E7WqixWTKteSJAHJXlYr2XsqYmFpWbKLB-6_hc_S7dG8Nut9Tp0f8oWWcaeJ_GgGUdIcxGBrO-5R_EYrfK_XVLtQSkgbXd1hlcCZzLzOoK9grBev51BTbvMTLvcsl2zZDtH4h1DY9HHgQQx3fhFEu42yGmkgguDjbh5h68ffib4ijTW6isevhhuhuKkLX5Oy7f7TSg21yzQARg9OcUF4UWM"/>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface">Alex Rivera</p>
+<p class="text-[10px] text-text-muted">Level B2 Upper Intermediate</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 min-h-screen pt-lg px-md lg:px-xl pb-32">
+<div class="max-w-4xl mx-auto">
+<!-- Header Section -->
+<header class="mb-xl flex items-center justify-between">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Profile Settings</h2>
+<p class="text-text-muted font-body-base mt-xs">Optimize your linguistic immersion experience.</p>
+</div>
+<div class="hidden md:block">
+<span class="bg-primary/10 text-primary px-md py-sm rounded-full font-label-caps text-label-caps border border-primary/20">
+                        Premium Subscriber
+                    </span>
+</div>
+</header>
+<!-- Settings Bento Form -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Section 1: Language & Level (Left Column) -->
+<div class="md:col-span-7 space-y-lg">
+<!-- Target Language Card -->
+<div class="glass-card p-xl rounded-2xl">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-secondary">translate</span>
+<h3 class="font-headline-sm text-headline-sm">Learning Focus</h3>
+</div>
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-text-muted block">Target Language</label>
+<div class="relative">
+<select class="w-full bg-surface-container-highest border border-glass-border rounded-xl px-lg py-md text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer">
+<option>Spanish</option>
+<option selected="">French</option>
+<option>German</option>
+<option>Italian</option>
+<option>Portuguese</option>
+<option>Mandarin</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">expand_more</span>
+</div>
+</div>
+<div class="mt-xl space-y-md">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-muted">Comprehension Level</label>
+<span class="font-headline-sm text-headline-sm text-primary">B2</span>
+</div>
+<input class="w-full" max="6" min="1" type="range" value="4"/>
+<div class="flex justify-between text-[10px] font-label-caps text-text-dim px-1">
+<span>A1</span>
+<span>A2</span>
+<span>B1</span>
+<span class="text-primary font-bold">B2</span>
+<span>C1</span>
+<span>C2</span>
+</div>
+</div>
+</div>
+<!-- Personalization Card -->
+<div class="glass-card p-xl rounded-2xl">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-secondary">graphic_eq</span>
+<h3 class="font-headline-sm text-headline-sm">Immersion Audio</h3>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-text-muted block">TTS Voice Gender</label>
+<div class="flex bg-surface-container-highest rounded-xl p-1 border border-glass-border">
+<button class="flex-1 py-sm rounded-lg bg-primary text-on-primary font-label-caps text-[10px] transition-all">Male</button>
+<button class="flex-1 py-sm rounded-lg text-text-muted hover:text-on-surface font-label-caps text-[10px] transition-all">Female</button>
+</div>
+</div>
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-text-muted block">Playback Speed</label>
+<div class="relative">
+<select class="w-full bg-surface-container-highest border border-glass-border rounded-xl px-md py-sm text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer text-sm">
+<option>0.75x</option>
+<option selected="">1.0x</option>
+<option>1.25x</option>
+<option>1.5x</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-text-muted scale-75">expand_more</span>
+</div>
+</div>
+</div>
+<div class="mt-lg p-md bg-white/5 rounded-xl flex items-center gap-md">
+<button class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<p class="text-xs text-text-muted italic">"Le chat dort sur le canapé bleu."</p>
+</div>
+</div>
+</div>
+<!-- Section 2: Account Credentials (Right Column) -->
+<div class="md:col-span-5 space-y-lg">
+<div class="glass-card p-xl rounded-2xl h-full">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-secondary">lock</span>
+<h3 class="font-headline-sm text-headline-sm">Account & Access</h3>
+</div>
+<form class="space-y-xl">
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-text-muted block">Email Address</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border border-glass-border rounded-xl px-lg py-md text-on-surface focus:ring-0 focus:border-primary transition-all" type="email" value="alex.rivera@linguist.pro"/>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-text-dim group-focus-within:text-primary">alternate_email</span>
+</div>
+</div>
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-text-muted block">New Password</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border border-glass-border rounded-xl px-lg py-md text-on-surface focus:ring-0 focus:border-primary transition-all" placeholder="••••••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-text-dim group-focus-within:text-primary">key</span>
+</div>
+</div>
+<div class="pt-md">
+<label class="font-label-caps text-label-caps text-text-muted block mb-md">Connected Accounts</label>
+<div class="flex items-center justify-between p-lg bg-surface-container-highest rounded-xl border border-glass-border">
+<div class="flex items-center gap-md">
+<svg class="w-6 h-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"></path>
+</svg>
+<div>
+<p class="font-body-base text-on-surface">Google Account</p>
+<p class="text-[10px] text-success">Linked</p>
+</div>
+</div>
+<button class="text-[10px] font-label-caps text-error hover:underline transition-all">Disconnect</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-xl flex flex-col md:flex-row items-center justify-between gap-lg">
+<div class="flex items-center gap-md">
+<button class="btn-gold-glow flex items-center gap-md bg-primary text-on-primary-fixed px-xl py-md rounded-xl font-headline-sm text-headline-sm transition-all shadow-lg">
+<span class="material-symbols-outlined">save</span>
+                        Save Profile Settings
+                    </button>
+<button class="flex items-center gap-md border border-error/50 text-error px-xl py-md rounded-xl font-headline-sm text-headline-sm hover:bg-error/10 transition-all active:scale-95">
+<span class="material-symbols-outlined">logout</span>
+                        Sign Out
+                    </button>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-label-caps text-text-dim">Last security sync: Today, 09:42 AM</p>
+<p class="text-[10px] font-label-caps text-text-dim">LearnCI OS v2.4.1</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation Shell -->
+<div class="fixed bottom-0 left-0 right-0 h-16 md:hidden glass-card z-50 flex items-center justify-around px-md">
+<button class="flex flex-col items-center text-text-muted">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</button>
+<button class="flex flex-col items-center text-text-muted">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-[10px] font-label-caps">Learn</span>
+</button>
+<button class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px] font-label-caps">Settings</span>
+</button>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Form field focus effects
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('scale-[1.01]');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+
+        // Toggle male/female selector
+        const voiceButtons = document.querySelectorAll('.Personalization button'); // Generalized selector
+        // (Visual only mock functionality)
+    </script>
+</body></html>

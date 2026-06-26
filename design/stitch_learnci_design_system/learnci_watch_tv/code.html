@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnCI | YouTube Immersion Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Lexend:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --glass-fill: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #10131f;
+            color: #e0e1f3;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: var(--glass-fill);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.3);
+        }
+        .glow-gold:hover {
+            box-shadow: 0 0 25px rgba(255, 199, 136, 0.5);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .video-container:hover .video-overlay {
+            opacity: 1;
+        }
+        .focus-dim {
+            transition: opacity 0.5s ease;
+        }
+        .is-focus-mode .dim-target {
+            opacity: 0.15;
+            pointer-events: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#e0e1f3",
+                        "surface-container": "#1c1f2b",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d303d",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0b0e19",
+                        "surface-container-high": "#262936",
+                        "danger": "#EF4444",
+                        "surface-variant": "#313441",
+                        "on-secondary": "#00363d",
+                        "tertiary-container": "#a1b1ff",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                        "outline": "#a18d79",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#0035bd",
+                        "on-secondary-fixed-variant": "#004f58",
+                        "on-tertiary-fixed-variant": "#0035bd",
+                        "text-muted": "rgba(255, 255, 255, 0.7)",
+                        "inverse-primary": "#875200",
+                        "surface-container-highest": "#313441",
+                        "secondary": "#bdf4ff",
+                        "error-container": "#93000a",
+                        "success": "#10B981",
+                        "background": "#10131f",
+                        "on-primary-container": "#673e00",
+                        "surface-bright": "#363946",
+                        "surface": "#10131f",
+                        "secondary-fixed": "#9cf0ff",
+                        "on-background": "#e0e1f3",
+                        "outline-variant": "#544433",
+                        "inverse-surface": "#e0e1f3",
+                        "surface-container-low": "#181b27",
+                        "surface-elevated": "#23283B",
+                        "primary": "#ffc788",
+                        "tertiary-fixed-dim": "#b8c3ff",
+                        "tertiary": "#c6ceff",
+                        "on-secondary-container": "#00616d",
+                        "primary-fixed-dim": "#ffb865",
+                        "secondary-container": "#00e3fd",
+                        "on-surface-variant": "#d9c3ad",
+                        "on-primary-fixed": "#2b1700",
+                        "on-tertiary-fixed": "#001355",
+                        "on-primary-fixed-variant": "#663d00",
+                        "on-primary": "#482a00",
+                        "on-secondary-fixed": "#001f24",
+                        "secondary-fixed-dim": "#00daf3",
+                        "primary-container": "#ffa000",
+                        "tertiary-fixed": "#dde1ff",
+                        "glass-fill": "rgba(255, 255, 255, 0.04)",
+                        "surface-dim": "#10131f",
+                        "text-dim": "rgba(255, 255, 255, 0.4)",
+                        "on-tertiary": "#002487",
+                        "primary-fixed": "#ffddba",
+                        "surface-tint": "#ffb865"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "badge-caption": ["Lexend"],
+                        "body-base": ["Inter"],
+                        "body-prose": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "label-caps": ["Lexend"],
+                        "headline-lg-mobile": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background font-body-base text-on-surface">
+<!-- Background Atmospheric Blurs -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+<div class="absolute -top-[20%] -left-[10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-[40%] -right-[5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+<div class="absolute -bottom-[10%] left-[20%] w-[600px] h-[600px] bg-tertiary/5 rounded-full blur-[150px]"></div>
+</div>
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-glass-fill backdrop-blur-md border-b border-glass-border shadow-xl">
+<div class="flex justify-between items-center px-lg py-md max-w-container-max mx-auto h-20">
+<div class="flex items-center gap-xl">
+<span class="font-display-lg text-display-lg font-extrabold text-primary tracking-tighter cursor-default">LearnCI</span>
+<nav class="hidden md:flex gap-lg">
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Dashboard</a>
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Stories</a>
+<a class="text-text-muted hover:text-on-surface transition-colors font-headline-sm text-headline-sm" href="#">Vocab SRS</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-headline-sm text-headline-sm" href="#">Watch TV</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<!-- Status Widget -->
+<div class="glass-card rounded-xl px-md py-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-label-caps text-label-caps text-on-surface whitespace-nowrap">Logged Today: 15 Mins</span>
+</div>
+<div class="relative w-10 h-10 rounded-full overflow-hidden border border-primary/30 group cursor-pointer transition-all hover:scale-105 active:scale-95">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young adult language learner with a confident expression. The lighting is cinematic with teal and gold rim lights against a dark, tech-inspired background, fitting the premium glassmorphism aesthetic of a high-end educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCY2nWfUBDffS8Dr77P6GE1t7GPOrYHh50dYDYnfDUYJdL35zCusOEJWO2O7soFQS9INooSaSWsjWqY6sRib--PakQq9ICYYYyUhD0eRmIRj-hoRHHnnwEkHZBL0R9zBEDyV6t5M-Add5LRIc-TNvDA8UA4UYxKXRTNgfjDoJ4MEEXFRyaQ0U1NpT_9Nnx5rde2XTSDpXT5ANbQUo-BLqJF9Q-Avta-KLl3P9XpXGU54LZlgGLWga_pKAmI7Jx3_vMCyplZY9Y-Kfs"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border pt-24 z-40 dim-target focus-dim">
+<div class="flex flex-col h-full py-lg px-md gap-sm">
+<div class="mb-lg px-md">
+<p class="text-text-dim font-label-caps text-label-caps uppercase tracking-widest">Main Hub</p>
+</div>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">dashboard</span>
+<span class="font-body-base text-body-base">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">auto_stories</span>
+<span class="font-body-base text-body-base">Library</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">style</span>
+<span class="font-body-base text-body-base">SRS Deck</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl bg-primary/10 text-primary border-r-4 border-primary group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200" style="font-variation-settings: 'FILL' 1;">live_tv</span>
+<span class="font-body-base text-body-base">Media Hub</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all group mt-auto" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+<div class="mt-lg p-md glass-card rounded-2xl">
+<p class="font-label-caps text-label-caps text-primary mb-xs">Daily Goal</p>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]" style="box-shadow: 0 0 10px rgba(255, 199, 136, 0.4)"></div>
+</div>
+<p class="text-[10px] text-text-dim mt-sm text-right">32 / 45 mins</p>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-64 pt-24 pb-12 px-gutter min-h-screen">
+<div class="max-w-container-max mx-auto grid grid-cols-12 gap-lg relative">
+<!-- Focus Mode Button & Header -->
+<div class="col-span-12 flex justify-between items-end mb-md dim-target focus-dim">
+<div>
+<nav class="flex gap-xs text-text-dim font-label-caps text-[10px] mb-xs">
+<span>LEARNCI</span>
+<span>/</span>
+<span>IMMERSION</span>
+<span>/</span>
+<span class="text-primary">YOUTUBE</span>
+</nav>
+<h1 class="font-headline-md text-headline-md">YouTube Immersion Center</h1>
+</div>
+<button class="glass-card px-md py-sm rounded-lg flex items-center gap-sm text-text-muted hover:text-primary transition-all active:scale-95 group" onclick="toggleFocus()">
+<span class="material-symbols-outlined text-[20px]" id="focus-icon">filter_center_focus</span>
+<span class="font-label-caps text-label-caps" id="focus-text">Enter Focus Mode</span>
+</button>
+</div>
+<!-- Left Column: Player & Progress -->
+<div class="col-span-12 lg:col-span-8 space-y-lg">
+<!-- Video Player Shell -->
+<div class="relative z-50 transition-all duration-500 rounded-3xl overflow-hidden border border-glass-border shadow-2xl group/player">
+<div class="aspect-video bg-black relative flex items-center justify-center overflow-hidden">
+<!-- Simulated Player Image -->
+<div class="absolute inset-0 w-full h-full" data-alt="A stunning cinematic first-person view of a traveler walking through the vibrant streets of Medellin, Colombia. The shot features lush green mountains in the distance, colorful architecture, and bright sunny lighting. The image captures the essence of a high-quality intermediate Spanish travel vlog, with a slightly soft aesthetic and high depth of field." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLNdQ-76TcMbWNcH42wVh2PV0bHEHTRKlz16PQ75eNmQ3-MVF4SYYcG2rLrH9AvvuPqrYFVk4hz4HPt5OvtqD3Xro_P7MXvgDsYziy5zm9mT4p0U24SAXPkyNmKGkyeTvk4moUp-oz9KDNvyhlWKuOetO6JhY6abgvlnrorlEoPRWMSyIqysTlDxjoTcK-tl9aFdxsVSlnqBJNyQmy2igjaFpb9_gds1UiYByLJAHa-KsRnJOEn23h91_SEdQFRE0siIvW4huf5_M')"></div>
+<!-- Video Controls Overlay -->
+<div class="absolute inset-x-0 bottom-0 p-lg bg-gradient-to-t from-black/80 to-transparent flex flex-col gap-sm opacity-0 group-hover/player:opacity-100 transition-opacity duration-300">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<div class="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden cursor-pointer">
+<div class="h-full bg-primary w-[42%] relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg"></div>
+</div>
+</div>
+<span class="font-label-caps text-[10px]">12:45 / 30:20</span>
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-primary transition-colors">settings</span>
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-primary transition-colors">fullscreen</span>
+</div>
+</div>
+<!-- Big Center Play Icon (Micro-interaction) -->
+<div class="z-10 w-20 h-20 rounded-full bg-primary/20 backdrop-blur-md border border-primary/40 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all group-hover/player:opacity-100 opacity-0">
+<span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+<!-- Video Info & Meta -->
+<div class="dim-target focus-dim space-y-md">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Explorando las Joyas Ocultas de Antioquia | Spanish B1-B2</h2>
+<p class="text-text-muted mt-1">Viajes con Mateo • 1.2M views • 2 days ago</p>
+</div>
+<div class="flex gap-sm">
+<button class="glass-card p-sm rounded-lg hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="glass-card p-sm rounded-lg hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<!-- Progress Log Widget -->
+<div class="glass-card rounded-3xl p-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px]">sync</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md relative z-10">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm">Session Tracking</p>
+<p class="text-text-muted text-body-base">Tracking active comprehension time...</p>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-text-dim">MINUTES GAINED</p>
+<p class="font-display-lg text-primary" id="session-timer">+8:12</p>
+</div>
+<div class="h-10 w-px bg-glass-border"></div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-text-dim">STATUS</p>
+<div class="flex items-center gap-sm mt-1">
+<div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+<p class="font-body-base text-success text-xs font-bold">SYNCING</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Recommendations -->
+<div class="col-span-12 lg:col-span-4 space-y-md dim-target focus-dim">
+<div class="flex items-center justify-between px-xs">
+<h3 class="font-headline-sm text-headline-sm">Recommended for B2</h3>
+<button class="text-primary font-label-caps text-label-caps hover:underline">Refresh</button>
+</div>
+<div class="space-y-md">
+<!-- Recommendation Card 1 -->
+<div class="glass-card p-sm rounded-2xl flex gap-md group cursor-pointer hover:bg-white/10 transition-all hover:-translate-y-0.5">
+<div class="relative w-32 aspect-video shrink-0 rounded-xl overflow-hidden">
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-alt="A vibrant culinary scene in Mexico City showing street tacos being prepared with fresh ingredients. The lighting is warm and inviting, capturing the atmosphere of a bustling food market. The colors are saturated with reds and greens, suitable for a Spanish learning video thumbnail about culture and food." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_nwoFGA2XqnXPANIa3YsNGq84_SYlQiupMsubChoYLjXa5-JlPqec-Z797ts7OEwS9LX2uv5snoIu2gZlciQQdyxSbQWcrEKuIAE-5WopWLeh1Jrmw7Y-pt0ltEhGXv3jNaCd2igYx5m-7sp2Q6hgCodEB1AAKJIOGrwU4_n7EiY9nDJWvLJCMAr3de5Hq3wRfaZ72630q68iJNhQMRIQTHUAFMM1g2_LwVpwAPAzsf8gr0g1S1pe19iswf67Rlu9H8vQLoqsoHM')"></div>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded text-[10px] font-bold">14:02</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-white">play_circle</span>
+</div>
+</div>
+<div class="flex flex-col justify-center min-w-0">
+<span class="bg-secondary/10 text-secondary border border-secondary/20 px-sm py-0.5 rounded-full text-[9px] font-bold self-start mb-1 font-label-caps">B2 UPPER</span>
+<h4 class="font-body-base font-bold text-sm leading-tight truncate">Cultura Callejera en CDMX</h4>
+<p class="text-[11px] text-text-dim mt-1">Habla con Sofía</p>
+</div>
+</div>
+<!-- Recommendation Card 2 -->
+<div class="glass-card p-sm rounded-2xl flex gap-md group cursor-pointer hover:bg-white/10 transition-all hover:-translate-y-0.5">
+<div class="relative w-32 aspect-video shrink-0 rounded-xl overflow-hidden">
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-alt="A clean, minimalist workspace with a high-end laptop, a cup of coffee, and a notebook. The aesthetic is professional and productive, using a cool blue and white palette with sharp focus. This represents a Spanish tutorial on business vocabulary and productivity hacks." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAjZNP0eZaWgVWsF3F7n01KrZPEzfYieCOeyvlFnU7da_yPDCf7h7Lu2PlxC9MMr4RM0hoUJ2L1jPB1Ho8Lqzia-yilMZ4XDMzAwdn8FsK44PA3rAkI4KhOD0YXFHxtmWEJQfjP19y2i5MUBIoHpoaU5acTKTGFaDTvhBUgRkpnL5Wk5bYonYjtYmZQY1HkINCwHWpkUbs1bRPM-MK_JiLOlqMiEXMEKSQ7HFITGNg34rDcnZzeiWY2HJoWKgs5Af--amDjAQzC07k')"></div>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded text-[10px] font-bold">08:45</div>
+</div>
+<div class="flex flex-col justify-center min-w-0">
+<span class="bg-primary/10 text-primary border border-primary/20 px-sm py-0.5 rounded-full text-[9px] font-bold self-start mb-1 font-label-caps">B1 INTERMEDIATE</span>
+<h4 class="font-body-base font-bold text-sm leading-tight truncate">Productividad para Profesionales</h4>
+<p class="text-[11px] text-text-dim mt-1">Tech Español</p>
+</div>
+</div>
+<!-- Recommendation Card 3 -->
+<div class="glass-card p-sm rounded-2xl flex gap-md group cursor-pointer hover:bg-white/10 transition-all hover:-translate-y-0.5">
+<div class="relative w-32 aspect-video shrink-0 rounded-xl overflow-hidden">
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-alt="A breathtaking landscape of the Patagonia mountains at sunrise. The peaks are glowing orange with the first light, while the foreground is in deep purple shadow. A cinematic, documentary-style image perfect for a high-level Spanish nature immersion video." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFwFBuPj-VQSrjqUOhOuwWJYETFx-4KPJv9XDLzxVjnc2QnWi3rwwqI8DbwRqUrjdNN2Vr9gjW9RiiiBiO2he-wMA6MTSVgiUtqNGB3nrIkeTZYWlaVBuYizSM01i6U_l5GJOArQidjgL3fQ81r1dg0Z4Bh7aZGvXH_9XAKKJjc9IVtyequkChKHuZqgBDNKxwAk7FjmIWK5zVAos7o4g375pw47XkrbCdp35ZYT4nHlp1DVJr9noo8jTvIDk0GiPyriK8bIBmT9E')"></div>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded text-[10px] font-bold">22:18</div>
+</div>
+<div class="flex flex-col justify-center min-w-0">
+<span class="bg-danger/10 text-danger border border-danger/20 px-sm py-0.5 rounded-full text-[9px] font-bold self-start mb-1 font-label-caps">C1 ADVANCED</span>
+<h4 class="font-body-base font-bold text-sm leading-tight truncate">Documental: Patagonia</h4>
+<p class="text-[11px] text-text-dim mt-1">Naturaleza Viva</p>
+</div>
+</div>
+<!-- Recommendation Card 4 -->
+<div class="glass-card p-sm rounded-2xl flex gap-md group cursor-pointer hover:bg-white/10 transition-all hover:-translate-y-0.5">
+<div class="relative w-32 aspect-video shrink-0 rounded-xl overflow-hidden">
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-alt="A cozy indoor scene of a woman listening to music with high-end headphones, looking out a rainy window at a city at night. The mood is moody, lo-fi, and introspective. Teal and purple neon lights from the city reflect on the window pane. Perfect for a casual Spanish listening practice video." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUr2GS1s4E2GykW_GlLjs9ku0Nbgk-Dix4ph59c5T4F5A_WVGloJJooGVKi4Y5wz_qSfVlc3PMy9lz9ujBIRhcqGjSmvb0Zg71tsXyqa1AVhQ2ur53XcQy-VZXYBpJpP37DCZQsfr9WXqrNPhG5Qsb4cYYk-LAdpoSJ6G2l6CvXr8_bqooQ5nK_A4PZbU3qg6FzIbun18fLrWwsY_stOl7O5tvNRreTncRHfkgObjSDyRqao5JEZvAkolppbUlgBp8zE7ihNV3f7M')"></div>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded text-[10px] font-bold">10:30</div>
+</div>
+<div class="flex flex-col justify-center min-w-0">
+<span class="bg-success/10 text-success border border-success/20 px-sm py-0.5 rounded-full text-[9px] font-bold self-start mb-1 font-label-caps">A2 ELEMENTARY</span>
+<h4 class="font-body-base font-bold text-sm leading-tight truncate">Mi Rutina Nocturna</h4>
+<p class="text-[11px] text-text-dim mt-1">Cami en Casa</p>
+</div>
+</div>
+</div>
+<!-- Bento Card CTA -->
+<div class="glass-card rounded-2xl p-md mt-lg relative group overflow-hidden">
+<div class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl group-hover:bg-primary/40 transition-all duration-700"></div>
+<h5 class="font-headline-sm text-headline-sm text-primary mb-1">New Challenges</h5>
+<p class="text-xs text-text-muted mb-md">Unlock specialized vocabulary by completing this immersion hour.</p>
+<button class="w-full py-sm bg-primary text-on-primary font-label-caps text-label-caps rounded-lg glow-gold transition-all duration-300">
+                        View Goals
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full bg-surface-container-low/80 backdrop-blur-xl border-t border-glass-border flex justify-around items-center py-sm px-md lg:hidden z-50">
+<button class="flex flex-col items-center gap-xs text-text-muted">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</button>
+<button class="flex flex-col items-center gap-xs text-text-muted">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-[10px] font-label-caps">Library</span>
+</button>
+<div class="relative -top-4">
+<button class="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-lg glow-gold">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">live_tv</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-xs text-text-muted">
+<span class="material-symbols-outlined">style</span>
+<span class="text-[10px] font-label-caps">SRS</span>
+</button>
+<button class="flex flex-col items-center gap-xs text-text-muted">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-caps">Profile</span>
+</button>
+</nav>
+<script>
+        function toggleFocus() {
+            const body = document.body;
+            const icon = document.getElementById('focus-icon');
+            const text = document.getElementById('focus-text');
+            
+            body.classList.toggle('is-focus-mode');
+            
+            if (body.classList.contains('is-focus-mode')) {
+                icon.textContent = 'close_fullscreen';
+                text.textContent = 'Exit Focus Mode';
+                // Trigger a slight atmospheric pulse
+                body.style.backgroundColor = '#05070d';
+            } else {
+                icon.textContent = 'filter_center_focus';
+                text.textContent = 'Enter Focus Mode';
+                body.style.backgroundColor = '#10131f';
+            }
+        }
+
+        // Lightweight atmospheric effect: session timer increment
+        let seconds = 492; // 8:12
+        const timerElement = document.getElementById('session-timer');
+        
+        setInterval(() => {
+            seconds++;
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            timerElement.textContent = `+${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }, 1000);
+    </script>
+</body></html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LinguistOS | Admin Learning Resources</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gold-glow-hover:hover {
+            box-shadow: 0 0 15px rgba(255, 199, 136, 0.3);
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 199, 136, 0.2);
+            border-radius: 10px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffc788 !important;
+            box-shadow: 0 0 0 1px #ffc788;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "glass-fill": "rgba(255, 255, 255, 0.04)",
+                      "surface-container-high": "#262936",
+                      "on-tertiary": "#002487",
+                      "inverse-primary": "#875200",
+                      "on-secondary-fixed-variant": "#004f58",
+                      "on-error": "#690005",
+                      "on-secondary": "#00363d",
+                      "on-tertiary-container": "#0035bd",
+                      "on-secondary-fixed": "#001f24",
+                      "on-secondary-container": "#00616d",
+                      "on-primary-fixed": "#2b1700",
+                      "primary-fixed-dim": "#ffb865",
+                      "surface-container-highest": "#313441",
+                      "background": "#10131f",
+                      "surface-tint": "#ffb865",
+                      "outline": "#a18d79",
+                      "tertiary-fixed": "#dde1ff",
+                      "success": "#10B981",
+                      "secondary-container": "#00e3fd",
+                      "on-primary-fixed-variant": "#663d00",
+                      "inverse-on-surface": "#2d303d",
+                      "surface-variant": "#313441",
+                      "error": "#ffb4ab",
+                      "on-surface-variant": "#d9c3ad",
+                      "outline-variant": "#544433",
+                      "text-dim": "rgba(255, 255, 255, 0.4)",
+                      "surface-dim": "#10131f",
+                      "on-primary-container": "#673e00",
+                      "primary": "#ffc788",
+                      "surface-container-lowest": "#0b0e19",
+                      "text-muted": "rgba(255, 255, 255, 0.7)",
+                      "on-tertiary-fixed": "#001355",
+                      "tertiary": "#c6ceff",
+                      "on-background": "#e0e1f3",
+                      "surface-elevated": "#23283B",
+                      "surface-container": "#1c1f2b",
+                      "primary-fixed": "#ffddba",
+                      "on-primary": "#482a00",
+                      "on-error-container": "#ffdad6",
+                      "inverse-surface": "#e0e1f3",
+                      "surface-container-low": "#181b27",
+                      "tertiary-container": "#a1b1ff",
+                      "secondary-fixed": "#9cf0ff",
+                      "secondary-fixed-dim": "#00daf3",
+                      "error-container": "#93000a",
+                      "primary-container": "#ffa000",
+                      "danger": "#EF4444",
+                      "surface": "#10131f",
+                      "on-surface": "#e0e1f3",
+                      "secondary": "#bdf4ff",
+                      "tertiary-fixed-dim": "#b8c3ff",
+                      "on-tertiary-fixed-variant": "#0035bd",
+                      "surface-bright": "#363946",
+                      "glass-border": "rgba(255, 255, 255, 0.1)"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "container-max": "1280px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Outfit"],
+                      "label-caps": ["Lexend"],
+                      "body-base": ["Inter"],
+                      "headline-lg-mobile": ["Outfit"],
+                      "body-prose": ["Inter"],
+                      "headline-md": ["Outfit"],
+                      "badge-caption": ["Lexend"],
+                      "headline-sm": ["Outfit"]
+              },
+              "fontSize": {
+                      "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                      "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-base overflow-hidden">
+<!-- Background Atmospheric Blurs -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-secondary/10 blur-[150px] rounded-full"></div>
+<div class="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-tertiary/10 blur-[130px] rounded-full"></div>
+</div>
+<!-- Side Navigation Shell -->
+<nav class="h-screen w-64 fixed left-0 top-0 flex flex-col h-full py-lg px-md bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-xl z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-display-lg text-display-lg font-extrabold text-primary tracking-tight">LinguistOS</h1>
+<p class="text-on-surface-variant/70 font-label-caps text-badge-caption uppercase tracking-widest mt-xs">System Operator</p>
+</div>
+<div class="flex-1 space-y-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all duration-200" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-headline-sm text-headline-sm">Pipeline</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-2 border-primary bg-glass-fill transition-all duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-headline-sm text-headline-sm">Stories</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all duration-200" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-headline-sm text-headline-sm">Database</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-headline-sm text-headline-sm">Users</span>
+</a>
+</div>
+<div class="mt-auto space-y-sm">
+<button class="w-full py-sm bg-primary text-on-primary font-bold rounded-lg gold-glow-hover transition-all active:scale-95 mb-lg">
+                Generate API Key
+            </button>
+<div class="border-t border-glass-border pt-md">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-base text-body-base">Support</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-256px)] h-16 px-lg flex justify-between items-center bg-background/10 backdrop-blur-md border-b border-glass-border z-40">
+<div class="flex items-center gap-md bg-surface-container-lowest/50 border border-glass-border px-md py-xs rounded-full w-96">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none text-body-base w-full focus:ring-0 placeholder:text-on-surface-variant/50" placeholder="Search resources..." type="text"/>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors transition-all duration-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors transition-all duration-300">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors transition-all duration-300">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of a female system administrator with glasses, looking focused and calm. She is wearing a modern tech-minimalist black blazer. The lighting is low-key with cool blue and warm amber rim lights that suggest a high-tech control room environment, matching the dark glassmorphism UI theme perfectly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjDZQXSQTNduVncXGPQ_UDWfXcg2dMlh0J2HxhO7BPl8mEgZsvz15ft26o9KHrG4eUGWI7dvzcitKLX82leWXrHxSDRtS7Dl8SUlHMUpIuRAiYwmer5G6AyfP0dx0XUtRDMZjJaURYbBEU5Fb3ST-8CXA-klF-A14xxg9ugDnwMda_rpoTG4YBp9YgTCJeDJ74cyznqD0Lj74RLGuljdO3Fel3inLCROUJbEsPD_cPbGz0BZc3hsZDWramv2yHp8-g7cHLuKsPHrU"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-24 px-lg h-screen overflow-hidden flex flex-col">
+<!-- Page Header & Action -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Learning Resources</h2>
+<p class="text-on-surface-variant mt-xs">Curate and manage external video content, channels, and immersive links.</p>
+</div>
+<button class="flex items-center gap-sm px-lg py-sm bg-primary text-on-primary font-bold rounded-xl gold-glow-hover transition-all active:scale-95" onclick="toggleModal(true)">
+<span class="material-symbols-outlined">add</span>
+<span>Add New Resource</span>
+</button>
+</div>
+<!-- Data Grid Container -->
+<div class="flex-1 glass-panel rounded-2xl overflow-hidden flex flex-col mb-lg">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-glass-border bg-white/5">
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">Type</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">Title</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">URL / Source</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">Language</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">Difficulty</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider">Status</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-primary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-glass-border">
+<!-- Row 1 -->
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm text-secondary">
+<span class="material-symbols-outlined text-[20px]">smart_display</span>
+<span class="text-body-base">YouTube</span>
+</div>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base w-full text-on-surface focus:ring-0" type="text" value="Advanced Spanish Syntax"/>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base text-on-surface-variant/60 w-full focus:ring-0 font-mono text-[12px]" type="text" value="youtube.com/watch?v=sp_2938"/>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-1 rounded bg-surface-container-high text-badge-caption border border-glass-border">ES-ES</span>
+</td>
+<td class="px-md py-md">
+<select class="bg-transparent border-none p-0 text-body-base text-on-surface focus:ring-0">
+<option class="bg-surface-container">Beginner</option>
+<option class="bg-surface-container">Intermediate</option>
+<option class="bg-surface-container" selected="">Advanced</option>
+</select>
+</td>
+<td class="px-md py-md">
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-success/20 border border-success/30 group-hover:bg-success/30 transition-all">
+<span class="inline-block h-4 w-4 translate-x-6 rounded-full bg-success shadow-sm"></span>
+</button>
+</td>
+<td class="px-md py-md text-right">
+<button class="p-sm text-on-surface-variant hover:text-danger transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm text-tertiary">
+<span class="material-symbols-outlined text-[20px]">link</span>
+<span class="text-body-base">Article</span>
+</div>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base w-full text-on-surface focus:ring-0" type="text" value="French Daily Conversations"/>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base text-on-surface-variant/60 w-full focus:ring-0 font-mono text-[12px]" type="text" value="le-monde.fr/culture/langues"/>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-1 rounded bg-surface-container-high text-badge-caption border border-glass-border">FR-FR</span>
+</td>
+<td class="px-md py-md">
+<select class="bg-transparent border-none p-0 text-body-base text-on-surface focus:ring-0">
+<option class="bg-surface-container">Beginner</option>
+<option class="bg-surface-container" selected="">Intermediate</option>
+<option class="bg-surface-container">Advanced</option>
+</select>
+</td>
+<td class="px-md py-md">
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-success/20 border border-success/30 transition-all">
+<span class="inline-block h-4 w-4 translate-x-6 rounded-full bg-success shadow-sm"></span>
+</button>
+</td>
+<td class="px-md py-md text-right">
+<button class="p-sm text-on-surface-variant hover:text-danger transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm text-primary">
+<span class="material-symbols-outlined text-[20px]">podcasts</span>
+<span class="text-body-base">Channel</span>
+</div>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base w-full text-on-surface focus:ring-0" type="text" value="Tech Talk Tokyo"/>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base text-on-surface-variant/60 w-full focus:ring-0 font-mono text-[12px]" type="text" value="youtube.com/c/techtalktokyo"/>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-1 rounded bg-surface-container-high text-badge-caption border border-glass-border">JA-JP</span>
+</td>
+<td class="px-md py-md">
+<select class="bg-transparent border-none p-0 text-body-base text-on-surface focus:ring-0">
+<option class="bg-surface-container">Beginner</option>
+<option class="bg-surface-container">Intermediate</option>
+<option class="bg-surface-container" selected="">Advanced</option>
+</select>
+</td>
+<td class="px-md py-md">
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-white/10 border border-white/20 transition-all">
+<span class="inline-block h-4 w-4 translate-x-1 rounded-full bg-on-surface-variant/50 shadow-sm"></span>
+</button>
+</td>
+<td class="px-md py-md text-right">
+<button class="p-sm text-on-surface-variant hover:text-danger transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm text-secondary">
+<span class="material-symbols-outlined text-[20px]">smart_display</span>
+<span class="text-body-base">YouTube</span>
+</div>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base w-full text-on-surface focus:ring-0" type="text" value="German News Review"/>
+</td>
+<td class="px-md py-md">
+<input class="bg-transparent border-none p-0 text-body-base text-on-surface-variant/60 w-full focus:ring-0 font-mono text-[12px]" type="text" value="youtube.com/watch?v=de_7721"/>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-1 rounded bg-surface-container-high text-badge-caption border border-glass-border">DE-DE</span>
+</td>
+<td class="px-md py-md">
+<select class="bg-transparent border-none p-0 text-body-base text-on-surface focus:ring-0">
+<option class="bg-surface-container">Beginner</option>
+<option class="bg-surface-container" selected="">Intermediate</option>
+<option class="bg-surface-container">Advanced</option>
+</select>
+</td>
+<td class="px-md py-md">
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-success/20 border border-success/30 transition-all">
+<span class="inline-block h-4 w-4 translate-x-6 rounded-full bg-success shadow-sm"></span>
+</button>
+</td>
+<td class="px-md py-md text-right">
+<button class="p-sm text-on-surface-variant hover:text-danger transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination-like Footer -->
+<div class="mt-auto border-t border-glass-border p-md flex justify-between items-center bg-white/[0.01]">
+<span class="text-badge-caption text-on-surface-variant">Showing 4 of 128 resources</span>
+<div class="flex gap-sm">
+<button class="p-xs rounded hover:bg-glass-fill transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-xs rounded hover:bg-glass-fill transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay (Add New Resource) -->
+<div class="fixed inset-0 bg-background/80 backdrop-blur-sm z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" id="modal-overlay">
+<div class="glass-panel w-full max-w-lg p-xl rounded-2xl shadow-2xl scale-95 transition-transform duration-300" id="modal-content">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-md text-headline-md text-primary">Add New Resource</h3>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors" onclick="toggleModal(false)">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="space-y-md">
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Resource Type</label>
+<select class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base text-on-surface focus:border-primary">
+<option>YouTube Video</option>
+<option>YouTube Channel</option>
+<option>External Link / Article</option>
+<option>Immersive Tool</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Difficulty</label>
+<select class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base text-on-surface focus:border-primary">
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+<option>Native</option>
+</select>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Resource Title</label>
+<input class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base text-on-surface focus:border-primary" placeholder="e.g. Mastering French Verbs" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Target URL</label>
+<input class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base font-mono text-[13px] text-on-surface focus:border-primary" placeholder="https://..." type="url"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Language Code</label>
+<input class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base text-on-surface focus:border-primary" placeholder="e.g. FR-FR" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-badge-caption text-on-surface-variant uppercase">Metadata Tags</label>
+<input class="w-full bg-surface-container-high border border-glass-border rounded-lg px-md py-sm text-body-base text-on-surface focus:border-primary" placeholder="Grammar, Speaking..." type="text"/>
+</div>
+</div>
+<div class="pt-lg flex gap-md">
+<button class="flex-1 py-sm bg-surface-container-highest text-on-surface font-bold rounded-xl border border-glass-border hover:bg-glass-fill transition-all" onclick="toggleModal(false)" type="button">
+                        Cancel
+                    </button>
+<button class="flex-1 py-sm bg-primary text-on-primary font-bold rounded-xl gold-glow-hover transition-all" type="submit">
+                        Publish Resource
+                    </button>
+</div>
+</form>
+</div>
+</div>
+<script>
+        function toggleModal(show) {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            if (show) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                content.classList.add('scale-95');
+                content.classList.remove('scale-100');
+            }
+        }
+
+        // Close modal on escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') toggleModal(false);
+        });
+
+        // Background Animation (Subtle movement)
+        document.addEventListener('mousemove', (e) => {
+            const blobs = document.querySelectorAll('div[class*="blur-"]');
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            blobs.forEach((blob, i) => {
+                blob.style.transform = `translate(${x * (i+1) * 0.5}px, ${y * (i+1) * 0.5}px)`;
+            });
+        });
+    </script>
+</body></html>

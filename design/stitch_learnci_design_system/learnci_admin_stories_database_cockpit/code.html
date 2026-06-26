@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LinguistOS | Stories Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(255, 199, 136, 0.3);
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .json-key { color: #ffc788; }
+        .json-string { color: #bdf4ff; }
+        .json-num { color: #10B981; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "glass-fill": "rgba(255, 255, 255, 0.04)",
+                      "surface-container-high": "#262936",
+                      "on-tertiary": "#002487",
+                      "inverse-primary": "#875200",
+                      "on-secondary-fixed-variant": "#004f58",
+                      "on-error": "#690005",
+                      "on-secondary": "#00363d",
+                      "on-tertiary-container": "#0035bd",
+                      "on-secondary-fixed": "#001f24",
+                      "on-secondary-container": "#00616d",
+                      "on-primary-fixed": "#2b1700",
+                      "primary-fixed-dim": "#ffb865",
+                      "surface-container-highest": "#313441",
+                      "background": "#10131f",
+                      "surface-tint": "#ffb865",
+                      "outline": "#a18d79",
+                      "tertiary-fixed": "#dde1ff",
+                      "success": "#10B981",
+                      "secondary-container": "#00e3fd",
+                      "on-primary-fixed-variant": "#663d00",
+                      "inverse-on-surface": "#2d303d",
+                      "surface-variant": "#313441",
+                      "error": "#ffb4ab",
+                      "on-surface-variant": "#d9c3ad",
+                      "outline-variant": "#544433",
+                      "text-dim": "rgba(255, 255, 255, 0.4)",
+                      "surface-dim": "#10131f",
+                      "on-primary-container": "#673e00",
+                      "primary": "#ffc788",
+                      "surface-container-lowest": "#0b0e19",
+                      "text-muted": "rgba(255, 255, 255, 0.7)",
+                      "on-tertiary-fixed": "#001355",
+                      "tertiary": "#c6ceff",
+                      "on-background": "#e0e1f3",
+                      "surface-elevated": "#23283B",
+                      "surface-container": "#1c1f2b",
+                      "primary-fixed": "#ffddba",
+                      "on-primary": "#482a00",
+                      "on-error-container": "#ffdad6",
+                      "inverse-surface": "#e0e1f3",
+                      "surface-container-low": "#181b27",
+                      "tertiary-container": "#a1b1ff",
+                      "secondary-fixed": "#9cf0ff",
+                      "secondary-fixed-dim": "#00daf3",
+                      "error-container": "#93000a",
+                      "primary-container": "#ffa000",
+                      "danger": "#EF4444",
+                      "surface": "#10131f",
+                      "on-surface": "#e0e1f3",
+                      "secondary": "#bdf4ff",
+                      "tertiary-fixed-dim": "#b8c3ff",
+                      "on-tertiary-fixed-variant": "#0035bd",
+                      "surface-bright": "#363946",
+                      "glass-border": "rgba(255, 255, 255, 0.1)"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "container-max": "1280px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Outfit"],
+                      "label-caps": ["Lexend"],
+                      "body-base": ["Inter"],
+                      "headline-lg-mobile": ["Outfit"],
+                      "body-prose": ["Inter"],
+                      "headline-md": ["Outfit"],
+                      "badge-caption": ["Lexend"],
+                      "headline-sm": ["Outfit"]
+              },
+              "fontSize": {
+                      "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                      "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-base overflow-hidden">
+<!-- Atmospheric Background Layers -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-on-tertiary-container/15 blur-[150px]"></div>
+
+</div>
+<div class="flex h-screen w-full">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low/40 dark:bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border shadow-xl flex flex-col h-full py-lg px-md z-50">
+<div class="flex items-center gap-sm mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary font-bold">translate</span>
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg font-extrabold text-primary dark:text-primary tracking-tight">LinguistOS</h1>
+<p class="font-label-caps text-badge-caption text-text-dim uppercase tracking-widest">System Operator</p>
+</div>
+</div>
+<nav class="flex-1 space-y-xs">
+<div class="px-sm py-xs mb-xs text-text-dim font-label-caps text-[10px]">MAIN OPERATIONS</div>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant/70 dark:text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200 cursor-pointer active:scale-95 group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant/70 group-hover:text-primary transition-colors">account_tree</span>
+<span class="font-body-base text-body-base">Pipeline</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-primary dark:text-primary font-bold border-r-2 border-primary bg-glass-fill transition-all duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="font-body-base text-body-base">Stories</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant/70 dark:text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200 cursor-pointer active:scale-95 group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant/70 group-hover:text-primary transition-colors">database</span>
+<span class="font-body-base text-body-base">Database</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant/70 dark:text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill hover:translate-y-[-2px] transition-all duration-200 cursor-pointer active:scale-95 group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant/70 group-hover:text-primary transition-colors">group</span>
+<span class="font-body-base text-body-base">Users</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-glass-border space-y-xs">
+<button class="w-full mb-md bg-primary py-sm px-md rounded-xl text-on-primary font-headline-sm text-[14px] flex items-center justify-center gap-sm glow-hover transition-all duration-300">
+<span class="material-symbols-outlined">key</span>
+                    Generate API Key
+                </button>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant/70 hover:text-on-surface hover:bg-glass-fill transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-base text-body-base">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center h-16 px-lg backdrop-blur-md border-b border-glass-border bg-background/10 dark:bg-background/10 z-40">
+<div class="flex items-center gap-xl flex-1 max-w-2xl">
+<h2 class="font-display-lg text-display-lg font-black text-primary min-w-fit">LinguistOS Admin</h2>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-glass-fill border border-glass-border rounded-xl pl-11 pr-md py-xs font-body-base text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all" placeholder="Search stories, languages, or levels..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors relative group">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors group">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-secondary transition-colors group">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-8 w-[1px] bg-glass-border mx-xs"></div>
+<div class="flex items-center gap-sm">
+<img class="w-8 h-8 rounded-full border border-primary/30 object-cover" data-alt="A cinematic, high-end profile portrait of a modern software engineer in a dark techwear studio, with soft blue and teal rim lighting and a focused, professional expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1pbEdHPkl1-jlI3vvvLnLCZ90BMpLJFE8qDvhOdNuK0zNnuqvS5cziPwrIQpurAaWdwqyEmQAOyAyB_hPEOZ8rmcS9AjBbEvpoe4YWadSP0AXUSdZfhJTqLUeioFvke8AZt_GlPlifvd-8ixnFArNXwJaqlDaimzKWXOgNfq8xGN-LRd9syNxhtp8IXRNiE7vdWlH9uiLBQQK5PEwp1VbV7sYrQ9tWAprr681oww5iLcTW3Eu6K0iqdtNUiEADGTP1zwXB0iKrKc"/>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Table Header / Filters -->
+<div class="px-lg pt-lg pb-md flex items-end justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Stories Manager</h3>
+<p class="text-text-muted font-body-base">Syncing data across 4 nodes. 128 stories live.</p>
+</div>
+<div class="flex gap-sm">
+<div class="bg-glass-fill border border-glass-border rounded-xl px-md py-sm flex items-center gap-sm cursor-pointer hover:bg-glass-fill/20 transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">language</span>
+<span class="text-on-surface font-label-caps uppercase text-[11px]">All Languages</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">filter_list</span>
+</div>
+<div class="bg-glass-fill border border-glass-border rounded-xl px-md py-sm flex items-center gap-sm cursor-pointer hover:bg-glass-fill/20 transition-all">
+<span class="material-symbols-outlined text-primary text-[18px]">bar_chart</span>
+<span class="text-on-surface font-label-caps uppercase text-[11px]">Any Level</span>
+</div>
+<button class="bg-secondary-container/20 text-secondary border border-secondary/30 px-md py-sm rounded-xl font-label-caps uppercase text-[11px] flex items-center gap-sm hover:bg-secondary/20 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Entry
+                    </button>
+</div>
+</div>
+<!-- Main Table Canvas -->
+<div class="flex-1 px-lg pb-lg overflow-hidden">
+<div class="glass-card h-full rounded-2xl overflow-hidden flex flex-col">
+<div class="overflow-x-auto custom-scrollbar h-full">
+<table class="w-full text-left border-collapse min-w-[1000px]">
+<thead class="sticky top-0 bg-surface-container-high/80 backdrop-blur-md z-10">
+<tr>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border">Story ID</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border">Title</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border">Language</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border">Level</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border text-center">Chaps</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border">Assets Status</th>
+<th class="px-md py-md font-label-caps text-badge-caption text-text-dim uppercase tracking-wider border-b border-glass-border text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-glass-border">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-md py-md font-mono text-secondary text-[12px]">ST-0041-DE</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A vibrant, cinematic cover art for a mystery story set in futuristic Berlin, featuring a neon-lit rainy street and a shadowy figure in a long coat, in a premium dark glassmorphism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpIsDI2Yk1L9CRGw2V088ImkunRV8DAdX4MG4p2rCPSKxP95NutF52ZuveFnmIzDGNcW8t8RB0BXZu8NKVXdGtFYGxm7ctwa3Q2La2KKLKf_khbk-jHRVswni5Xx4yaziDGIJ-qV6KQzBcsvtitRjiCcoU1btMn0omIH8DcEsMuKX2INePIkzWivVVlHai0v7AVLOt-HQQ_1h2yrGKEwxaDnQwZlmaOFHMWCCRa6WoY21XJmnH3_EpqXLqHV47eWGYiWieGo86rKI"/>
+</div>
+<div>
+<div class="font-headline-sm text-[15px] text-on-surface">Der Schattenläufer</div>
+<div class="text-[11px] text-text-dim">updated 2h ago</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<span class="w-5 h-3 bg-red-500 rounded-sm"></span>
+<span class="text-on-surface-variant">German</span>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold">B1 INTERMEDIATE</span>
+</td>
+<td class="px-md py-md text-center text-on-surface">12</td>
+<td class="px-md py-md">
+<div class="flex gap-xs">
+<span class="material-symbols-outlined text-success text-[18px]" title="Cover Art OK">image</span>
+<span class="material-symbols-outlined text-success text-[18px]" title="Video Path OK">movie</span>
+<span class="material-symbols-outlined text-on-surface-variant/30 text-[18px]" title="Audio Missing">volume_up</span>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm rounded-lg hover:bg-primary/20 text-primary transition-all" onclick="openJsonEditor('ST-0041-DE')" title="Edit JSON">
+<span class="material-symbols-outlined text-[20px]">code</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-secondary/20 text-secondary transition-all" title="Update Media Paths">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-tertiary/20 text-tertiary transition-all" title="Clone to Draft">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-md py-md font-mono text-secondary text-[12px]">ST-0922-JP</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Digital art of a serene Japanese tea house at dusk, with glowing paper lanterns and a soft purple mountain silhouette in the background, cinematic lighting, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAadmL_q9n0cZueCvyBwyXfiNhlnJPVAaFC4gcElMjAnxs2A8ZSjFpVn0uoj1kYiOiOiL17qge80UDdg7LIms1_BgDPycYANvdUFxmKc8RKkJk0u_wfGhIWFkcGIe_vAW5dzzN0kYuCHwkWw0bSibwY1AcdByTm_jDyq8aOMrrgk2fn2um-CViLb7ObRbxnVLF1Pe3A-O5BEiiE0ms-9DwQ0bHtZCq_PMZhiOIqnSrNAqx5ltPbLOpXvmtaPGwSnrB4RU2MYXukBQc"/>
+</div>
+<div>
+<div class="font-headline-sm text-[15px] text-on-surface">京都の静寂</div>
+<div class="text-[11px] text-text-dim">updated 1d ago</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<span class="w-5 h-3 bg-white rounded-sm border border-glass-border"></span>
+<span class="text-on-surface-variant">Japanese</span>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-[10px] font-bold">A2 ELEMENTARY</span>
+</td>
+<td class="px-md py-md text-center text-on-surface">8</td>
+<td class="px-md py-md">
+<div class="flex gap-xs">
+<span class="material-symbols-outlined text-success text-[18px]">image</span>
+<span class="material-symbols-outlined text-on-surface-variant/30 text-[18px]">movie</span>
+<span class="material-symbols-outlined text-success text-[18px]">volume_up</span>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm rounded-lg hover:bg-primary/20 text-primary transition-all" onclick="openJsonEditor('ST-0922-JP')">
+<span class="material-symbols-outlined text-[20px]">code</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-secondary/20 text-secondary transition-all">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-tertiary/20 text-tertiary transition-all">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-md py-md font-mono text-secondary text-[12px]">ST-1108-ES</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A stylized illustration of a sun-drenched Spanish marketplace with vibrant textiles and fresh fruit, high-contrast warm lighting, gold and crimson accents, modern flat design with glass textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5A7ZRqW9IqsJNDQ-CF8JUZQ9nqOttuY8nGSS5rJeB1G66XGhutEhbINqMBFsK50MJOXdcTxZby-KFhQuAQEtVN24v_mWtxdeTu7r_lTdwSxhMWZ7mjPTrwJgU2oxk4_W4MXE-D21UW0-FIeegFl-sfyEsEWQ7BjIVPMFqfHf8df2fLK5TFStE4ULilS3t7ws_VUbf4qkvzWEajO8Q-6NR_b3O-CNXALvrtcDynAf0CCJDiH0_bY1J9Qlr0EmFFxaTwj1bLej60nE"/>
+</div>
+<div>
+<div class="font-headline-sm text-[15px] text-on-surface">El Mercado Dorado</div>
+<div class="text-[11px] text-text-dim">updated 5h ago</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<span class="w-5 h-3 bg-yellow-500 rounded-sm"></span>
+<span class="text-on-surface-variant">Spanish</span>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-0.5 rounded-full bg-error/10 text-error border border-error/20 text-[10px] font-bold">C1 ADVANCED</span>
+</td>
+<td class="px-md py-md text-center text-on-surface">24</td>
+<td class="px-md py-md">
+<div class="flex gap-xs">
+<span class="material-symbols-outlined text-success text-[18px]">image</span>
+<span class="material-symbols-outlined text-success text-[18px]">movie</span>
+<span class="material-symbols-outlined text-success text-[18px]">volume_up</span>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm rounded-lg hover:bg-primary/20 text-primary transition-all" onclick="openJsonEditor('ST-1108-ES')">
+<span class="material-symbols-outlined text-[20px]">code</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-secondary/20 text-secondary transition-all">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-tertiary/20 text-tertiary transition-all">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Table Footer Pagination -->
+<div class="px-lg pb-lg flex justify-between items-center text-text-dim text-[12px]">
+<div>Showing 1 to 3 of 128 stories</div>
+<div class="flex gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-glass-border hover:bg-glass-fill transition-all">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-glass-border hover:bg-glass-fill transition-all">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-glass-border hover:bg-glass-fill transition-all">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-glass-border hover:bg-glass-fill transition-all">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+<!-- JSON Editor Modal -->
+<div class="fixed inset-0 bg-background/80 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-opacity duration-300" id="jsonModal">
+<div class="glass-card w-[800px] max-h-[870px] rounded-3xl overflow-hidden flex flex-col shadow-2xl scale-95 transition-transform duration-300" id="modalContent">
+<div class="px-xl py-lg border-b border-glass-border flex justify-between items-center bg-white/5">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Schema Editor: <span class="text-primary" id="currentStoryId">ST-0041-DE</span></h4>
+<p class="text-[12px] text-text-dim">Editing story metadata and nested objects</p>
+</div>
+<button class="p-sm rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error transition-all" onclick="closeJsonEditor()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 p-md overflow-hidden bg-surface-container-lowest">
+<div class="h-full rounded-xl bg-black/40 p-md font-mono text-[13px] overflow-y-auto custom-scrollbar leading-relaxed">
+<div class="flex gap-md">
+<div class="text-on-surface-variant/30 text-right select-none pr-md border-r border-glass-border">
+                            1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20
+                        </div>
+<div class="flex-1 outline-none caret-primary" contenteditable="true" spellcheck="false">
+                            {<br/>
+                              <span class="json-key">"id"</span>: <span class="json-string">"ST-0041-DE"</span>,<br/>
+                              <span class="json-key">"title"</span>: <span class="json-string">"Der Schattenläufer"</span>,<br/>
+                              <span class="json-key">"language"</span>: <span class="json-string">"de"</span>,<br/>
+                              <span class="json-key">"level"</span>: <span class="json-string">"B1"</span>,<br/>
+                              <span class="json-key">"cover_art"</span>: <span class="json-string">"/assets/stories/de/041/cover.webp"</span>,<br/>
+                              <span class="json-key">"video_path"</span>: <span class="json-string">"/assets/stories/de/041/intro.mp4"</span>,<br/>
+                              <span class="json-key">"chapters"</span>: [<br/>
+                                {<br/>
+                                  <span class="json-key">"num"</span>: <span class="json-num">1</span>,<br/>
+                                  <span class="json-key">"title"</span>: <span class="json-string">"The Encounter"</span>,<br/>
+                                  <span class="json-key">"content_ref"</span>: <span class="json-string">"S041_C01"</span><br/>
+                                },<br/>
+                                {<br/>
+                                  <span class="json-key">"num"</span>: <span class="json-num">2</span>,<br/>
+                                  <span class="json-key">"title"</span>: <span class="json-string">"Shadow Play"</span>,<br/>
+                                  <span class="json-key">"content_ref"</span>: <span class="json-string">"S041_C02"</span><br/>
+                                }<br/>
+                              ],<br/>
+                              <span class="json-key">"is_published"</span>: <span class="json-num">true</span><br/>
+                            }
+                        </div>
+</div>
+</div>
+</div>
+<div class="px-xl py-lg border-t border-glass-border flex justify-between items-center bg-white/5">
+<div class="flex items-center gap-md">
+<span class="flex items-center gap-xs text-[11px] text-success">
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                        Valid JSON
+                    </span>
+<span class="text-[11px] text-text-dim">UTF-8 Encoding</span>
+</div>
+<div class="flex gap-sm">
+<button class="px-lg py-sm rounded-xl text-on-surface-variant hover:bg-glass-fill transition-all font-label-caps text-[12px]" onclick="closeJsonEditor()">Discard</button>
+<button class="bg-primary px-lg py-sm rounded-xl text-on-primary font-label-caps text-[12px] glow-hover transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                        Commit Changes
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        function openJsonEditor(id) {
+            const modal = document.getElementById('jsonModal');
+            const content = document.getElementById('modalContent');
+            const storyIdLabel = document.getElementById('currentStoryId');
+            
+            storyIdLabel.textContent = id;
+            modal.classList.remove('hidden');
+            
+            // Trigger animation
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeJsonEditor() {
+            const modal = document.getElementById('jsonModal');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Close modal on click outside
+        document.getElementById('jsonModal').addEventListener('click', (e) => {
+            if (e.target.id === 'jsonModal') closeJsonEditor();
+        });
+
+        // Add some subtle parallax or glow movement on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            // Adjust the background blobs slightly for a premium feel
+            const bg = document.querySelector('.fixed.inset-0 div:first-child');
+            if (bg) {
+                bg.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+            }
+        });
+    </script>
+</body></html>

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { createClient } from "@/utils/supabase/client";
 import { LogOut, CloudRain, Cloud, CloudSun, Sun, Sparkles, ChevronRight, Trophy, Lock } from "lucide-react";
@@ -12,9 +11,6 @@ import { TodaysActivities } from "@/components/TodaysActivities";
 import { LogActivityForm } from "@/components/LogActivityForm";
 import { MindsetForm } from "@/components/MindsetForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Settings } from "lucide-react";
 
 export default function MobilePortal() {
     const [loading, setLoading] = useState(true);
@@ -50,14 +46,12 @@ export default function MobilePortal() {
                     .single();
 
                 if (profileError) {
-                    // Check if error is "no rows found" (PGRST116)
                     if (profileError.code === 'PGRST116') {
                         console.log("No profile found. Creating defaults...");
-                        // Attempt to create a default profile
                         const { data: newProfile, error: createError } = await supabase
                             .from("profiles")
                             .insert({
-                                id: session.user.id, // Assuming 1:1 mapping for ID
+                                id: session.user.id,
                                 user_id: session.user.id,
                                 total_minutes: 0,
                                 current_level: 'A1',
@@ -71,7 +65,6 @@ export default function MobilePortal() {
                         } else {
                             console.log("Profile auto-created:", newProfile);
                             setProfile(newProfile as any);
-                            // Initial setup for creating milestone vars
                             setCurrentHours(0);
                             setNextMilestone(25);
                         }
@@ -79,7 +72,6 @@ export default function MobilePortal() {
                         console.error("Profile fetch error:", profileError);
                     }
                 } else {
-                    // Cast to any to avoid strict inference issues during build when types are in flux
                     setProfile(profileData as any);
 
                     if (profileData) {
@@ -87,7 +79,6 @@ export default function MobilePortal() {
                         const totalMins = (data.total_minutes || 0) + ((data.starting_hours || 0) * 60);
                         const hrs = totalMins / 60;
                         setCurrentHours(hrs);
-                        // Calculate next 25h milestone
                         const next = (Math.floor(hrs / 25) + 1) * 25;
                         setNextMilestone(next);
                     }
@@ -102,16 +93,13 @@ export default function MobilePortal() {
                     .limit(1)
                     .single();
 
-                // Ignore PGRST116 (no rows)
                 if (checkInError && checkInError.code !== 'PGRST116') {
                     console.error("Check-in fetch error:", checkInError);
                 }
 
                 setLatestCheckIn(checkInData);
 
-                // Check if it's from today (local date check simplified)
                 if (checkInData) {
-                    // Assuming date is stored as ISO string in daily_feedback
                     const data = checkInData as any;
                     // @ts-ignore
                     const checkInDate = new Date(data.date).toDateString();
@@ -128,7 +116,7 @@ export default function MobilePortal() {
         } finally {
             setLoading(false);
         }
-    }, [supabase.auth, supabase, router]);
+    }, [supabase, router]);
 
     useEffect(() => {
         checkUser();
@@ -141,237 +129,249 @@ export default function MobilePortal() {
 
     const handleActivitySuccess = () => {
         setIsLogSheetOpen(false);
-        setActivityRefreshTrigger(prev => prev + 1); // Trigger data refresh
-        checkUser(); // Refresh hours
+        setActivityRefreshTrigger(prev => prev + 1);
+        checkUser();
     };
 
     const handleMindsetSuccess = () => {
         setIsMindsetSheetOpen(false);
-        checkUser(); // Refresh check-in status
-    };
-
-    const updateVoiceGender = async (gender: string) => {
-        if (!user) return;
-        setProfile((prev: any) => ({ ...prev, tts_voice_gender: gender }));
-        const { error } = await supabase
-            .from("profiles")
-            // @ts-ignore
-            .update({ tts_voice_gender: gender } as any)
-            .eq("user_id", user.id);
-
-        if (error) {
-            console.error("Error updating voice gender:", error);
-            checkUser(); // Revert on error
-        }
+        checkUser();
     };
 
     const getMoodIcon = (rating: number) => {
-        if (rating === 1) return { label: "Bad", icon: CloudRain, color: "text-gray-500", bg: "bg-gray-100" };
-        if (rating === 2) return { label: "Struggling", icon: Cloud, color: "text-blue-500", bg: "bg-blue-100" };
-        if (rating === 3) return { label: "Good", icon: CloudSun, color: "text-orange-500", bg: "bg-orange-100" };
-        if (rating === 4) return { label: "Great", icon: Sun, color: "text-yellow-500", bg: "bg-yellow-100" };
-        if (rating === 5) return { label: "Amazing", icon: Sparkles, color: "text-yellow-400", bg: "bg-yellow-100" };
-        return { label: "Unknown", icon: Cloud, color: "text-gray-400", bg: "bg-gray-100" };
+        if (rating === 1) return { label: "Bad", icon: CloudRain, color: "text-blue-400", bg: "bg-blue-950/40" };
+        if (rating === 2) return { label: "Struggling", icon: Cloud, color: "text-purple-400", bg: "bg-purple-950/40" };
+        if (rating === 3) return { label: "Good", icon: CloudSun, color: "text-amber-500", bg: "bg-amber-950/40" };
+        if (rating === 4) return { label: "Great", icon: Sun, color: "text-amber-400", bg: "bg-amber-950/40" };
+        if (rating === 5) return { label: "Amazing", icon: Sparkles, color: "text-primaryAccent", bg: "bg-primaryAccent/10" };
+        return { label: "Unknown", icon: Cloud, color: "text-white/40", bg: "bg-white/5" };
     };
 
-    if (loading) return <div className="p-8 text-center text-muted-foreground">Loading portal...</div>;
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
+                <div className="w-8 h-8 border-4 border-t-primaryAccent border-white/10 rounded-full animate-spin"></div>
+                <p className="font-labels text-[10px] tracking-widest text-white/40 uppercase">Loading session...</p>
+            </div>
+        );
+    }
 
     const hoursUntilMilestone = Math.max(0, nextMilestone - currentHours);
     const milestoneProgress = ((25 - hoursUntilMilestone) / 25) * 100;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 p-4 pb-20 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-primary/20 via-primary/5 to-transparent -z-10" />
-
-            <header className="flex items-center justify-between mb-8 pt-4 max-w-5xl mx-auto">
+        <div className="space-y-8 pb-12 animate-fade-in relative z-10">
+            
+            {/* Header / Command Center Welcome */}
+            <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Learner Portal</h1>
+                    <h1 className="font-heading text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                        Learner Dashboard
+                    </h1>
                     {profile ? (
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-bold uppercase tracking-wide">
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-accentTeal/10 border border-accentTeal/20 text-accentTeal font-labels text-[10px] font-extrabold uppercase tracking-wider">
                                 {profile.current_language || "Language"}
                             </span>
-                            <span className="text-sm text-muted-foreground font-medium">
-                                Level {profile.current_level || "N/A"}
+                            <span className="font-labels text-[10px] text-white/50 tracking-wider font-bold">
+                                LEVEL {profile.current_level || "N/A"}
                             </span>
                         </div>
                     ) : (
-                        <p className="text-sm text-muted-foreground font-medium">Welcome back, learner.</p>
+                        <p className="text-white/40 font-sans text-sm mt-1">Welcome back, operative.</p>
                     )}
                 </div>
-                <Button variant="ghost" size="icon" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleLogout} 
+                    className="rounded-xl text-white/40 hover:text-red-400 hover:bg-red-500/10 border border-white/5 bg-white/5 transition-all"
+                >
                     <LogOut className="h-5 w-5" />
                 </Button>
             </header>
 
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto relative z-10">
+            {/* Main Interactive Bento Grid */}
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
 
-                {/* Input Roadmap */}
-                <Card className="border-t-4 border-t-green-500 shadow-xl shadow-green-500/5 hover:shadow-green-500/10 transition-shadow">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2">
-                            <span className="text-2xl">🗺️</span> Input Roadmap
-                        </CardTitle>
-                        <CardDescription>
-                            {profile ? `${Math.floor(((profile.total_minutes || 0) + ((profile.starting_hours || 0) * 60)) / 60)}h Total Input` : "Track your listening hours"}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                {/* 1. Input Roadmap Card */}
+                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
+                                <span className="text-xl">🗺️</span> Input Roadmap
+                            </h3>
+                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
+                                Progress Chart
+                            </span>
+                        </div>
+                        <p className="text-white/60 font-sans text-sm mb-6">
+                            {profile 
+                                ? `You have accumulated ${Math.floor(((profile.total_minutes || 0) + ((profile.starting_hours || 0) * 60)) / 60)} hours of tracked comprehensible input.` 
+                                : "Track your listening hours to unlock native-level fluency."
+                            }
+                        </p>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
                         <InputRoadmap totalMinutes={(profile?.total_minutes || 0) + ((profile?.starting_hours || 0) * 60)} />
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Today's Activities */}
-                <Card className="border-t-4 border-t-blue-500 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-2">
-                            <span className="text-2xl">📅</span> Today&apos;s Activities
-                        </CardTitle>
-                        <CardDescription>Your daily immersion summary.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                {/* 2. Today's Activities Card */}
+                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
+                                <span className="text-xl">📅</span> Today&apos;s Activities
+                            </h3>
+                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
+                                Immersion Log
+                            </span>
+                        </div>
+                        <p className="text-white/60 font-sans text-sm mb-6">
+                            Track the details of your daily reading, audio podcasts, and YouTube immersion sessions.
+                        </p>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
                         <TodaysActivities
                             userId={user?.id}
                             onAddClick={() => setIsLogSheetOpen(true)}
                             refreshTrigger={activityRefreshTrigger}
                         />
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Milestone Progress */}
-                <Card className="border-t-4 border-t-yellow-500 shadow-xl shadow-yellow-500/5 hover:shadow-yellow-500/10 transition-shadow">
-                    <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                            <CardTitle className="flex items-center gap-2">
-                                <span className="text-2xl">🎯</span> Next Coaching
-                            </CardTitle>
-                            <span className="text-xs font-bold px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
-                                {nextMilestone}h Milestone
+                {/* 3. Milestone Progress Card */}
+                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
+                                <span className="text-xl">🎯</span> Next Coaching
+                            </h3>
+                            <span className="px-2.5 py-0.5 rounded-full bg-primaryAccent/15 border border-primaryAccent/30 text-primaryAccent font-labels text-[9px] font-extrabold tracking-wider">
+                                {nextMilestone}H MILESTONE
                             </span>
                         </div>
-                        <CardDescription>
-                            Unlock your next coaching session in {hoursUntilMilestone.toFixed(1)} hours.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            <Progress value={Math.max(5, milestoneProgress)} className="h-3" />
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>{Math.floor(currentHours)} hours</span>
-                                <span>{nextMilestone} hours</span>
-                            </div>
-                            {hoursUntilMilestone <= 0 && (
-                                <div className="mt-2 p-2 bg-green-100 text-green-700 text-sm font-bold rounded-lg text-center flex items-center justify-center gap-2 animate-pulse">
-                                    <Lock className="h-4 w-4" /> Ready to Unlock!
-                                </div>
-                            )}
+                        <p className="text-white/60 font-sans text-sm mb-6">
+                            Unlock your next personal language coaching session and progress audit in {hoursUntilMilestone.toFixed(1)} hours.
+                        </p>
+                    </div>
+                    <div className="space-y-3 bg-white/[0.02] border border-white/5 rounded-xl p-5">
+                        <Progress value={Math.max(5, milestoneProgress)} className="h-2.5 bg-white/5 [&>div]:bg-primaryAccent" />
+                        <div className="flex justify-between font-labels text-[10px] text-white/40 uppercase tracking-wider font-bold">
+                            <span>{Math.floor(currentHours)} Hours</span>
+                            <span>{nextMilestone} Hours</span>
                         </div>
-                    </CardContent>
-                </Card>
+                        {hoursUntilMilestone <= 0 && (
+                            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-bold rounded-xl text-center flex items-center justify-center gap-2 animate-pulse font-heading">
+                                <Lock className="h-4 w-4" /> Coaching Milestone Unlocked!
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-                {/* Coaching / Mindset Check */}
-                {todaysCheckIn ? (
-                    // IF LOGGED TODAY: Show Summary + Link to History
-                    <Card
-                        className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all cursor-pointer group"
-                        onClick={() => router.push("/portal/check-in-history")}
-                    >
-                        <CardHeader className="pb-2">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="flex items-center gap-2">
-                                    <span className="text-2xl">🧠</span> Today&apos;s Mindset
-                                </CardTitle>
-                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                            </div>
-                            <CardDescription>You&apos;ve checked in for today.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-4 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-100 dark:border-purple-900/50">
-                                {(() => {
-                                    const { icon: Icon, color, bg } = getMoodIcon(todaysCheckIn.rating);
-                                    return (
-                                        <div className={`p-3 rounded-full ${bg} ${color}`}>
-                                            <Icon className="h-6 w-6" />
-                                        </div>
-                                    );
-                                })()}
-                                <div>
-                                    <div className="font-bold text-lg">{getMoodIcon(todaysCheckIn.rating).label}</div>
-                                    {todaysCheckIn.note && (
-                                        <div className="text-sm text-muted-foreground line-clamp-1 italic">
-                                            &quot;{todaysCheckIn.note}&quot;
-                                        </div>
-                                    )}
+                {/* 4. Coaching / Mindset Check */}
+                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
+                                <span className="text-xl">🧠</span> Mindset &amp; Feedback
+                            </h3>
+                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
+                                Mental Check
+                            </span>
+                        </div>
+                        <p className="text-white/60 font-sans text-sm mb-6">
+                            Language acquisition is a marathon. Check in daily to log your mood, track frustrations, and align your study mindset.
+                        </p>
+                    </div>
+                    
+                    {todaysCheckIn ? (
+                        <div 
+                            className="flex items-center gap-4 bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl transition-all cursor-pointer group"
+                            onClick={() => router.push("/portal/check-in-history")}
+                        >
+                            {(() => {
+                                const { icon: Icon, color, bg } = getMoodIcon(todaysCheckIn.rating);
+                                return (
+                                    <div className={`p-3 rounded-xl ${bg} ${color} border border-white/5 shadow-inner`}>
+                                        <Icon className="h-6 w-6" />
+                                    </div>
+                                );
+                            })()}
+                            <div className="flex-1 min-w-0">
+                                <div className="font-heading font-bold text-white text-base">
+                                    Today&apos;s Mindset: <span className="text-purple-400">{getMoodIcon(todaysCheckIn.rating).label}</span>
                                 </div>
+                                {todaysCheckIn.note && (
+                                    <p className="text-xs text-white/40 truncate italic mt-0.5">
+                                        &quot;{todaysCheckIn.note}&quot;
+                                    </p>
+                                )}
                             </div>
-                            <div className="mt-3 text-xs text-center text-muted-foreground font-medium">
-                                Tap to view history &amp; edit
-                            </div>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    // IF NOT LOGGED: Show "Check In" Call to Action
-                    <Card className="border-t-4 border-t-purple-500 shadow-xl shadow-purple-500/5">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2">
-                                <span className="text-2xl">🧠</span> Mindset Check
-                            </CardTitle>
-                            <CardDescription>How are you feeling about your progress?</CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                            <ChevronRight className="h-5 w-5 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
                             <Button
                                 onClick={() => setIsMindsetSheetOpen(true)}
-                                className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg shadow-purple-500/25 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full h-12 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 hover:scale-[1.02] active:scale-[0.98] text-white shadow-lg shadow-purple-500/10 rounded-xl transition-all font-heading font-bold tracking-wide"
                             >
-                                Start Daily Check-in <ChevronRight className="ml-2 h-5 w-5" />
+                                Start Daily Check-in <ChevronRight className="ml-1 h-4 w-4" />
                             </Button>
-                            <div className="mt-4 flex justify-between px-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer" onClick={() => setIsMindsetSheetOpen(true)}>
+                            <div className="flex justify-between px-4 py-2 border border-white/5 bg-white/[0.01] rounded-xl opacity-40 hover:opacity-100 transition-all cursor-pointer" onClick={() => setIsMindsetSheetOpen(true)}>
                                 {[CloudRain, Cloud, CloudSun, Sun, Sparkles].map((Icon, i) => (
-                                    <Icon key={i} className="h-6 w-6" />
+                                    <Icon key={i} className="h-5 w-5 text-white/60 hover:text-purple-400 transition-colors" />
                                 ))}
                             </div>
-                        </CardContent>
-                    </Card>
-                )}
+                        </div>
+                    )}
+                </div>
 
-                {/* ... previous content (Sheet components usually here, need to ensure they are preserved or re-added) */}
-                {/* Log Activity Sheet */}
-                <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
-                    <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
-                        <SheetHeader className="mb-6">
-                            <SheetTitle className="flex items-center gap-2 text-2xl">
-                                ⏱️ Log Activity
-                            </SheetTitle>
-                            <SheetDescription>
-                                What input did you get today?
-                            </SheetDescription>
-                        </SheetHeader>
+            </div>
+
+            {/* Sheets / Drawer Modals */}
+            
+            {/* Log Activity Sheet */}
+            <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-[28px] bg-brandDark border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-2xl">
+                    <SheetHeader className="mb-6">
+                        <SheetTitle className="flex items-center gap-2 text-2xl font-heading font-extrabold text-primaryAccent">
+                            ⏱️ Log Activity
+                        </SheetTitle>
+                        <SheetDescription className="text-white/60 font-sans text-sm">
+                            What comprehensible input did you immerse yourself in today?
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div className="overflow-y-auto max-h-[70vh] pr-1">
                         <LogActivityForm
                             userId={user?.id}
                             profile={profile}
                             onSuccess={handleActivitySuccess}
                         />
-                    </SheetContent>
-                </Sheet>
+                    </div>
+                </SheetContent>
+            </Sheet>
 
-                {/* Mindset Sheet */}
-                <Sheet open={isMindsetSheetOpen} onOpenChange={setIsMindsetSheetOpen}>
-                    <SheetContent side="bottom" className="h-[90vh] rounded-t-[20px] sm:max-w-md sm:mx-auto">
-                        <SheetHeader className="mb-6">
-                            <SheetTitle className="flex items-center gap-2 text-2xl">
-                                🧠 Daily Check-in
-                            </SheetTitle>
-                            <SheetDescription>
-                                Log your mood and progress notes.
-                            </SheetDescription>
-                        </SheetHeader>
+            {/* Mindset Sheet */}
+            <Sheet open={isMindsetSheetOpen} onOpenChange={setIsMindsetSheetOpen}>
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-[28px] bg-brandDark border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-2xl">
+                    <SheetHeader className="mb-6">
+                        <SheetTitle className="flex items-center gap-2 text-2xl font-heading font-extrabold text-purple-400">
+                            🧠 Daily Check-in
+                        </SheetTitle>
+                        <SheetDescription className="text-white/60 font-sans text-sm">
+                            Log your emotional state, blockers, and mindset parameters.
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div className="overflow-y-auto max-h-[70vh] pr-1">
                         <MindsetForm
                             userId={user?.id}
                             onSuccess={handleMindsetSuccess}
                         />
-                    </SheetContent>
-                </Sheet>
-            </div>
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }

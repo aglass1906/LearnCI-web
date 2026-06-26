@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnCI Portal - Phase 0 Design Prototype</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Outfit, Lexend, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN via Development Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            labels: ['Lexend', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brandDark: '#161925',
+            brandSurface: '#23283B',
+            accentTeal: '#00E5FF',
+            primaryAccent: '#FFA000',
+            glowPurple: '#3861FB',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #161925;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #23283B;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3861FB;
+    }
+    
+    /* Glassmorphism Styles */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    
+    .glass-card-hover:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Active Highlight Glow */
+    .glow-active {
+      border-color: #FFA000;
+      box-shadow: 0 0 15px rgba(255, 160, 0, 0.3);
+    }
+
+    .glow-teal-active {
+      border-color: #00E5FF;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    }
+
+    /* 3D Flip Card */
+    .flip-card {
+      perspective: 1000px;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 1rem;
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Word highlighting animation */
+    .word-highlight {
+      transition: all 0.25s ease;
+    }
+    .word-highlight.active {
+      background-color: rgba(255, 160, 0, 0.2);
+      color: #FFA000;
+      border-radius: 4px;
+      padding: 0 2px;
+      box-shadow: 0 0 8px rgba(255, 160, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-brandDark text-white font-sans min-h-screen relative overflow-x-hidden selection:bg-primaryAccent/30">
+
+  <!-- Background Glowing Blobs -->
+  <div class="absolute top-[-200px] left-[-100px] w-[500px] h-[500px] rounded-full bg-accentTeal/10 blur-[150px] -z-20 pointer-events-none"></div>
+  <div class="absolute top-[20%] right-[-200px] w-[600px] h-[600px] rounded-full bg-glowPurple/10 blur-[180px] -z-20 pointer-events-none"></div>
+  <div class="absolute bottom-[-100px] left-[20%] w-[500px] h-[500px] rounded-full bg-primaryAccent/5 blur-[150px] -z-20 pointer-events-none"></div>
+
+  <!-- Main Grid Container -->
+  <div class="flex flex-col min-h-screen">
+    
+    <!-- Top Navigation Bar -->
+    <header class="glass-card sticky top-0 z-50 border-b border-white/10 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
+          <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-accentTeal to-glowPurple flex items-center justify-center shadow-lg shadow-glowPurple/30">
+            <i data-lucide="book-open" class="text-white h-5 w-5"></i>
+          </div>
+          <span class="font-heading text-2xl font-extrabold bg-gradient-to-r from-white via-white to-accentTeal bg-clip-text text-transparent">LearnCI</span>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center gap-1 font-labels text-xs font-semibold tracking-wider text-white/70">
+          <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg transition-all hover:text-white text-white border-b-2 border-primaryAccent">DASHBOARD</button>
+          <button id="nav-stories" onclick="switchTab('stories')" class="px-4 py-2 rounded-lg transition-all hover:text-white hover:bg-white/5">STORIES</button>
+          <button id="nav-review" onclick="switchTab('review')" class="px-4 py-2 rounded-lg transition-all hover:text-white hover:bg-white/5">VOCAB SRS</button>
+          <button id="nav-watch" onclick="switchTab('watch')" class="px-4 py-2 rounded-lg transition-all hover:text-white hover:bg-white/5">WATCH TV</button>
+        </nav>
+
+        <!-- Search & User Control -->
+        <div class="flex items-center gap-4">
+          <div class="relative hidden sm:block">
+            <input type="text" placeholder="Search stories..." class="bg-white/5 border border-white/10 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:border-accentTeal transition-colors w-60">
+            <i data-lucide="search" class="absolute left-3.5 top-2.5 h-4 w-4 text-white/40"></i>
+          </div>
+          
+          <div class="flex items-center gap-3 border-l border-white/10 pl-4">
+            <div class="text-right hidden lg:block">
+              <p class="text-xs font-labels font-semibold text-white">Alex R.</p>
+              <p class="text-[10px] font-labels text-accentTeal tracking-wide">LEVEL 14 • B2</p>
+            </div>
+            <div class="h-9 w-9 rounded-full bg-gradient-to-br from-primaryAccent to-accentTeal p-0.5 cursor-pointer" onclick="switchTab('profile')">
+              <div class="h-full w-full rounded-full bg-brandSurface flex items-center justify-center text-xs font-bold">AR</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="tab-dashboard" class="space-y-8 block">
+        <!-- Welcome Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 class="font-heading text-3xl font-extrabold tracking-tight">Welcome Back, Alex</h1>
+            <p class="text-white/60 text-sm mt-1 font-sans">Ready to acquire some language today? Your current target is <span class="text-accentTeal font-semibold uppercase">Spanish</span>.</p>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="switchTab('stories')" class="glass-card glass-card-hover px-5 py-2.5 rounded-xl font-labels text-xs font-bold tracking-wider text-accentTeal flex items-center gap-2">
+              <i data-lucide="book-open" class="h-4 w-4"></i> READ STORY
+            </button>
+            <button onclick="switchTab('review')" class="bg-primaryAccent text-brandDark shadow-lg shadow-primaryAccent/25 hover:shadow-primaryAccent/40 hover:scale-[1.02] transition-all px-5 py-2.5 rounded-xl font-labels text-xs font-extrabold tracking-wider flex items-center gap-2">
+              <i data-lucide="sparkles" class="h-4 w-4"></i> START REVIEW
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Streak Card -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between h-[320px]">
+            <div class="flex items-center justify-between">
+              <span class="font-labels text-xs font-bold tracking-wider text-white/50">WEEKLY STREAK</span>
+              <span class="px-2.5 py-1 rounded-full bg-primaryAccent/10 text-primaryAccent text-[10px] font-labels font-extrabold">GOAL: 10 DAYS</span>
+            </div>
+            
+            <div class="flex flex-col items-center my-4">
+              <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-primaryAccent/20 to-primaryAccent/5 border border-primaryAccent/30 flex items-center justify-center mb-2 shadow-lg shadow-primaryAccent/10 relative">
+                <i data-lucide="flame" class="text-primaryAccent h-10 w-10 animate-pulse"></i>
+                <span class="absolute -bottom-1 -right-1 bg-primaryAccent text-brandDark h-6 w-6 rounded-full flex items-center justify-center font-labels text-xs font-extrabold">7</span>
+              </div>
+              <h3 class="font-heading text-xl font-bold">7 Days Streak!</h3>
+              <p class="text-white/40 text-xs mt-1">Keep it up! You are in the top 5% this week.</p>
+            </div>
+
+            <!-- Custom mini bar chart -->
+            <div class="flex justify-between items-end h-16 px-2">
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-8 rounded-full bg-primaryAccent/30"></div>
+                <span class="text-[9px] font-labels text-white/40">M</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-6 rounded-full bg-primaryAccent/30"></div>
+                <span class="text-[9px] font-labels text-white/40">T</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-10 rounded-full bg-accentTeal shadow-sm shadow-accentTeal/50"></div>
+                <span class="text-[9px] font-labels text-white/40">W</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-12 rounded-full bg-primaryAccent shadow-sm shadow-primaryAccent/50"></div>
+                <span class="text-[9px] font-labels text-white/40">T</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-8 rounded-full bg-primaryAccent shadow-sm shadow-primaryAccent/50"></div>
+                <span class="text-[9px] font-labels text-white/40">F</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-6 rounded-full bg-primaryAccent shadow-sm shadow-primaryAccent/50"></div>
+                <span class="text-[9px] font-labels text-white/40">S</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-2 h-8 rounded-full bg-primaryAccent shadow-sm shadow-primaryAccent/50"></div>
+                <span class="text-[9px] font-labels text-white/40">S</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Learning Progress Card -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between h-[320px]">
+            <div class="flex items-center justify-between">
+              <span class="font-labels text-xs font-bold tracking-wider text-white/50">LEARNING PROGRESS</span>
+              <span class="px-2.5 py-1 rounded-full bg-accentTeal/10 text-accentTeal text-[10px] font-labels font-extrabold">B2 IMMERSION</span>
+            </div>
+
+            <div class="flex items-center justify-around my-4">
+              <!-- SVG Radial Progress -->
+              <div class="relative w-32 h-32">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                  <circle class="text-white/5" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="60" cy="60" />
+                  <circle class="text-accentTeal" stroke-width="8" stroke-dasharray="282.7" stroke-dashoffset="98.9" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="60" cy="60" style="filter: drop-shadow(0 0 4px rgba(0,229,255,0.4));" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="font-heading text-2xl font-extrabold">65%</span>
+                  <span class="text-[9px] font-labels text-white/40 uppercase tracking-widest">COMPLETE</span>
+                </div>
+              </div>
+
+              <!-- Stats Info -->
+              <div class="space-y-3">
+                <div>
+                  <p class="text-[10px] font-labels text-white/40 uppercase">HOURS LEARNED</p>
+                  <p class="text-lg font-heading font-bold text-white">48h <span class="text-xs font-normal text-white/60">/ 75h</span></p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-labels text-white/40 uppercase">DAILY AVERAGE</p>
+                  <p class="text-lg font-heading font-bold text-accentTeal">1.8h</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-labels text-white/40 uppercase">CURRENT LEVEL</p>
+                  <p class="text-sm font-heading font-bold text-primaryAccent">Fluent (B2)</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-3 text-center text-[10px] font-labels text-white/40 uppercase tracking-wider">
+              27 Hours Remaining until next milestone
+            </div>
+          </div>
+
+          <!-- Active Stories & Recommendation Card -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between h-[320px]">
+            <div>
+              <span class="font-labels text-xs font-bold tracking-wider text-white/50 uppercase">Active Language Stories</span>
+              <div class="mt-4 space-y-4">
+                <!-- Recommended item 1 -->
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors" onclick="playStory('el-gran-escape')">
+                  <div class="h-12 w-12 rounded-lg overflow-hidden bg-gradient-to-tr from-green-800 to-emerald-500 relative flex-shrink-0">
+                    <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=120" class="h-full w-full object-cover opacity-80">
+                  </div>
+                  <div class="flex-grow min-w-0">
+                    <h4 class="font-heading text-sm font-bold truncate">El Murmullo del Bosque</h4>
+                    <p class="text-[10px] font-labels text-white/40 mt-0.5">SPANISH • LEVEL B1 • 60% READ</p>
+                  </div>
+                  <i data-lucide="play" class="text-accentTeal h-4 w-4 flex-shrink-0"></i>
+                </div>
+                <!-- Recommended item 2 -->
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors" onclick="playStory('el-gran-escape')">
+                  <div class="h-12 w-12 rounded-lg overflow-hidden bg-gradient-to-tr from-purple-800 to-indigo-500 relative flex-shrink-0">
+                    <img src="https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&q=80&w=120" class="h-full w-full object-cover opacity-80">
+                  </div>
+                  <div class="flex-grow min-w-0">
+                    <h4 class="font-heading text-sm font-bold truncate">Luces de Tokio</h4>
+                    <p class="text-[10px] font-labels text-white/40 mt-0.5">JAPANESE • LEVEL A2 • 35% READ</p>
+                  </div>
+                  <i data-lucide="play" class="text-accentTeal h-4 w-4 flex-shrink-0"></i>
+                </div>
+              </div>
+            </div>
+            
+            <button onclick="switchTab('stories')" class="w-full text-center text-xs font-labels font-semibold text-accentTeal hover:underline py-2">
+              Browse All Stories &rarr;
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Featured Carousel Area -->
+        <div>
+          <h2 class="font-heading text-xl font-extrabold mb-4">Latest Story Releases</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Story Card 1 -->
+            <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between" onclick="playStory('el-gran-escape')">
+              <div>
+                <div class="relative w-full h-40 bg-gradient-to-br from-orange-400 to-amber-600">
+                  <img src="https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                  <span class="absolute top-3 left-3 px-2 py-0.5 bg-brandDark/80 rounded-md text-[9px] font-labels font-bold tracking-widest text-primaryAccent">SPANISH B1</span>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-heading text-lg font-bold mb-1.5">El Gran Escape</h3>
+                  <p class="text-white/60 text-xs font-sans line-clamp-3">Un espía corre contra el tiempo para escapar de una fortaleza de alta seguridad usando sólo su ingenio y un mapa antiguo.</p>
+                </div>
+              </div>
+              <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40">
+                <span>3 CHAPTERS • 18 MINS</span>
+                <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+              </div>
+            </div>
+            
+            <!-- Story Card 2 -->
+            <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between" onclick="playStory('el-gran-escape')">
+              <div>
+                <div class="relative w-full h-40 bg-gradient-to-br from-cyan-400 to-blue-600">
+                  <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                  <span class="absolute top-3 left-3 px-2 py-0.5 bg-brandDark/80 rounded-md text-[9px] font-labels font-bold tracking-widest text-accentTeal">FRENCH A2</span>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-heading text-lg font-bold mb-1.5">Le Secret de la Forêt</h3>
+                  <p class="text-white/60 text-xs font-sans line-clamp-3">Deux amis découvrent un sentier caché dans les bois qui mène à des ruines mystérieuses non répertoriées sur les cartes.</p>
+                </div>
+              </div>
+              <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40">
+                <span>2 CHAPTERS • 12 MINS</span>
+                <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+              </div>
+            </div>
+
+            <!-- Story Card 3 -->
+            <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between" onclick="playStory('el-gran-escape')">
+              <div>
+                <div class="relative w-full h-40 bg-gradient-to-br from-purple-400 to-indigo-600">
+                  <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                  <span class="absolute top-3 left-3 px-2 py-0.5 bg-brandDark/80 rounded-md text-[9px] font-labels font-bold tracking-widest text-glowPurple">PORTUGUESE B2</span>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-heading text-lg font-bold mb-1.5">O Portal do Tempo</h3>
+                  <p class="text-white/60 text-xs font-sans line-clamp-3">Uma cientista acidentalmente ativa um antigo mecanismo que altera a gravidade local e abre uma fenda temporal no porão de sua casa.</p>
+                </div>
+              </div>
+              <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40">
+                <span>4 CHAPTERS • 25 MINS</span>
+                <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. STORIES CATALOG VIEW -->
+      <section id="tab-stories" class="space-y-8 hidden">
+        <div class="border-b border-white/10 pb-4">
+          <h1 class="font-heading text-3xl font-extrabold tracking-tight">Comprehensible Input Library</h1>
+          <p class="text-white/60 text-sm mt-1">Select from hundreds of stories customized to your vocabulary, with dramatized narration and interactive transcription.</p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap gap-4 items-center justify-between">
+          <div class="flex flex-wrap items-center gap-3">
+            <select class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-labels text-white/80 focus:outline-none focus:border-accentTeal">
+              <option value="all">All Languages</option>
+              <option value="spanish" selected>Spanish</option>
+              <option value="french">French</option>
+              <option value="japanese">Japanese</option>
+              <option value="portuguese">Portuguese</option>
+            </select>
+            <select class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-labels text-white/80 focus:outline-none focus:border-accentTeal">
+              <option value="all">All Levels</option>
+              <option value="a1">A1 Beginner</option>
+              <option value="a2">A2 Elementary</option>
+              <option value="b1" selected>B1 Intermediate</option>
+              <option value="b2">B2 Upper-Intermediate</option>
+              <option value="c1">C1 Advanced</option>
+            </select>
+            <select class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-labels text-white/80 focus:outline-none focus:border-accentTeal">
+              <option value="all">All Lengths</option>
+              <option value="short">Short (&lt; 10m)</option>
+              <option value="medium">Medium (10m - 20m)</option>
+              <option value="long">Long (&gt; 20m)</option>
+            </select>
+          </div>
+          
+          <div class="text-xs font-labels text-white/40 uppercase">
+            Showing 12 Stories
+          </div>
+        </div>
+
+        <!-- Catalog Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Story Card 1 -->
+          <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between" onclick="playStory('el-gran-escape')">
+            <div>
+              <div class="relative w-full h-44 bg-gradient-to-br from-orange-400 to-amber-600">
+                <img src="https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                <span class="absolute top-3 left-3 px-2.5 py-1 bg-brandDark/90 border border-primaryAccent/30 rounded-lg text-[9px] font-labels font-bold tracking-widest text-primaryAccent">SPANISH B1</span>
+              </div>
+              <div class="p-5">
+                <h3 class="font-heading text-lg font-bold mb-1.5">El Gran Escape</h3>
+                <p class="text-white/60 text-xs font-sans line-clamp-3">Un espía corre contra el tiempo para escapar de una fortaleza de alta seguridad usando sólo su ingenio y un mapa antiguo.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40 border-t border-white/5 pt-3">
+              <span>3 CHAPTERS • 18 MINS</span>
+              <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+            </div>
+          </div>
+          
+          <!-- Story Card 2 -->
+          <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between opacity-70 hover:opacity-100 transition-opacity" onclick="playStory('el-gran-escape')">
+            <div>
+              <div class="relative w-full h-44 bg-gradient-to-br from-green-400 to-emerald-600">
+                <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                <span class="absolute top-3 left-3 px-2.5 py-1 bg-brandDark/90 border border-accentTeal/30 rounded-lg text-[9px] font-labels font-bold tracking-widest text-accentTeal">SPANISH B1</span>
+              </div>
+              <div class="p-5">
+                <h3 class="font-heading text-lg font-bold mb-1.5">El Murmullo del Bosque</h3>
+                <p class="text-white/60 text-xs font-sans line-clamp-3">Cosas extrañas suceden cuando un excursionista decide pasar la noche en la sección más profunda del bosque nacional.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40 border-t border-white/5 pt-3">
+              <span>2 CHAPTERS • 12 MINS</span>
+              <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+            </div>
+          </div>
+
+          <!-- Story Card 3 -->
+          <div class="glass-card glass-card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between opacity-70 hover:opacity-100 transition-opacity" onclick="playStory('el-gran-escape')">
+            <div>
+              <div class="relative w-full h-44 bg-gradient-to-br from-red-400 to-rose-600">
+                <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover mix-blend-multiply opacity-90">
+                <span class="absolute top-3 left-3 px-2.5 py-1 bg-brandDark/90 border border-primaryAccent/30 rounded-lg text-[9px] font-labels font-bold tracking-widest text-primaryAccent">SPANISH B1</span>
+              </div>
+              <div class="p-5">
+                <h3 class="font-heading text-lg font-bold mb-1.5">El Secreto de la Receta</h3>
+                <p class="text-white/60 text-xs font-sans line-clamp-3">Un chef novato en Madrid accidentalmente encuentra el diario culinario secreto de su legendario abuelo.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 flex items-center justify-between text-[10px] font-labels text-white/40 border-t border-white/5 pt-3">
+              <span>3 CHAPTERS • 15 MINS</span>
+              <span class="text-accentTeal flex items-center gap-1 font-bold">PLAY <i data-lucide="play" class="h-3 w-3"></i></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. STORY PLAYBACK WORKSPACE VIEW -->
+      <section id="tab-story-player" class="grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
+        <!-- Main Story Panel (flex: 2 equivalents) -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Back button -->
+          <button onclick="switchTab('stories')" class="inline-flex items-center gap-2 text-xs font-labels text-white/60 hover:text-white transition-colors">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i> BACK TO LIBRARY
+          </button>
+          
+          <!-- Story Header -->
+          <div class="relative w-full h-56 rounded-2xl overflow-hidden bg-gradient-to-br from-orange-400 to-amber-600 shadow-xl">
+            <img src="https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover mix-blend-multiply opacity-80">
+            <div class="absolute inset-0 bg-gradient-to-t from-brandDark via-brandDark/30 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2.5 py-0.5 bg-primaryAccent text-brandDark rounded-md text-[10px] font-labels font-extrabold tracking-wide">SPANISH B1</span>
+                <span class="text-xs text-white/60 font-labels font-semibold">CHAPTER 1: LA DECISIÓN</span>
+              </div>
+              <h1 class="font-heading text-3xl font-extrabold">El Gran Escape</h1>
+            </div>
+          </div>
+
+          <!-- Chapter Intro Container -->
+          <div class="glass-card rounded-2xl p-6 border-l-4 border-l-primaryAccent">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="quote" class="text-primaryAccent h-4 w-4"></i>
+              <span class="font-labels text-[10px] font-bold tracking-wider text-primaryAccent">CHAPTER INTRO QUOTE & SETTING</span>
+            </div>
+            <!-- Chapter Intro text -->
+            <p class="font-sans italic text-white/70 text-sm leading-relaxed">
+              "La libertad no es simplemente romper las cadenas, sino vivir de una manera que respete y mejore la libertad de los demás." <br>
+              <span class="text-white/40 text-xs block mt-1.5 font-sans">— En las profundidades de la fortaleza de piedra gris, el viento frío del norte silba a través de las rejas de hierro de la celda de Carlos. Carlos está parado frente a un viejo escritorio de madera, analizando detenidamente un papel arrugado.</span>
+            </p>
+          </div>
+
+          <!-- Story Reading & Highlight Content -->
+          <div class="glass-card rounded-2xl p-8 min-h-[300px]">
+            <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+              <span class="font-labels text-xs font-bold tracking-wider text-white/50">STORY TRANSLATION</span>
+              
+              <div class="inline-flex rounded-lg border border-white/10 p-0.5 text-xs font-labels font-bold bg-white/5">
+                <button id="btn-lang-target" onclick="toggleTranslation('target')" class="px-3 py-1.5 rounded-md bg-primaryAccent text-brandDark">SPANISH</button>
+                <button id="btn-lang-native" onclick="toggleTranslation('native')" class="px-3 py-1.5 rounded-md hover:text-white text-white/60">ENGLISH</button>
+              </div>
+            </div>
+
+            <!-- Paragraph text with words wrapped for highlighting -->
+            <div class="prose max-w-none">
+              <p id="story-text-container" class="font-sans text-lg md:text-xl leading-loose tracking-wide whitespace-pre-wrap text-white/95 transition-all">
+                <!-- Spans representing words that can highlight -->
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'carlos')">Carlos</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'estaba')">estaba</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'cansado')">cansado</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'esperar')">esperar.</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'la')">La</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'oportunidad')">oportunidad</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'habia')">había</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'llegado.')">llegado.</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">El</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'guarda')">guarda</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'dormia')">dormía</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'placidamente')">plácidamente</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'en')">en</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'la')">la</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'silla,')">silla,</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'dejando')">dejando</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">el</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'manojo')">manojo</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'llaves')">llaves</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'colgando')">colgando</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'su')">su</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'cinturón.')">cinturón.</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'carlos')">Carlos</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'respiro')">respiró hondo,</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'tomo')">tomó</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">el</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'alambre')">alambre</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'y')">y</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'comenzo')">comenzó</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'su')">su</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'gran')">gran</span> 
+                <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'escape.')">escape.</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Persistent Audio Controller Cockpit -->
+          <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+              <button id="btn-audio-play" onclick="toggleAudio()" class="h-12 w-12 rounded-full bg-primaryAccent text-brandDark flex items-center justify-center shadow-lg shadow-primaryAccent/25 hover:scale-[1.05] transition-transform">
+                <i id="play-icon" data-lucide="play" class="h-5 w-5 fill-brandDark"></i>
+              </button>
+              <div>
+                <h4 class="font-heading text-sm font-bold truncate max-w-[180px]">Chapter 1 Audio</h4>
+                <p class="text-[10px] font-labels text-white/40 tracking-wider">MALE NARRATOR STYLE</p>
+              </div>
+            </div>
+
+            <!-- Audio Progress Bar -->
+            <div class="flex-grow flex items-center gap-3 w-full">
+              <span id="audio-time-current" class="text-xs font-labels text-white/40">0:00</span>
+              <div class="flex-grow bg-white/10 rounded-full h-1.5 relative cursor-pointer" onclick="seekAudio(event)">
+                <div id="audio-progress-bar" class="bg-primaryAccent h-full rounded-full w-0 shadow-lg shadow-primaryAccent/50"></div>
+              </div>
+              <span id="audio-time-duration" class="text-xs font-labels text-white/40">0:15</span>
+            </div>
+
+            <!-- Speed Controls -->
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+              <select id="audio-speed" onchange="changePlaybackSpeed()" class="bg-white/5 border border-white/10 rounded-lg py-1.5 px-3 text-xs font-labels text-white/80 focus:outline-none">
+                <option value="0.8">0.8x Speed</option>
+                <option value="1.0" selected>1.0x Speed</option>
+                <option value="1.2">1.2x Speed</option>
+                <option value="1.5">1.5x Speed</option>
+              </select>
+              <button class="glass-card p-2 rounded-lg text-white/60 hover:text-white" title="Autoplay chapter">
+                <i data-lucide="repeat" class="h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar context (flex: 1 equivalent) -->
+        <div class="space-y-6">
+          
+          <!-- Vocabulary Quick Panel -->
+          <div class="glass-card rounded-2xl p-6">
+            <span class="font-labels text-xs font-bold tracking-wider text-white/50 uppercase">Vocabulary Lookup</span>
+            
+            <!-- Dynamic lookup result placeholder -->
+            <div id="vocab-lookup-box" class="mt-4 space-y-4">
+              <div class="text-center py-8 text-white/40">
+                <i data-lucide="help-circle" class="h-8 w-8 mx-auto mb-2 opacity-50"></i>
+                <p class="text-xs font-sans">Click on any highlighted word in the story to view definitions, audio pronunciation, and add it to your flashcards.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lesson Integrity card -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <span class="font-labels text-xs font-bold tracking-wider text-accentTeal uppercase">Pedagogical Integrity</span>
+            <div class="space-y-2">
+              <p class="text-xs text-white/80 font-sans leading-relaxed">This chapter focuses on the <span class="text-accentTeal font-bold">Imperfect Past Tense</span> (e.g., *estaba*, *dormía*) and incorporates <span class="text-primaryAccent font-bold">14 new target vocabulary words</span> matching your user profile.</p>
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="px-2 py-0.5 rounded bg-white/5 text-[9px] font-labels border border-white/10 text-white/70">Imperfect Tense</span>
+                <span class="px-2 py-0.5 rounded bg-white/5 text-[9px] font-labels border border-white/10 text-white/70">A2-B1 Vocabulary</span>
+                <span class="px-2 py-0.5 rounded bg-white/5 text-[9px] font-labels border border-white/10 text-white/70">Dramatized Narrative</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. VOCAB SRS FLASHCARDS VIEW -->
+      <section id="tab-review" class="max-w-xl mx-auto space-y-8 hidden">
+        <div class="text-center">
+          <h1 class="font-heading text-3xl font-extrabold tracking-tight">Active Vocabulary SRS</h1>
+          <p class="text-white/60 text-sm mt-1">Review words you've encountered in stories using our Spaced Repetition System.</p>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="glass-card rounded-xl p-4 flex justify-between items-center text-xs font-labels">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-accentTeal"></span>
+            <span>20 Cards Remaining</span>
+          </div>
+          <div class="w-1/2 bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-accentTeal h-full w-[35%] shadow-sm shadow-accentTeal/50"></div>
+          </div>
+          <span class="text-white/60">7/20 Review Cards</span>
+        </div>
+
+        <!-- Flip Card Component -->
+        <div id="flashcard-container" class="flip-card w-full h-[320px] cursor-pointer" onclick="flipCard()">
+          <div class="flip-card-inner w-full h-full">
+            
+            <!-- Card Front -->
+            <div class="flip-card-front glass-card p-8 flex flex-col justify-between border-t-4 border-t-accentTeal">
+              <div class="flex justify-between items-center text-xs font-labels text-white/40">
+                <span>FRONT - SPANISH</span>
+                <span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] tracking-wider text-accentTeal">TARGET</span>
+              </div>
+              
+              <div class="text-center">
+                <h2 id="card-front-word" class="font-heading text-4xl font-extrabold tracking-wide">el guarda</h2>
+                <p class="text-white/40 text-xs mt-2 font-sans">[Noun / Masculine]</p>
+              </div>
+
+              <div class="text-center text-xs font-labels text-accentTeal">
+                <i data-lucide="rotate-cw" class="h-4 w-4 inline mr-1 text-accentTeal"></i> TAP TO REVEAL DEFINITION
+              </div>
+            </div>
+            
+            <!-- Card Back -->
+            <div class="flip-card-back glass-card p-8 flex flex-col justify-between border-t-4 border-t-primaryAccent">
+              <div class="flex justify-between items-center text-xs font-labels text-white/40">
+                <span>BACK - ENGLISH DEFINITION</span>
+                <span class="px-2 py-0.5 rounded bg-primaryAccent/10 text-[9px] tracking-wider text-primaryAccent">ACQUIRED</span>
+              </div>
+              
+              <div class="text-center space-y-3">
+                <h2 id="card-back-word" class="font-heading text-3xl font-extrabold text-primaryAccent tracking-wide">the guard / sentinel</h2>
+                <div class="border-t border-white/10 my-2"></div>
+                <p class="text-white/80 text-sm font-sans italic">"El guarda dormía plácidamente en la silla."</p>
+                <p class="text-white/40 text-xs font-sans">"The guard was sleeping peacefully in the chair."</p>
+              </div>
+
+              <div class="text-center text-xs font-labels text-white/40">
+                TAP TO FLIP BACK
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SRS Buttons -->
+        <div class="grid grid-cols-4 gap-3">
+          <button onclick="nextCard('Again')" class="glass-card hover:bg-red-500/10 hover:border-red-500/50 transition-colors py-3 rounded-xl flex flex-col items-center">
+            <span class="font-heading text-sm font-bold text-red-400">Again</span>
+            <span class="text-[9px] font-labels text-white/40 mt-0.5 uppercase">&lt; 1m</span>
+          </button>
+          <button onclick="nextCard('Hard')" class="glass-card hover:bg-orange-500/10 hover:border-orange-500/50 transition-colors py-3 rounded-xl flex flex-col items-center">
+            <span class="font-heading text-sm font-bold text-orange-400">Hard</span>
+            <span class="text-[9px] font-labels text-white/40 mt-0.5 uppercase">12h</span>
+          </button>
+          <button onclick="nextCard('Good')" class="glass-card hover:bg-green-500/10 hover:border-green-500/50 transition-colors py-3 rounded-xl flex flex-col items-center glow-active">
+            <span class="font-heading text-sm font-bold text-green-400">Good</span>
+            <span class="text-[9px] font-labels text-white/40 mt-0.5 uppercase">3d</span>
+          </button>
+          <button onclick="nextCard('Easy')" class="glass-card hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-colors py-3 rounded-xl flex flex-col items-center">
+            <span class="font-heading text-sm font-bold text-accentTeal">Easy</span>
+            <span class="text-[9px] font-labels text-white/40 mt-0.5 uppercase">7d</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 5. WATCH PORTAL / YOUTUBE VIEW -->
+      <section id="tab-watch" class="space-y-8 hidden">
+        <div class="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 class="font-heading text-3xl font-extrabold tracking-tight">Comprehensible Input TV</h1>
+            <p class="text-white/60 text-sm mt-1">Watch video streams and automatically log active input minutes into your learning dashboard.</p>
+          </div>
+          <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-labels text-white/70">
+            <i data-lucide="clock" class="text-accentTeal h-4 w-4"></i>
+            <span>Logged Today: <strong class="text-accentTeal">15 Mins</strong></span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Featured Video Frame -->
+          <div class="glass-card rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between">
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center">
+              <!-- Simulated Video Overlay -->
+              <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply">
+              <button onclick="startWatching()" class="relative z-10 h-16 w-16 rounded-full bg-primaryAccent text-brandDark flex items-center justify-center shadow-2xl hover:scale-[1.05] transition-transform">
+                <i data-lucide="play" class="h-6 w-6 fill-brandDark"></i>
+              </button>
+              <div class="absolute bottom-4 left-4 right-4 bg-brandDark/80 backdrop-blur-md px-4 py-2 rounded-lg border border-white/10 text-xs font-labels flex justify-between items-center">
+                <span>Spanish CI - Intermediate Vlog</span>
+                <span class="text-accentTeal">12 Mins</span>
+              </div>
+            </div>
+            <div class="p-6 space-y-2">
+              <h3 class="font-heading text-lg font-bold">Un día en Madrid - Vuelo, comida y paseos</h3>
+              <p class="text-white/60 text-xs font-sans leading-relaxed">Join Lucía as she walks through the historic streets of Madrid, detailing her travels, introducing local foods, and speaking in natural, slow-paced intermediate Spanish.</p>
+            </div>
+          </div>
+
+          <!-- Video Lists -->
+          <div class="space-y-4">
+            <h2 class="font-heading text-lg font-extrabold">Curated Channels & Recommended Videos</h2>
+            <div class="space-y-3">
+              <!-- Video Row 1 -->
+              <div class="flex gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors border border-white/10">
+                <div class="h-16 w-24 rounded-lg overflow-hidden bg-white/20 relative flex-shrink-0">
+                  <img src="https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&q=80&w=120" class="h-full w-full object-cover">
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-heading text-sm font-bold truncate">Aventuras en Barcelona: La Sagrada Familia</h4>
+                  <p class="text-[10px] font-labels text-white/40 mt-1">SPANISH CI HUB • 18 MINUTES • A2 LEVEL</p>
+                  <p class="text-[11px] text-white/60 font-sans truncate mt-0.5">Explore the legendary architecture of Antoni Gaudí with natural descriptions...</p>
+                </div>
+              </div>
+
+              <!-- Video Row 2 -->
+              <div class="flex gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors border border-white/10">
+                <div class="h-16 w-24 rounded-lg overflow-hidden bg-white/20 relative flex-shrink-0">
+                  <img src="https://images.unsplash.com/photo-1522083165195-342750297f95?auto=format&fit=crop&q=80&w=120" class="h-full w-full object-cover">
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-heading text-sm font-bold truncate">Cómo preparar una Tortilla de Patata Española</h4>
+                  <p class="text-[10px] font-labels text-white/40 mt-1">COCINA FÁCIL CI • 14 MINUTES • B1 LEVEL</p>
+                  <p class="text-[11px] text-white/60 font-sans truncate mt-0.5">Step by step recipe details spoken fully in clear, comprehensible input...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Mobile Nav (Tab replication) -->
+    <footer class="md:hidden glass-card border-t border-white/10 fixed bottom-0 left-0 right-0 py-3 px-6 z-50">
+      <div class="flex justify-between items-center">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-1 text-xs font-labels font-semibold text-primaryAccent">
+          <i data-lucide="home" class="h-5 w-5"></i>
+          <span>Home</span>
+        </button>
+        <button onclick="switchTab('stories')" class="flex flex-col items-center gap-1 text-xs font-labels font-semibold text-white/60">
+          <i data-lucide="book-open" class="h-5 w-5"></i>
+          <span>Library</span>
+        </button>
+        <button onclick="switchTab('review')" class="flex flex-col items-center gap-1 text-xs font-labels font-semibold text-white/60">
+          <i data-lucide="sparkles" class="h-5 w-5"></i>
+          <span>SRS</span>
+        </button>
+        <button onclick="switchTab('watch')" class="flex flex-col items-center gap-1 text-xs font-labels font-semibold text-white/60">
+          <i data-lucide="tv" class="h-5 w-5"></i>
+          <span>Immersion</span>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript logic for Prototype Actions -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. Tab Switching System
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.getElementById('tab-dashboard').style.display = 'none';
+      document.getElementById('tab-stories').style.display = 'none';
+      document.getElementById('tab-story-player').style.display = 'none';
+      document.getElementById('tab-review').style.display = 'none';
+      document.getElementById('tab-watch').style.display = 'none';
+      
+      // Remove borders and active states from navigation headers
+      const navButtons = document.querySelectorAll('header nav button');
+      navButtons.forEach(btn => {
+        btn.classList.remove('border-b-2', 'border-primaryAccent', 'text-white');
+        btn.classList.add('text-white/70');
+      });
+
+      // Show requested tab
+      if(tabId === 'dashboard') {
+        document.getElementById('tab-dashboard').style.display = 'block';
+        document.getElementById('nav-dashboard').classList.add('border-b-2', 'border-primaryAccent', 'text-white');
+      } else if (tabId === 'stories') {
+        document.getElementById('tab-stories').style.display = 'block';
+        document.getElementById('nav-stories').classList.add('border-b-2', 'border-primaryAccent', 'text-white');
+      } else if (tabId === 'story-player') {
+        document.getElementById('tab-story-player').style.display = 'grid';
+        document.getElementById('nav-stories').classList.add('border-b-2', 'border-primaryAccent', 'text-white');
+      } else if (tabId === 'review') {
+        document.getElementById('tab-review').style.display = 'block';
+        document.getElementById('nav-review').classList.add('border-b-2', 'border-primaryAccent', 'text-white');
+      } else if (tabId === 'watch') {
+        document.getElementById('tab-watch').style.display = 'block';
+        document.getElementById('nav-watch').classList.add('border-b-2', 'border-primaryAccent', 'text-white');
+      }
+      
+      // Update icons
+      lucide.createIcons();
+    }
+
+    // 2. Story Playback System
+    function playStory(storyKey) {
+      switchTab('story-player');
+    }
+
+    // 3. Audio Control Simulation (Whisper Timing Karaoke Mode)
+    let isPlaying = false;
+    let audioTimer = null;
+    let audioProgress = 0;
+    let activeWordIndex = -1;
+    
+    // Selectable words for simulated playback highlight sequencing
+    const words = [
+      { id: 0, text: "Carlos", start: 0, duration: 1 },
+      { id: 1, text: "estaba", start: 1, duration: 1 },
+      { id: 2, text: "cansado", start: 2, duration: 1 },
+      { id: 3, text: "de", start: 3, duration: 0.5 },
+      { id: 4, text: "esperar.", start: 3.5, duration: 1 },
+      { id: 5, text: "La", start: 4.5, duration: 0.5 },
+      { id: 6, text: "oportunidad", start: 5, duration: 1 },
+      { id: 7, text: "habia", start: 6, duration: 0.5 },
+      { id: 8, text: "llegado.", start: 6.5, duration: 1 },
+      { id: 9, text: "el", start: 7.5, duration: 0.5 },
+      { id: 10, text: "guarda", start: 8, duration: 0.8 },
+      { id: 11, text: "dormia", start: 8.8, duration: 1 },
+      { id: 12, text: "placidamente", start: 9.8, duration: 1.5 },
+      { id: 13, text: "en", start: 11.3, duration: 0.3 },
+      { id: 14, text: "la", start: 11.6, duration: 0.3 },
+      { id: 15, text: "silla,", start: 11.9, duration: 0.8 },
+      { id: 16, text: "dejando", start: 12.7, duration: 0.8 },
+      { id: 17, text: "el", start: 13.5, duration: 0.3 },
+      { id: 18, text: "manojo", start: 13.8, duration: 0.8 },
+      { id: 19, text: "de", start: 14.6, duration: 0.3 },
+      { id: 20, text: "llaves", start: 14.9, duration: 0.8 },
+      { id: 21, text: "colgando", start: 15.7, duration: 1.0 },
+      { id: 22, text: "de", start: 16.7, duration: 0.3 },
+      { id: 23, text: "su", start: 17.0, duration: 0.3 },
+      { id: 24, text: "cinturón.", start: 17.3, duration: 1.0 },
+      { id: 25, text: "Carlos", start: 18.3, duration: 0.8 },
+      { id: 26, text: "respiro", start: 19.1, duration: 1.2 },
+      { id: 27, text: "tomo", start: 20.3, duration: 0.6 },
+      { id: 28, text: "el", start: 20.9, duration: 0.3 },
+      { id: 29, text: "alambre", start: 21.2, duration: 0.8 },
+      { id: 30, text: "y", start: 22.0, duration: 0.3 },
+      { id: 31, text: "comenzo", start: 22.3, duration: 0.8 },
+      { id: 32, text: "su", start: 23.1, duration: 0.4 },
+      { id: 33, text: "gran", start: 23.5, duration: 0.5 },
+      { id: 34, text: "escape.", start: 24.0, duration: 1.2 }
+    ];
+
+    function toggleAudio() {
+      const playBtn = document.getElementById('btn-audio-play');
+      const playIcon = document.getElementById('play-icon');
+      
+      if(isPlaying) {
+        // Pause
+        isPlaying = false;
+        clearInterval(audioTimer);
+        playIcon.setAttribute('data-lucide', 'play');
+        playBtn.classList.remove('glow-active');
+      } else {
+        // Play
+        isPlaying = true;
+        playIcon.setAttribute('data-lucide', 'pause');
+        playBtn.classList.add('glow-active');
+        
+        const totalDuration = 25; // 25 seconds duration
+        
+        audioTimer = setInterval(() => {
+          audioProgress += 0.1;
+          
+          if(audioProgress >= totalDuration) {
+            audioProgress = 0;
+            isPlaying = false;
+            clearInterval(audioTimer);
+            playIcon.setAttribute('data-lucide', 'play');
+            playBtn.classList.remove('glow-active');
+            clearWordHighlighting();
+          }
+          
+          // Update Progress Bar UI
+          const percentage = (audioProgress / totalDuration) * 100;
+          document.getElementById('audio-progress-bar').style.width = percentage + '%';
+          
+          // Update Time
+          document.getElementById('audio-time-current').innerText = formatSeconds(audioProgress);
+          
+          // Sync Word Highlights
+          syncWordHighlights(audioProgress);
+        }, 100);
+      }
+      lucide.createIcons();
+    }
+
+    function syncWordHighlights(seconds) {
+      const wordSpans = document.querySelectorAll('#story-text-container .word-highlight');
+      
+      // Find active word
+      let currentActiveIndex = -1;
+      for (let i = 0; i < words.length; i++) {
+        if(seconds >= words[i].start && seconds <= (words[i].start + words[i].duration)) {
+          currentActiveIndex = i;
+          break;
+        }
+      }
+      
+      if(currentActiveIndex !== activeWordIndex) {
+        clearWordHighlighting();
+        activeWordIndex = currentActiveIndex;
+        if(activeWordIndex !== -1 && wordSpans[activeWordIndex]) {
+          wordSpans[activeWordIndex].classList.add('active');
+        }
+      }
+    }
+
+    function clearWordHighlighting() {
+      const wordSpans = document.querySelectorAll('#story-text-container .word-highlight');
+      wordSpans.forEach(span => span.classList.remove('active'));
+    }
+
+    function formatSeconds(secs) {
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function seekAudio(event) {
+      const barWidth = event.currentTarget.clientWidth;
+      const clickX = event.offsetX;
+      const percentage = clickX / barWidth;
+      const totalDuration = 25;
+      
+      audioProgress = percentage * totalDuration;
+      document.getElementById('audio-progress-bar').style.width = (percentage * 100) + '%';
+      document.getElementById('audio-time-current').innerText = formatSeconds(audioProgress);
+      
+      syncWordHighlights(audioProgress);
+    }
+
+    // 4. Translation Toggle (Simulated text replacements)
+    const targetText = "Carlos estaba cansado de esperar. La oportunidad había llegado. El guarda dormía plácidamente en la silla, dejando el manojo de llaves colgando de su cinturón. Carlos respiró hondo, tomó el alambre y comenzó su gran escape.";
+    const nativeText = "Carlos was tired of waiting. The opportunity had arrived. The guard slept peacefully in the chair, leaving the bunch of keys hanging from his belt. Carlos took a deep breath, took the wire and began his great escape.";
+
+    function toggleTranslation(mode) {
+      const btnTarget = document.getElementById('btn-lang-target');
+      const btnNative = document.getElementById('btn-lang-native');
+      const container = document.getElementById('story-text-container');
+      
+      if(mode === 'target') {
+        btnTarget.className = "px-3 py-1.5 rounded-md bg-primaryAccent text-brandDark";
+        btnNative.className = "px-3 py-1.5 rounded-md hover:text-white text-white/60";
+        // Revert to words with clickable highlight classes
+        container.innerHTML = `
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'carlos')">Carlos</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'estaba')">estaba</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'cansado')">cansado</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'esperar')">esperar.</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'la')">La</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'oportunidad')">oportunidad</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'habia')">había</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'llegado.')">llegado.</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">El</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'guarda')">guarda</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'dormia')">dormía</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'placidamente')">plácidamente</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'en')">en</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'la')">la</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'silla,')">silla,</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'dejando')">dejando</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">el</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'manojo')">manojo</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'llaves')">llaves</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'colgando')">colgando</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'de')">de</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'su')">su</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'cinturón.')">cinturón.</span>
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'carlos')">Carlos</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'respiro')">respiró hondo,</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'tomo')">tomó</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'el')">el</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'alambre')">alambre</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'y')">y</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'comenzo')">comenzó</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'su')">su</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'gran')">gran</span> 
+          <span class="word-highlight cursor-pointer" onclick="lookupWord(this, 'escape.')">escape.</span>
+        `;
+      } else {
+        btnTarget.className = "px-3 py-1.5 rounded-md hover:text-white text-white/60";
+        btnNative.className = "px-3 py-1.5 rounded-md bg-primaryAccent text-brandDark";
+        container.innerHTML = nativeText;
+      }
+      activeWordIndex = -1;
+      syncWordHighlights(audioProgress);
+    }
+
+    // 5. Vocabulary Click Lookup Simulation
+    const dictionary = {
+      'carlos': { target: "Carlos", native: "Carlos (Name)", type: "Proper Noun", def: "A masculine given name. In this story, represents the primary protagonist." },
+      'estaba': { target: "estaba", native: "was", type: "Verb / Imperfect Past", def: "Third-person singular imperfect past of the verb 'estar' (to be, denoting temporary states/locations)." },
+      'cansado': { target: "cansado", native: "tired / weary", type: "Adjective / Masculine", def: "Feeling fatigue; drained of strength or energy." },
+      'esperar': { target: "esperar", native: "to wait / to hope", type: "Verb / Infinitive", def: "To stay in place in expectation of something occurring." },
+      'la': { target: "la", native: "the", type: "Article / Feminine Singular", def: "Definite feminine singular article used to specify a particular noun." },
+      'oportunidad': { target: "oportunidad", native: "opportunity / chance", type: "Noun / Feminine", def: "A favorable set of circumstances or a chance for progress." },
+      'habia': { target: "había", native: "had", type: "Verb / Auxiliary Imperfect", def: "Third-person singular imperfect past of 'haber' (auxiliary verb used to form pluperfect past tenses)." },
+      'llegado.': { target: "llegado", native: "arrived / come", type: "Verb / Past Participle", def: "Past participle of 'llegar' (to arrive, reach a destination)." },
+      'el': { target: "el", native: "the", type: "Article / Masculine Singular", def: "Definite masculine singular article." },
+      'guarda': { target: "guarda", native: "guard / sentinel", type: "Noun / Masculine", def: "A person who keeps watch, guards a prisoner, or protects a location." },
+      'dormia': { target: "dormía", native: "was sleeping / slept", type: "Verb / Imperfect Past", def: "Third-person singular imperfect past of 'dormir' (to sleep). Represents an ongoing background state in the past." },
+      'placidamente': { target: "plácidamente", native: "peacefully / placidly", type: "Adverb", def: "In a calm, quiet, and tranquil manner; undisturbed." },
+      'en': { target: "en", native: "in / on / at", type: "Preposition", def: "Preposition indicating location, space, or position." },
+      'silla,': { target: "silla", native: "chair", type: "Noun / Feminine", def: "A separate seat for one person, typically with four legs and a back support." },
+      'dejando': { target: "dejando", native: "leaving", type: "Verb / Gerund", def: "The present participle (gerund) of the verb 'dejar' (to leave, let, or abandon)." },
+      'manojo': { target: "manojo", native: "bunch / cluster", type: "Noun / Masculine", def: "A bundle of small objects (like keys or herbs) that can be held in a hand." },
+      'llaves': { target: "llaves", native: "keys", type: "Noun / Feminine Plural", def: "Metal instruments designed to align pins and operate locking mechanisms." },
+      'colgando': { target: "colgando", native: "hanging / dangling", type: "Verb / Gerund", def: "Present participle (gerund) of the verb 'colgar' (to hang, suspend)." },
+      'de': { target: "de", native: "of / from", type: "Preposition", def: "Preposition denoting possession, origin, material, or association." },
+      'su': { target: "su", native: "his / her / its / your", type: "Pronoun / Possessive", def: "Possessive adjective representing singular ownership." },
+      'cinturón.': { target: "cinturón", native: "belt", type: "Noun / Masculine", def: "A strip of leather or flexible material worn around the waist to support clothing." },
+      'respiro': { target: "respiró hondo", native: "breathed deeply", type: "Verb phrase", def: "Combined verb phrase signifying taking a deep, purposeful inhalation." },
+      'tomo': { target: "tomó", native: "took", type: "Verb / Preterite Past", def: "Third-person singular preterite (completed past) of 'tomar' (to take, grasp, or consume)." },
+      'alambre': { target: "alambre", native: "wire", type: "Noun / Masculine", def: "A metal thread or flexible rod, frequently used for lock-picking or bindings." },
+      'y': { target: "y", native: "and", type: "Conjunction", def: "Conjunction used to connect coordinate words, phrases, or clauses." },
+      'comenzo': { target: "comenzó", native: "began / started", type: "Verb / Preterite Past", def: "Third-person singular preterite of 'comenzar' (to begin, start a process)." },
+      'gran': { target: "gran", native: "great / grand", type: "Adjective", def: "Shortened form of 'grande' used before singular nouns, denoting importance or scale." },
+      'escape.': { target: "escape", native: "escape", type: "Noun / Masculine", def: "An act of breaking free from confinement, danger, or capture." }
+    };
+
+    function lookupWord(spanElement, cleanKey) {
+      // Highlight element visually as selected
+      document.querySelectorAll('#story-text-container .word-highlight').forEach(w => w.classList.remove('ring-2', 'ring-accentTeal'));
+      spanElement.classList.add('ring-2', 'ring-accentTeal');
+      
+      const lookupBox = document.getElementById('vocab-lookup-box');
+      const data = dictionary[cleanKey.toLowerCase()] || { target: cleanKey, native: "Definition not found", type: "Unknown", def: "No definition details available in this prototype." };
+      
+      // Update Sidebar Panel with a beautiful glass lookup detail
+      lookupBox.innerHTML = `
+        <div class="space-y-3 animate-fadeIn">
+          <div>
+            <div class="flex justify-between items-start">
+              <h3 class="font-heading text-2xl font-extrabold text-accentTeal">${data.target}</h3>
+              <span class="px-2 py-0.5 rounded bg-accentTeal/10 text-[8px] font-labels tracking-widest uppercase text-accentTeal">${data.type}</span>
+            </div>
+            <p class="text-white/60 text-xs font-labels mt-1">${data.native}</p>
+          </div>
+          <div class="border-t border-white/10 my-2"></div>
+          <p class="text-xs text-white/80 font-sans leading-relaxed">${data.def}</p>
+          <div class="pt-2 flex gap-2">
+            <button onclick="addWordToDeck('${data.target}')" class="flex-grow bg-primaryAccent text-brandDark shadow-md shadow-primaryAccent/20 hover:scale-[1.02] transition-transform py-2 rounded-xl text-center font-labels text-[10px] font-extrabold tracking-wider">
+              + ADD TO SRS DECK
+            </button>
+            <button onclick="playPronunciation('${data.target}')" class="glass-card hover:bg-white/10 p-2 rounded-xl text-white/60 hover:text-white" title="Pronounce">
+              <i data-lucide="volume-2" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function addWordToDeck(word) {
+      alert(`"${word}" has been successfully added to your active Vocabulary SRS card deck.`);
+    }
+
+    function playPronunciation(word) {
+      // Speak word using standard Web Speech API if supported
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'es-ES'; // Spanish locale
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert(`Pronouncing: ${word} (Simulated audio)`);
+      }
+    }
+
+    // 6. Flashcard System
+    let cardIsFlipped = false;
+    function flipCard() {
+      const card = document.getElementById('flashcard-container');
+      if(cardIsFlipped) {
+        card.classList.remove('flipped');
+        cardIsFlipped = false;
+      } else {
+        card.classList.add('flipped');
+        cardIsFlipped = true;
+      }
+    }
+
+    const flashcards = [
+      { front: "el guarda", frontType: "[Noun / Masculine]", back: "the guard / sentinel", backEx: "\"El guarda dormía plácidamente en la silla.\"", backExTr: "\"The guard was sleeping peacefully in the chair.\"" },
+      { front: "cansado", frontType: "[Adjective / Masculine]", back: "tired / weary", backEx: "\"Carlos estaba cansado de esperar.\"", backExTr: "\"Carlos was tired of waiting.\"" },
+      { front: "el manojo", frontType: "[Noun / Masculine]", back: "bunch / cluster", backEx: "\"dejando el manojo de llaves colgando.\"", backExTr: "\"leaving the bunch of keys hanging.\"" },
+      { front: "el alambre", frontType: "[Noun / Masculine]", back: "wire / metallic thread", backEx: "\"tomó el alambre y comenzó su escape.\"", backExTr: "\"he took the wire and began his escape.\"" }
+    ];
+    let activeCardIndex = 0;
+
+    function nextCard(responseType) {
+      // Flip back first if flipped
+      const cardElement = document.getElementById('flashcard-container');
+      cardElement.classList.remove('flipped');
+      cardIsFlipped = false;
+      
+      // Select next card index after short delay for flip animation
+      setTimeout(() => {
+        activeCardIndex = (activeCardIndex + 1) % flashcards.length;
+        const card = flashcards[activeCardIndex];
+        
+        // Update front card text
+        document.getElementById('card-front-word').innerText = card.front;
+        // Update back card details
+        document.getElementById('card-back-word').innerText = card.back;
+        document.querySelector('.flip-card-back p.italic').innerText = card.backEx;
+        document.querySelector('.flip-card-back p.text-white\\/40').innerText = card.backExTr;
+      }, 300);
+    }
+  </script>
+
+</body>
+</html>

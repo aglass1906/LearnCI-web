@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold:hover {
+            box-shadow: 0 0 20px rgba(255, 199, 136, 0.4);
+        }
+        .neon-text-teal {
+            text-shadow: 0 0 10px rgba(0, 227, 253, 0.5);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#e0e1f3",
+                    "surface-container": "#1c1f2b",
+                    "on-error": "#690005",
+                    "inverse-on-surface": "#2d303d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#0b0e19",
+                    "surface-container-high": "#262936",
+                    "danger": "#EF4444",
+                    "surface-variant": "#313441",
+                    "on-secondary": "#00363d",
+                    "tertiary-container": "#a1b1ff",
+                    "glass-border": "rgba(255, 255, 255, 0.1)",
+                    "outline": "#a18d79",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#0035bd",
+                    "on-secondary-fixed-variant": "#004f58",
+                    "on-tertiary-fixed-variant": "#0035bd",
+                    "text-muted": "rgba(255, 255, 255, 0.7)",
+                    "inverse-primary": "#875200",
+                    "surface-container-highest": "#313441",
+                    "secondary": "#bdf4ff",
+                    "error-container": "#93000a",
+                    "success": "#10B981",
+                    "background": "#10131f",
+                    "on-primary-container": "#673e00",
+                    "surface-bright": "#363946",
+                    "surface": "#10131f",
+                    "secondary-fixed": "#9cf0ff",
+                    "on-background": "#e0e1f3",
+                    "outline-variant": "#544433",
+                    "inverse-surface": "#e0e1f3",
+                    "surface-container-low": "#181b27",
+                    "surface-elevated": "#23283B",
+                    "primary": "#ffc788",
+                    "tertiary-fixed-dim": "#b8c3ff",
+                    "tertiary": "#c6ceff",
+                    "on-secondary-container": "#00616d",
+                    "primary-fixed-dim": "#ffb865",
+                    "secondary-container": "#00e3fd",
+                    "on-surface-variant": "#d9c3ad",
+                    "on-primary-fixed": "#2b1700",
+                    "on-tertiary-fixed": "#001355",
+                    "on-primary-fixed-variant": "#663d00",
+                    "on-primary": "#482a00",
+                    "on-secondary-fixed": "#001f24",
+                    "secondary-fixed-dim": "#00daf3",
+                    "primary-container": "#ffa000",
+                    "tertiary-fixed": "#dde1ff",
+                    "glass-fill": "rgba(255, 255, 255, 0.04)",
+                    "surface-dim": "#10131f",
+                    "text-dim": "rgba(255, 255, 255, 0.4)",
+                    "on-tertiary": "#002487",
+                    "primary-fixed": "#ffddba",
+                    "surface-tint": "#ffb865"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "badge-caption": ["Lexend"],
+                    "body-base": ["Inter"],
+                    "body-prose": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "label-caps": ["Lexend"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "badge-caption": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-base": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "body-prose": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-base overflow-x-hidden">
+<!-- Atmospheric Background -->
+<div class="fixed inset-0 z-0">
+
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px]"></div>
+</div>
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-low/40 backdrop-blur-xl border-r border-glass-border z-50">
+<div class="p-lg flex flex-col h-full">
+<div class="mb-xl">
+<span class="font-headline-md text-headline-md text-primary tracking-tighter">LearnCI</span>
+</div>
+<nav class="space-y-sm flex-1">
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-base text-body-base">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-body-base text-body-base">Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl bg-primary/10 text-primary border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">style</span>
+<span class="font-body-base text-body-base">Vocab Games</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">live_tv</span>
+<span class="font-body-base text-body-base">Media Hub</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-text-muted hover:text-on-surface hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-base text-body-base">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-glass-border">
+<div class="flex items-center gap-md mb-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-glass-border">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-definition portrait of a focused language learner wearing sleek noise-canceling headphones, illuminated by the soft blue glow of a digital screen in a dark, tech-inspired study room. The style is professional and modern with shallow depth of field and premium glassmorphism accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGJvqt89Vr_Qgr4gC2TUiQy4IRSUGWa0Pw00qVzkyPmGnzOD2e0snpmL9BHDvTE2CgANHoH2m3ty35M_id6N9fUvZfLQIcY5S3pA6vi6dw-b-3zlNijdWALL5nyn93scgMqOC6i-OmTf30OgWiBpaHipA_B827Mz7HsVRQyzhkVnHeEB2gHVEqmNVUl8qlkBbVr7pq9czfCCq_cpO9Y0_hG1U3YDuUX8_yLqnuHAAhl2pP_1DYxo4Xv5r82FabsKV6mCSOdTZgW3o"/>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface leading-tight">Welcome back</p>
+<p class="text-[12px] text-text-dim">Level B2 Upper Intermediate</p>
+</div>
+</div>
+<button class="w-full py-md bg-primary text-on-primary font-label-caps text-label-caps rounded-xl glow-gold transition-all duration-300">
+                    START DAILY GOAL
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="relative z-10 lg:ml-64 p-lg lg:p-xl max-w-container-max mx-auto">
+<!-- Header -->
+<header class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-lg">
+<div class="space-y-xs">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-secondary-container shadow-[0_0_10px_#00e3fd]"></span>
+<span class="font-label-caps text-label-caps text-secondary-container tracking-widest">ACTIVE SESSION</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tighter">Vocabulary Arcade</h1>
+<p class="text-text-muted font-body-base max-w-2xl">Master new lexemes through high-intensity interactive simulations. Each game uses your current SRS deck for maximum retention.</p>
+</div>
+<div class="flex gap-md">
+<div class="glass-card px-lg py-sm rounded-xl flex flex-col items-center">
+<span class="font-label-caps text-[10px] text-text-dim">TOTAL XP</span>
+<span class="font-headline-md text-headline-md text-primary">12,450</span>
+</div>
+<div class="glass-card px-lg py-sm rounded-xl flex flex-col items-center">
+<span class="font-label-caps text-[10px] text-text-dim">STREAK</span>
+<span class="font-headline-md text-headline-md text-secondary-container">14 Days</span>
+</div>
+</div>
+</header>
+<!-- Games Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+<!-- Game 1: Memory -->
+<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/5">
+<div class="h-48 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+<!-- Background Visual Mockup -->
+<div class="absolute inset-0 opacity-20 grid grid-cols-4 gap-2 p-4">
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+<div class="bg-primary/20 rounded-lg border border-primary/30"></div>
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+<div class="bg-primary/20 rounded-lg border border-primary/30"></div>
+<div class="bg-white/10 rounded-lg border border-white/10"></div>
+</div>
+<div class="relative z-10 flex flex-col items-center animate-float">
+<span class="material-symbols-outlined text-primary text-[64px]" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<div class="mt-4 px-4 py-1 glass-card rounded-full border border-primary/20">
+<span class="text-primary font-label-caps text-[12px]">FLIP TILES</span>
+</div>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Memory</h3>
+<p class="text-text-muted text-body-base">Find pairs of target words and their definitions in a race against time.</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-label-caps border border-secondary/20">HIGH SCORE: 2,400</span>
+</div>
+<div class="flex items-center justify-between mt-lg">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional 3D render of a futuristic avatar head in a dark void, glowing with neon orange and teal highlights. The style is cinematic and hyper-detailed, suggesting a high-tech language learning profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYSB4kL37eP45W0b1rdWVAKORb4Pdp6PbozI4I03yZQg1K__xxHjDsvjg6l4LAUZXDGXmSGyxsmHLjiHxnPNS0y4N8lmsL192GchWvot3bX_dTwBi9wqjXSxSBAnEVWYCHqs03fgu7e2Hr8dkVMRK8-Ua3ii1H-icSMvtNwcuZmeBYoQj-wZ4NAWBo32HxI0pflVF73_XzBd6sbYdROPVQIX4ylMNIdA-wqslLhl6bLhLj9sfqMOPdlUvjQm1_cnyPwt5d495C6Os"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A sleek digital illustration of a cybernetic face profile with glowing circuits, set against a dark glassmorphic background with purple and gold lighting. The image is designed for a premium user interface profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCzRFoZ_yQqW4pllNqcUr3EEEOCoT3MuB37mq6EN856lPmVHrEaARmfywLiIdQM3DWsRmzK1jgZHSobLXZjrIbCjigavyraZUKPp963VD-C0sCQUlqqvCIztPGow3WGpMwg0gKf0uSScHi90k0oGRH0sWY38JqJbng8JkbmhrcUTqG1M20_e12KSF7CYWQq2NQelMZRRLHvooeQYlSA4pL8PDqTNMWAJuL85FLIN02Qsk2sZd5BojigwrFhhE_rpSSpGLglipyzis"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center text-[10px] font-bold text-text-dim">
+                                +12
+                            </div>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-caps rounded-lg glow-gold hover:scale-105 active:scale-95 transition-all">PLAY GAME</button>
+</div>
+</div>
+</div>
+<!-- Game 2: WordRain -->
+<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/5">
+<div class="h-48 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+<!-- Background Visual Mockup -->
+<div class="absolute inset-0 opacity-20">
+<div class="absolute top-4 left-10 w-12 h-12 rounded-full border border-secondary-container bg-secondary-container/10"></div>
+<div class="absolute top-20 left-40 w-14 h-14 rounded-full border border-secondary-container bg-secondary-container/10"></div>
+<div class="absolute top-10 right-12 w-10 h-10 rounded-full border border-secondary-container bg-secondary-container/10"></div>
+</div>
+<div class="relative z-10 flex flex-col items-center animate-float" style="animation-delay: 0.5s">
+<span class="material-symbols-outlined text-secondary-container text-[64px]" style="font-variation-settings: 'FILL' 1;">cloud_download</span>
+<div class="mt-4 px-4 py-1 glass-card rounded-full border border-secondary-container/20">
+<span class="text-secondary-container font-label-caps text-[12px]">FALLING BUBBLES</span>
+</div>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">WordRain</h3>
+<p class="text-text-muted text-body-base">Catch target language bubbles and match them to translations before they hit the ground.</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-label-caps border border-secondary/20">HIGH SCORE: 4,120</span>
+</div>
+<div class="flex items-center justify-between mt-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-container text-sm">bolt</span>
+<span class="text-[12px] font-label-caps text-text-muted">Reaction Speed: Fast</span>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-caps rounded-lg glow-gold hover:scale-105 active:scale-95 transition-all">PLAY GAME</button>
+</div>
+</div>
+</div>
+<!-- Game 3: Linker -->
+<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/5">
+<div class="h-48 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+<!-- Background Visual Mockup -->
+<svg class="absolute inset-0 w-full h-full opacity-10" viewbox="0 0 400 200">
+<path d="M 100 50 Q 200 100 300 50" fill="none" stroke="#ffc788" stroke-width="2"></path>
+<path d="M 100 100 Q 200 100 300 150" fill="none" stroke="#ffc788" stroke-width="2"></path>
+<path d="M 100 150 Q 200 150 300 100" fill="none" stroke="#ffc788" stroke-width="2"></path>
+</svg>
+<div class="relative z-10 flex flex-col items-center animate-float" style="animation-delay: 1s">
+<span class="material-symbols-outlined text-tertiary-container text-[64px]" style="font-variation-settings: 'FILL' 1;">hub</span>
+<div class="mt-4 px-4 py-1 glass-card rounded-full border border-tertiary-container/20">
+<span class="text-tertiary-container font-label-caps text-[12px]">GLOWING CONNECTORS</span>
+</div>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Linker</h3>
+<p class="text-text-muted text-body-base">Draw luminous lines between Spanish terms and their English counterparts.</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-label-caps border border-secondary/20">HIGH SCORE: 1,850</span>
+</div>
+<div class="flex items-center justify-between mt-lg">
+<div class="flex items-center gap-sm text-text-dim">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="text-[12px] font-label-caps">Last played: 2h ago</span>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-caps rounded-lg glow-gold hover:scale-105 active:scale-95 transition-all">PLAY GAME</button>
+</div>
+</div>
+</div>
+<!-- Game 4: WordCrush -->
+<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/5">
+<div class="h-48 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+<!-- Background Visual Mockup -->
+<div class="absolute inset-0 opacity-10 flex flex-wrap gap-1 p-4">
+<div class="w-8 h-8 flex items-center justify-center border border-white/20 font-bold">A</div>
+<div class="w-8 h-8 flex items-center justify-center border border-white/20 font-bold">B</div>
+<div class="w-8 h-8 flex items-center justify-center border border-white/20 font-bold">O</div>
+<div class="w-8 h-8 flex items-center justify-center border border-white/20 font-bold">L</div>
+<div class="w-8 h-8 flex items-center justify-center border border-white/20 font-bold">A</div>
+</div>
+<div class="relative z-10 flex flex-col items-center animate-float" style="animation-delay: 1.5s">
+<span class="material-symbols-outlined text-success text-[64px]" style="font-variation-settings: 'FILL' 1;">search_insights</span>
+<div class="mt-4 px-4 py-1 glass-card rounded-full border border-success/20">
+<span class="text-success font-label-caps text-[12px]">LETTER GRID</span>
+</div>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">WordCrush</h3>
+<p class="text-text-muted text-body-base">Find hidden vocabulary within the letter grid to crush them and earn combo points.</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-label-caps border border-secondary/20">HIGH SCORE: 3,210</span>
+</div>
+<div class="flex items-center justify-between mt-lg">
+<div class="flex items-center gap-sm text-text-dim">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="text-[12px] font-label-caps">Accuracy: 98%</span>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-caps rounded-lg glow-gold hover:scale-105 active:scale-95 transition-all">PLAY GAME</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Leaderboard Preview (Asymmetric Layout Addition) -->
+<section class="mt-xl grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2 glass-card rounded-2xl p-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">emoji_events</span>
+</div>
+<div class="relative z-10">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">military_tech</span>
+                        Weekly Arcade Ranking
+                    </h4>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md rounded-xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm text-primary w-6">1</span>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-primary/40 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A professional 3D render of a futuristic avatar head in a dark void, glowing with neon orange and teal highlights. The style is cinematic and hyper-detailed, suggesting a high-tech language learning profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARsPxdVEGI0m75PyKrAHjBsMtAEHjJSmu3U0CMyGZwed-gmcdJfNMjQLTgE7rhXfrZlHpVl1KYj6LDTB05JhnSk4WgPnO3cqiBA0eHb9sOvWWN3ovzZtxkpLMckuhwcn3f6m8hPyKZrPpoCYvDyPoP7fOt__rvYMJNlITfAGyGitPft_XGi3l5DWY72c-R6ZXUTsEoyLc3cg8b2KkpOKx-sVUG2vtAqyDtIgA9Qo1q3P5-YAhpdKwiPaKZtgnWjhuxYCo1yPqKvOM"/>
+</div>
+<span class="font-body-base text-on-surface">Alex_Polyglot</span>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-primary">15,420 XP</p>
+<p class="text-[10px] font-label-caps text-text-dim">SPANISH EXPERT</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-md rounded-xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm text-text-muted w-6">2</span>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-white/10 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A striking portrait of a sophisticated AI-assisted learner profile icon, set in a futuristic dark room with soft ambient light glowing in shades of electric blue and warm gold. The avatar looks confident and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACryKhdBdh1x2rHX1Np5av1ZPHNyijlTU5A3EoudtLV4HvfVWvHC9YkjN4eHIlOFxFQkM38Z8bwhJOyvzAJJFgyqGUHMX8oBEApmssvx_Q43Rz7aDIRfGNlxb9gTFMBoD59KHrvv5xWJk3csnX2gcgutJvHaRaUxbS4VhWYsPFZ36eJO_XQhl-Pw8z43W8L3IvfcqOHR7SYpBWSVdLeTKuAfrGOjbvUef_t5DI1Vb6DA7VRB4fuMhQyXThPJomwtJwGipfpL1B7AE"/>
+</div>
+<span class="font-body-base text-on-surface">MartaCodes</span>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-on-surface">14,800 XP</p>
+<p class="text-[10px] font-label-caps text-text-dim">C1 CANDIDATE</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-lg flex flex-col justify-between border-l-4 border-primary">
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-sm">Pro Tip</h4>
+<p class="text-body-base text-text-muted">Playing games right after a review session increases long-term neural pathway strength by up to 40%.</p>
+</div>
+<div class="mt-lg">
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="w-[65%] h-full bg-primary shadow-[0_0_10px_#ffc788]"></div>
+</div>
+<p class="mt-2 text-[12px] font-label-caps text-text-dim">65% OF DAILY GOAL MET</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full lg:hidden bg-surface-container/80 backdrop-blur-xl border-t border-glass-border flex justify-around items-center py-sm z-50">
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">style</span>
+<span class="text-[10px] font-label-caps">Games</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-[10px] font-label-caps">Library</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-text-muted">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-caps">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interactions for glass cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const icon = card.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    icon.style.transform = 'scale(1.2) rotate(5deg)';
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                const icon = card.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.transform = 'scale(1) rotate(0deg)';
+                }
+            });
+        });
+    </script>
+</body></html>
