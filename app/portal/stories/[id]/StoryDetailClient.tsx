@@ -8,9 +8,11 @@ import Link from "next/link";
 import { 
     ChevronLeft, Play, Pause, Volume2, Download, 
     SkipBack, SkipForward, BookOpen, Layers, 
-    Sparkles, HelpCircle, Check, BookmarkPlus, BookmarkCheck
+    Sparkles, HelpCircle, Check, BookmarkPlus, BookmarkCheck,
+    MessageSquare, Tv
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { useAudio, Track } from "@/context/audio-context";
 
 // Types for timing and vocabulary
 interface WordTiming {
@@ -35,12 +37,58 @@ interface StoryChapter {
     vocabulary_note?: string;
     script_target_language?: string;
     script_english?: string;
+    chapter_image_prompt?: string;
 }
 
 const cleanScriptText = (text: string | null | undefined) => {
     if (!text) return "";
     // Remove speaker tags like [NARRATOR] and emotion tags like (neutral)
     return text.replace(/\[.*?\]\s*(\(.*?\))?\s*/g, "");
+};
+
+interface DialogueLine {
+    speaker: string;
+    emotion: string;
+    textTarget: string;
+    textEnglish: string;
+}
+
+const parseDialogue = (targetScript: string | null, englishScript: string | null): DialogueLine[] => {
+    if (!targetScript) return [];
+    
+    const targetLines = targetScript.split("\n").map(l => l.trim()).filter(Boolean);
+    const englishLines = englishScript ? englishScript.split("\n").map(l => l.trim()).filter(Boolean) : [];
+    
+    const dialogues: DialogueLine[] = [];
+    
+    targetLines.forEach((line, index) => {
+        const match = line.match(/^\[(.*?)\]\s*(?:\((.*?)\))?\s*(.*)$/);
+        
+        let speaker = "Narrator";
+        let emotion = "neutral";
+        let textTarget = line;
+        
+        if (match) {
+            speaker = match[1].trim();
+            emotion = match[2] ? match[2].trim() : "neutral";
+            textTarget = match[3].trim();
+        }
+        
+        let textEnglish = "";
+        if (englishLines[index]) {
+            const engMatch = englishLines[index].match(/^\[.*?\]\s*(?:\(.*?\))?\s*(.*)$/);
+            textEnglish = engMatch ? engMatch[1].trim() : englishLines[index];
+        }
+        
+        dialogues.push({
+            speaker,
+            emotion,
+            textTarget,
+            textEnglish
+        });
+    });
+    
+    return dialogues;
 };
 
 interface DictionaryEntry {
@@ -52,15 +100,11 @@ interface DictionaryEntry {
 }
 
 type DisplayLanguage = "target" | "native" | "dual";
-type PresenterMode = "prose" | "dialogue" | "vocab";
+type PresenterMode = "prose" | "dialogue" | "comic" | "vocab";
 
 export default function StoryDetailClient({ story }: { story: any }) {
     const [selectedLanguage, setSelectedLanguage] = useState<DisplayLanguage>("target");
     const [presenterMode, setPresenterMode] = useState<PresenterMode>("prose");
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [playbackRate, setPlaybackRate] = useState(1);
     const [currentDeckIndex, setCurrentDeckIndex] = useState(0);
     
     // Vocab Lookup State
@@ -69,11 +113,24 @@ export default function StoryDetailClient({ story }: { story: any }) {
     const [savedWords, setSavedWords] = useState<string[]>([]);
     
     // Playback segment state: "intro" or "content"
-    const [activeSegment, setActiveSegment] = useState<"intro" | "content">("content");
+    const [activeSegment, setActiveSegment] = useState<"intro" | "content" | any>("content");
     
-    const audioRef = useRef<HTMLAudioElement>(null);
     const textContainerRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
+
+    // Consume global audio context
+    const {
+        track,
+        isPlaying,
+        currentTime,
+        duration,
+        playbackRate,
+        play,
+        pause,
+        seek,
+        setPlaybackRate,
+        playTrack,
+    } = useAudio();
 
     // Parse chapters and reading matter pages
     const chapters: StoryChapter[] = Array.isArray(story.chapters) ? story.chapters : [];
@@ -140,8 +197,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
             const prevItem = deck[currentDeckIndex - 1];
             setCurrentDeckIndex(currentDeckIndex - 1);
             setActiveSegment(prevItem.type === 'chapter' ? "intro" : "content");
-            setCurrentTime(0);
-            setIsPlaying(false);
+            seek(0);
         }
     };
 
@@ -150,8 +206,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
             const nextItem = deck[currentDeckIndex + 1];
             setCurrentDeckIndex(currentDeckIndex + 1);
             setActiveSegment(nextItem.type === 'chapter' ? "intro" : "content");
-            setCurrentTime(0);
-            setIsPlaying(false);
+            seek(0);
         }
     };
 
@@ -177,7 +232,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
         const note = currentChapter?.vocabulary_note || story.vocabulary_note;
         if (!note) return dict;
 
-        // Split by lines and parse entries
         const lines = note.split('\n');
         let currentEntry: DictionaryEntry | null = null;
 
@@ -197,7 +251,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
                     let word = wordWithDetails;
                     let type = "Vocabulary";
                     
-                    // Extract type in parentheses/brackets
                     const typeMatch = wordWithDetails.match(/[\(\[](.*?)[\)\]]/);
                     if (typeMatch) {
                         type = typeMatch[1];
@@ -221,7 +274,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
                         const targetEx = line.replace(/^\d+\.\s*/, '').trim();
                         let englishEx = "";
                         
-                        // Check if next line is a translation
                         if (i + 1 < lines.length && lines[i + 1].trim().startsWith('↳')) {
                             englishEx = lines[i + 1].trim().replace(/^↳\s*/, '').trim();
                             i++;
@@ -266,7 +318,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 return supabase.storage.from("audio-stories").getPublicUrl(path).data.publicUrl;
             }
 
-            // Standard chapter content audio: fall back to chapter_XX.mp3 if native_audio_url is null
             const chNum = String(currentChapter.chapter_number).padStart(2, '0');
             const chapterAudioPath = currentChapter.native_audio_url || `${userId}/${storyId}/audio/chapter_${chNum}.mp3`;
             
@@ -296,78 +347,69 @@ export default function StoryDetailClient({ story }: { story: any }) {
     };
     const languageName = languageNames[story.language.toLowerCase()] || story.language;
 
-    // Audio Event Handlers
+    // Load active track into the global audio manager
     useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+        if (!audioUrl) return;
 
-        const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-        const handleDurationChange = () => setDuration(audio.duration);
-        const handleEnded = () => {
-            if (activeSegment === "intro") {
-                // Intro ended, transition to main content automatically
-                setActiveSegment("content");
-                setCurrentTime(0);
-                setIsPlaying(false);
-            } else if (currentDeckIndex < deck.length - 1) {
-                // Main content ended, advance to next page in the deck
-                const nextItem = deck[currentDeckIndex + 1];
-                setCurrentDeckIndex(prev => prev + 1);
-                setActiveSegment(nextItem.type === 'chapter' ? "intro" : "content");
-                setCurrentTime(0);
-                setIsPlaying(false);
-            } else {
-                setIsPlaying(false);
-            }
-        };
+        const trackId = `${story.id}-${currentDeckIndex}-${activeSegment}`;
 
-        audio.addEventListener("timeupdate", handleTimeUpdate);
-        audio.addEventListener("durationchange", handleDurationChange);
-        audio.addEventListener("ended", handleEnded);
-
-        return () => {
-            audio.removeEventListener("timeupdate", handleTimeUpdate);
-            audio.removeEventListener("durationchange", handleDurationChange);
-            audio.removeEventListener("ended", handleEnded);
-        };
-    }, [deck, currentDeckIndex, activeSegment]);
-
-    // Handle segment/page swaps
-    useEffect(() => {
-        const audio = audioRef.current;
-        if (audio) {
-            audio.load();
-            if (isPlaying) {
-                audio.play().catch(console.error);
-            }
+        // Load track if it's different
+        if (!track || track.id !== trackId) {
+            playTrack({
+                id: trackId,
+                title: currentItem.type === 'reading_matter' 
+                    ? currentItem.titleTarget 
+                    : `Chapter ${currentChapterIndex + 1}: ${currentChapter?.title_target_language || "Scene"}`,
+                subtitle: story.title,
+                coverUrl: coverUrl || undefined,
+                audioUrl: audioUrl,
+                type: "story",
+                metadata: { storyId: story.id, currentDeckIndex, activeSegment }
+            });
         }
-    }, [currentDeckIndex, activeSegment, audioUrl]);
+    }, [currentDeckIndex, activeSegment, audioUrl, story.id, coverUrl]);
+
+    // Subscribe to global audio ended events
+    useEffect(() => {
+        const handleAudioEnded = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const endedTrack = customEvent.detail?.trackRef || customEvent.detail?.track;
+            const trackId = `${story.id}-${currentDeckIndex}-${activeSegment}`;
+            
+            if (endedTrack && endedTrack.id === trackId) {
+                console.log("[StoryDetailClient] Track finished playing. Auto-advancing...");
+                if (activeSegment === "intro") {
+                    setActiveSegment("content");
+                    seek(0);
+                } else if (currentDeckIndex < deck.length - 1) {
+                    const nextItem = deck[currentDeckIndex + 1];
+                    setCurrentDeckIndex(prev => prev + 1);
+                    setActiveSegment(nextItem.type === 'chapter' ? "intro" : "content");
+                    seek(0);
+                }
+            }
+        };
+
+        window.addEventListener("learnci-audio-ended", handleAudioEnded);
+        return () => {
+            window.removeEventListener("learnci-audio-ended", handleAudioEnded);
+        };
+    }, [story.id, currentDeckIndex, activeSegment, deck, seek]);
 
     const togglePlay = () => {
-        if (!audioRef.current) return;
-
         if (isPlaying) {
-            audioRef.current.pause();
-            setIsPlaying(false);
+            pause();
         } else {
-            audioRef.current.play().catch(console.error);
-            setIsPlaying(true);
+            play();
         }
     };
 
     const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const time = parseFloat(e.target.value);
-        setCurrentTime(time);
-        if (audioRef.current) {
-            audioRef.current.currentTime = time;
-        }
+        seek(parseFloat(e.target.value));
     };
 
     const changePlaybackRate = (rate: number) => {
         setPlaybackRate(rate);
-        if (audioRef.current) {
-            audioRef.current.playbackRate = rate;
-        }
     };
 
     const formatTime = (seconds: number) => {
@@ -382,20 +424,19 @@ export default function StoryDetailClient({ story }: { story: any }) {
         const clean = wordText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, "").trim();
         setSelectedWord(wordText);
         
-        // Remove previous ring highlights
+        // Remove previous highlights
         if (textContainerRef.current) {
             textContainerRef.current.querySelectorAll('.word-span').forEach(w => {
                 w.classList.remove('ring-2', 'ring-accentTeal/80', 'bg-accentTeal/10');
             });
         }
-        // Add highlight to clicked element
+        
+        // Highlight active word
         element.classList.add('ring-2', 'ring-accentTeal/80', 'bg-accentTeal/10');
 
-        // Look up in our parsed dictionary
         if (dictionary[clean]) {
             setLookupData(dictionary[clean]);
         } else {
-            // Set temporary loading state
             const cleanedWord = wordText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, "");
             setLookupData({
                 word: cleanedWord,
@@ -405,7 +446,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
                 examples: []
             });
 
-            // Perform translation fetch via MyMemory API
             try {
                 const langCodes: Record<string, string> = {
                     spanish: 'es',
@@ -442,11 +482,10 @@ export default function StoryDetailClient({ story }: { story: any }) {
         }
     };
 
-    // Voice Pronunciation (TTS fallback)
+    // Voice Pronunciation (TTS)
     const playVoicePronunciation = (word: string) => {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(word);
-            // Match language locale
             const langLocales: Record<string, string> = {
                 spanish: 'es-ES',
                 french: 'fr-FR',
@@ -461,7 +500,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
         }
     };
 
-    // Add Word to Local Spaced Repetition (SRS) Deck
+    // Save cards to local storage
     const handleAddWordToSRS = (entry: DictionaryEntry) => {
         const wordKey = entry.word.toLowerCase();
         
@@ -483,7 +522,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
             examples: entry.examples,
             language: story.language,
             created_at: new Date().toISOString(),
-            // SuperMemo-2 algorithm parameters
             interval: 1,
             repetition: 0,
             ease_factor: 2.5,
@@ -504,12 +542,10 @@ export default function StoryDetailClient({ story }: { story: any }) {
             return currentChapter?.chapter_intro_word_timings || [];
         }
         
-        // Return chapter timings or parse root word timings
         if (currentChapter?.native_word_timings && currentChapter.native_word_timings.length > 0) {
             return currentChapter.native_word_timings;
         }
 
-        // Parse root-level word timings
         if (story.word_timings_json) {
             try {
                 const timings = typeof story.word_timings_json === 'string' 
@@ -523,7 +559,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
         return [];
     }, [activeSegment, currentChapter, story.word_timings_json, currentItem]);
 
-    // Active Word Index in timings array
+    // Active Word Index
     const activeWordIndex = useMemo(() => {
         return activeTimings.findIndex(t => currentTime >= t.start && currentTime <= t.end);
     }, [activeTimings, currentTime]);
@@ -538,7 +574,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
         if (!text) return [];
 
-        // Split text by whitespace, preserving whitespace elements in the array
         const rawTokens = text.split(/(\s+)/);
         let timingIndex = 0;
 
@@ -549,7 +584,6 @@ export default function StoryDetailClient({ story }: { story: any }) {
             
             const clean = token.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡¿]/g, "").trim();
             
-            // Sequential mapping: find next timing matching token
             let matchedTiming = null;
             if (timingIndex < activeTimings.length) {
                 matchedTiming = activeTimings[timingIndex];
@@ -565,16 +599,36 @@ export default function StoryDetailClient({ story }: { story: any }) {
         });
     }, [activeSegment, currentChapter, story.target_text, activeTimings, currentItem]);
 
-    // Jump audio playhead to word timestamp
     const handleWordTimingJump = (start: number) => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = start;
-            setCurrentTime(start);
-            if (!isPlaying) {
-                audioRef.current.play().catch(console.error);
-                setIsPlaying(true);
-            }
+        seek(start);
+        if (!isPlaying) {
+            play();
         }
+    };
+
+    // Parse Dialogue script for Dialogue Mode
+    const dialogueLines = useMemo(() => {
+        return parseDialogue(
+            currentChapter?.script_target_language || null,
+            currentChapter?.script_english || null
+        );
+    }, [currentChapter]);
+
+    // Helper to render interactive clickable words in speech bubbles
+    const renderInteractiveDialogueText = (text: string) => {
+        const tokens = text.split(/(\s+)/);
+        return tokens.map((token, idx) => {
+            if (/^\s+$/.test(token)) return <span key={idx}>{token}</span>;
+            return (
+                <span
+                    key={idx}
+                    onClick={(e) => handleWordClick(token, e.currentTarget)}
+                    className="word-span cursor-pointer rounded px-0.5 hover:bg-white/10 hover:text-white transition-all border-b border-transparent"
+                >
+                    {token}
+                </span>
+            );
+        });
     };
 
     return (
@@ -591,18 +645,34 @@ export default function StoryDetailClient({ story }: { story: any }) {
 
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     {/* Presenter Mode Selectors */}
-                    <div className="inline-flex rounded-xl bg-white/5 p-1 border border-white/5 text-[10px] font-labels font-bold tracking-wider">
+                    <div className="inline-flex rounded-xl bg-white/5 p-1 border border-white/5 text-[10px] font-labels font-bold tracking-wider w-full sm:w-auto overflow-x-auto">
                         <button
                             onClick={() => setPresenterMode("prose")}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
                                 presenterMode === "prose" ? "bg-primaryAccent text-brandDark" : "text-white/60 hover:text-white"
                             }`}
                         >
                             <BookOpen className="h-3.5 w-3.5" /> PROSE PLAYER
                         </button>
                         <button
+                            onClick={() => setPresenterMode("dialogue")}
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                                presenterMode === "dialogue" ? "bg-primaryAccent text-brandDark" : "text-white/60 hover:text-white"
+                            }`}
+                        >
+                            <MessageSquare className="h-3.5 w-3.5" /> DIALOGUE MODE
+                        </button>
+                        <button
+                            onClick={() => setPresenterMode("comic")}
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                                presenterMode === "comic" ? "bg-primaryAccent text-brandDark" : "text-white/60 hover:text-white"
+                            }`}
+                        >
+                            <Tv className="h-3.5 w-3.5" /> COMIC GRID
+                        </button>
+                        <button
                             onClick={() => setPresenterMode("vocab")}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
                                 presenterMode === "vocab" ? "bg-primaryAccent text-brandDark" : "text-white/60 hover:text-white"
                             }`}
                         >
@@ -714,7 +784,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                     </div>
 
                     {/* Presenter Views */}
-                    {presenterMode === "prose" ? (
+                    {presenterMode === "prose" && (
                         <div className="space-y-6">
                             {/* Chapter Intro Header Block */}
                             {currentChapter?.chapter_intro_text && (
@@ -729,7 +799,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             <button
                                                 onClick={() => {
                                                     setActiveSegment(activeSegment === "intro" ? "content" : "intro");
-                                                    setCurrentTime(0);
+                                                    seek(0);
                                                 }}
                                                 className={`text-[9px] font-labels font-extrabold tracking-wider px-2.5 py-1 rounded-md border transition-all flex items-center gap-1 ${
                                                     activeSegment === "intro" 
@@ -797,7 +867,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             </div>
                                         </div>
                                     ) : (
-                                        /* Standard Monolingual Mode (Interactive Click & Karaoke Highlights) */
+                                        /* Standard Monolingual Mode */
                                         <div className="leading-loose text-base md:text-lg whitespace-pre-wrap">
                                             {selectedLanguage === "target" ? (
                                                 richTextWords.map((item: any, idx: number) => {
@@ -830,8 +900,190 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                 </div>
                             </div>
                         </div>
-                    ) : (
-                        /* Vocabulary Note List View */
+                    )}
+
+                    {/* Dialogue Mode View */}
+                    {presenterMode === "dialogue" && (
+                        <div className="space-y-6">
+                            {/* Dialogue list */}
+                            <div className="glass-card rounded-[24px] p-6 sm:p-8 border border-white/5 shadow-2xl space-y-6 relative overflow-hidden max-h-[60vh] overflow-y-auto custom-scrollbar">
+                                <div className="absolute top-4 right-6 font-labels text-[8px] tracking-widest text-white/30 uppercase">
+                                    Dialogue Scene Transcript
+                                </div>
+                                {dialogueLines.length === 0 ? (
+                                    <div className="text-center py-12 text-white/40 font-sans text-sm">
+                                        No dialogue script found for this chapter. Switch to Prose Mode to read the narration.
+                                    </div>
+                                ) : (
+                                    dialogueLines.map((line, idx) => {
+                                        const isNarrator = line.speaker.toLowerCase() === "narrator" || line.speaker.toLowerCase() === "narrador";
+                                        
+                                        if (isNarrator) {
+                                            return (
+                                                <div key={idx} className="text-center py-4 px-6 italic text-white/60 font-sans text-sm max-w-xl mx-auto border-y border-white/5 bg-white/[0.01] rounded-lg">
+                                                    <p className="leading-relaxed">
+                                                        {selectedLanguage === "native" ? line.textEnglish : line.textTarget}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        
+                                        const isLeft = idx % 2 === 0;
+                                        
+                                        return (
+                                            <div key={idx} className={`flex flex-col ${isLeft ? "items-start" : "items-end"} space-y-1.5 w-full`}>
+                                                {/* Speaker Badge */}
+                                                <div className="flex items-center gap-1.5 px-2">
+                                                    <span className="font-labels text-[10px] font-extrabold tracking-wider uppercase text-primaryAccent">
+                                                        {line.speaker}
+                                                    </span>
+                                                    {line.emotion !== "neutral" && (
+                                                        <span className="px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-[8px] text-purple-400 font-labels uppercase font-extrabold tracking-wider">
+                                                            {line.emotion}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                
+                                                {/* Speech Bubble */}
+                                                <div className={`max-w-[85%] sm:max-w-[70%] p-4 rounded-2xl border ${
+                                                    isLeft 
+                                                        ? "bg-brandSurface/80 border-white/15 rounded-tl-sm text-left shadow-lg" 
+                                                        : "bg-primaryAccent/10 border-primaryAccent/30 rounded-tr-sm text-left shadow-lg shadow-primaryAccent/5"
+                                                }`}>
+                                                    <p className="text-white font-sans text-sm sm:text-base leading-relaxed">
+                                                        {selectedLanguage === "native" ? (
+                                                            line.textEnglish
+                                                        ) : selectedLanguage === "dual" ? (
+                                                            <span className="space-y-2 block">
+                                                                <span className="block">{renderInteractiveDialogueText(line.textTarget)}</span>
+                                                                <span className="block border-t border-white/5 pt-2 text-xs text-white/50">{line.textEnglish}</span>
+                                                            </span>
+                                                        ) : (
+                                                            renderInteractiveDialogueText(line.textTarget)
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Comic Mode View */}
+                    {presenterMode === "comic" && (
+                        <div className="space-y-6">
+                            {/* Graphic Novel Illustrated Storyboard */}
+                            <div className="glass-card rounded-[24px] p-6 sm:p-8 border border-white/5 shadow-2xl space-y-8 relative overflow-hidden">
+                                <div className="absolute top-4 right-6 font-labels text-[8px] tracking-widest text-white/30 uppercase">
+                                    Graphic Novel Storyboard
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    {/* Column 1: Scene Illustration */}
+                                    <div className="space-y-4">
+                                        <div className="glass-card rounded-[20px] overflow-hidden border border-white/10 relative shadow-2xl aspect-[4/3]">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-brandDark/85 via-transparent to-transparent z-10"></div>
+                                            {coverUrl ? (
+                                                <Image
+                                                    src={coverUrl}
+                                                    alt={currentItem.type === 'reading_matter' ? currentItem.titleTarget : `Chapter ${currentChapterIndex + 1}`}
+                                                    fill
+                                                    className="object-cover hover:scale-105 transition-transform duration-700"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-primaryAccent/15 to-purple-600/15 flex items-center justify-center">
+                                                    <span className="text-5xl">🎨</span>
+                                                </div>
+                                            )}
+                                            
+                                            {/* Overlaid Badge */}
+                                            <div className="absolute bottom-4 left-4 z-20">
+                                                <Badge className="bg-primaryAccent text-brandDark font-labels text-[8px] font-extrabold uppercase tracking-widest border-none px-2 py-0.5">
+                                                    {currentItem.type === 'reading_matter' ? 'READING MATTER' : `CHAPTER ${currentChapterIndex + 1} SCENE`}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                        {currentChapter?.chapter_image_prompt && (
+                                            <p className="text-[10px] text-white/35 font-sans italic text-center px-4 leading-relaxed">
+                                                Art Prompt: &quot;{currentChapter.chapter_image_prompt}&quot;
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Column 2: Narrative Text Box */}
+                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                        <h3 className="font-heading text-xl font-extrabold text-white">
+                                            {currentItem.type === 'reading_matter' ? currentItem.titleTarget : currentChapter?.title_target_language}
+                                        </h3>
+                                        
+                                        <div className="border-t border-white/5 my-3"></div>
+                                        
+                                        <div ref={textContainerRef} className="prose prose-lg max-w-none text-white font-sans text-sm sm:text-base leading-relaxed select-none">
+                                            {selectedLanguage === "dual" ? (
+                                                <div className="space-y-4">
+                                                    <div className="leading-loose whitespace-pre-wrap text-white">
+                                                        {richTextWords.map((item: any, idx: number) => {
+                                                            if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
+                                                            const isHighlighted = item.timing && activeWordIndex !== -1 && activeTimings[activeWordIndex] === item.timing;
+                                                            return (
+                                                                <span 
+                                                                    key={idx}
+                                                                    onClick={(e) => handleWordClick(item.text, e.currentTarget)}
+                                                                    onDoubleClick={() => item.timing && handleWordTimingJump(item.timing.start)}
+                                                                    className={`word-span cursor-pointer rounded px-0.5 transition-all duration-150 border-b ${
+                                                                        isHighlighted 
+                                                                            ? "bg-primaryAccent/20 text-primaryAccent border-b-2 border-primaryAccent font-bold" 
+                                                                            : "border-transparent hover:bg-white/5 hover:text-white"
+                                                                    }`}
+                                                                >
+                                                                    {item.text}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="border-t border-white/5 pt-4">
+                                                        <p className="text-white/50 whitespace-pre-wrap text-xs">
+                                                            {currentItem.type === 'reading_matter' ? currentItem.bodyNative : (currentChapter?.text_english || cleanScriptText(currentChapter?.script_english) || story.native_text || "")}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="leading-loose whitespace-pre-wrap">
+                                                    {selectedLanguage === "target" ? (
+                                                        richTextWords.map((item: any, idx: number) => {
+                                                            if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
+                                                            const isHighlighted = item.timing && activeWordIndex !== -1 && activeTimings[activeWordIndex] === item.timing;
+                                                            return (
+                                                                <span 
+                                                                    key={idx}
+                                                                    onClick={(e) => handleWordClick(item.text, e.currentTarget)}
+                                                                    onDoubleClick={() => item.timing && handleWordTimingJump(item.timing.start)}
+                                                                    className={`word-span cursor-pointer rounded px-0.5 transition-all duration-150 border-b ${
+                                                                        isHighlighted 
+                                                                            ? "bg-primaryAccent/20 text-primaryAccent border-b-2 border-primaryAccent font-bold" 
+                                                                            : "border-transparent hover:bg-white/5 hover:text-white"
+                                                                    }`}
+                                                                >
+                                                                    {item.text}
+                                                                </span>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        currentItem.type === 'reading_matter' ? currentItem.bodyNative : (currentChapter?.text_english || cleanScriptText(currentChapter?.script_english) || story.native_text || "")
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Vocabulary Note List View */}
+                    {presenterMode === "vocab" && (
                         <div className="glass-card rounded-[24px] p-6 border border-white/5 space-y-4">
                             <h3 className="font-heading text-xl font-bold flex items-center gap-2 mb-4">
                                 <span className="text-xl">📝</span> Chapter Glossary Index
@@ -895,11 +1147,9 @@ export default function StoryDetailClient({ story }: { story: any }) {
                         </div>
                     )}
 
-                    {/* Audio Persistent Cockpit */}
+                    {/* Audio Cockpit Bar */}
                     {audioUrl && (
                         <div className="glass-card rounded-[20px] p-5 border border-white/10 shadow-2xl">
-                            <audio ref={audioRef} src={audioUrl} preload="metadata" />
-
                             <div className="flex flex-col gap-4">
                                 {/* Timeline Progress Slider */}
                                 <div className="flex items-center gap-3">
@@ -914,6 +1164,9 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                         value={currentTime}
                                         onChange={handleSeek}
                                         className="flex-1 h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-primaryAccent focus:outline-none"
+                                        style={{
+                                            background: `linear-gradient(to right, var(--color-primaryAccent, #3861FB) ${(duration > 0 ? (currentTime / duration) * 100 : 0)}%, rgba(255, 255, 255, 0.05) ${(duration > 0 ? (currentTime / duration) * 100 : 0)}%)`
+                                        }}
                                     />
                                     
                                     <span className="font-labels text-[10px] text-white/50 w-8 font-bold">
