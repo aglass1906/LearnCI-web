@@ -71,6 +71,24 @@ export default function StoryDetailClient({ story }: { story: any }) {
     const hasChapters = chapters.length > 0;
     const currentChapter = hasChapters ? chapters[currentChapterIndex] : null;
 
+    const prevChapter = () => {
+        if (currentChapterIndex > 0) {
+            setCurrentChapterIndex(currentChapterIndex - 1);
+            setActiveSegment("intro");
+            setCurrentTime(0);
+            setIsPlaying(false);
+        }
+    };
+
+    const nextChapter = () => {
+        if (currentChapterIndex < chapters.length - 1) {
+            setCurrentChapterIndex(currentChapterIndex + 1);
+            setActiveSegment("intro");
+            setCurrentTime(0);
+            setIsPlaying(false);
+        }
+    };
+
     // Load saved words from localStorage to check bookmark states
     useEffect(() => {
         const loadSavedWords = () => {
@@ -392,7 +410,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
         const rawTokens = text.split(/(\s+)/);
         let timingIndex = 0;
 
-        return rawTokens.map((token) => {
+        return rawTokens.map((token: string) => {
             if (/^\s+$/.test(token)) {
                 return { text: token, isWhitespace: true, cleanText: "", timing: null };
             }
@@ -612,7 +630,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                             <div className="space-y-4 pr-2">
                                                 <span className="font-labels text-[9px] text-accentTeal tracking-wider block font-bold uppercase mb-2">Target Prose</span>
                                                 <div className="flex flex-wrap gap-y-2">
-                                                    {richTextWords.map((item, idx) => {
+                                                    {richTextWords.map((item: any, idx: number) => {
                                                         if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
                                                         
                                                         const isHighlighted = item.timing && activeWordIndex !== -1 && activeTimings[activeWordIndex] === item.timing;
@@ -647,7 +665,7 @@ export default function StoryDetailClient({ story }: { story: any }) {
                                         /* Standard Monolingual Mode (Interactive Click & Karaoke Highlights) */
                                         <div className="flex flex-wrap gap-y-2">
                                             {selectedLanguage === "target" ? (
-                                                richTextWords.map((item, idx) => {
+                                                richTextWords.map((item: any, idx: number) => {
                                                     if (item.isWhitespace) return <span key={idx}>{item.text}</span>;
                                                     
                                                     const isHighlighted = item.timing && activeWordIndex !== -1 && activeTimings[activeWordIndex] === item.timing;
