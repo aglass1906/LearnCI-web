@@ -14,6 +14,7 @@ import {
     LogOut,
     Heart,
     BookOpen,
+    Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -44,6 +45,11 @@ const sidebarLinks = [
         title: "Stories",
         href: "/portal/stories",
         icon: BookOpen,
+    },
+    {
+        title: "Vocab Review",
+        href: "/portal/review",
+        icon: Layers,
     },
     {
         title: "Favorites",
