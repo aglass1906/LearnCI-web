@@ -160,20 +160,23 @@ export default function MobilePortal() {
     const milestoneProgress = ((25 - hoursUntilMilestone) / 25) * 100;
 
     return (
-        <div className="space-y-8 pb-12 animate-fade-in relative z-10">
-            
+        <div className="space-y-8 pb-16 relative z-10 max-w-5xl mx-auto px-4 sm:px-0">
+            {/* Background glowing decorations */}
+            <div className="absolute top-[-10%] left-[-20%] w-[60%] h-[40%] bg-[radial-gradient(circle,rgba(56,97,251,0.04)_0%,rgba(56,97,251,0)_70%)] blur-3xl pointer-events-none -z-10"></div>
+            <div className="absolute bottom-[20%] right-[-20%] w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(0,229,255,0.03)_0%,rgba(0,229,255,0)_70%)] blur-3xl pointer-events-none -z-10"></div>
+
             {/* Header / Command Center Welcome */}
-            <header className="flex items-center justify-between">
-                <div>
+            <header className="flex items-center justify-between border-b border-white/5 pb-6">
+                <div className="space-y-1.5">
                     <h1 className="font-heading text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                         Learner Dashboard
                     </h1>
                     {profile ? (
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className="px-2.5 py-0.5 rounded-md bg-accentTeal/10 border border-accentTeal/20 text-accentTeal font-labels text-[10px] font-extrabold uppercase tracking-wider">
+                        <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 rounded-full bg-accentTeal/10 border border-accentTeal/20 text-accentTeal font-labels text-[9px] font-extrabold uppercase tracking-widest shadow-sm shadow-accentTeal/5">
                                 {profile.current_language || "Language"}
                             </span>
-                            <span className="font-labels text-[10px] text-white/50 tracking-wider font-bold">
+                            <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-white/50 font-labels text-[9px] font-extrabold uppercase tracking-widest">
                                 LEVEL {profile.current_level || "N/A"}
                             </span>
                         </div>
@@ -181,58 +184,59 @@ export default function MobilePortal() {
                         <p className="text-white/40 font-sans text-sm mt-1">Welcome back, operative.</p>
                     )}
                 </div>
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
+                <button 
                     onClick={handleLogout} 
-                    className="rounded-xl text-white/40 hover:text-red-400 hover:bg-red-500/10 border border-white/5 bg-white/5 transition-all"
+                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-red-500/20 text-white/50 hover:text-red-400 font-labels text-xs font-bold tracking-wider uppercase transition-all duration-300 hover:bg-red-500/10 active:scale-95"
                 >
-                    <LogOut className="h-5 w-5" />
-                </Button>
+                    <LogOut className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    <span>Sign Out</span>
+                </button>
             </header>
 
             {/* Main Interactive Bento Grid */}
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
 
                 {/* 1. Input Roadmap Card */}
-                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                <div className="glass-card glass-card-hover rounded-[28px] p-6 sm:p-8 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute top-[-20%] right-[-10%] w-[30%] h-[150%] bg-[radial-gradient(circle,rgba(56,97,251,0.03)_0%,rgba(56,97,251,0)_70%)] blur-xl pointer-events-none"></div>
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
-                                <span className="text-xl">🗺️</span> Input Roadmap
+                            <h3 className="font-heading text-lg font-extrabold text-white flex items-center gap-2">
+                                <span className="text-xl group-hover:scale-110 transition-transform duration-300">🗺️</span> Input Roadmap
                             </h3>
-                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
-                                Progress Chart
+                            <span className="font-labels text-[8px] text-white/30 uppercase tracking-widest font-extrabold">
+                                PROGRESS CHART
                             </span>
                         </div>
-                        <p className="text-white/60 font-sans text-sm mb-6">
+                        <p className="text-white/50 font-sans text-xs leading-relaxed mb-6">
                             {profile 
-                                ? `You have accumulated ${Math.floor(((profile.total_minutes || 0) + ((profile.starting_hours || 0) * 60)) / 60)} hours of tracked comprehensible input.` 
+                                ? `You have accumulated ${Math.floor(((profile.total_minutes || 0) + ((profile.starting_hours || 0) * 60)) / 60)} hours of tracked comprehensible input. Keep adding hours to advance your level.` 
                                 : "Track your listening hours to unlock native-level fluency."
                             }
                         </p>
                     </div>
-                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                    <div className="bg-brandDark/40 border border-white/5 rounded-2xl p-4 shadow-inner">
                         <InputRoadmap totalMinutes={(profile?.total_minutes || 0) + ((profile?.starting_hours || 0) * 60)} />
                     </div>
                 </div>
 
                 {/* 2. Today's Activities Card */}
-                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                <div className="glass-card glass-card-hover rounded-[28px] p-6 sm:p-8 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute top-[-20%] right-[-10%] w-[30%] h-[150%] bg-[radial-gradient(circle,rgba(0,229,255,0.03)_0%,rgba(0,229,255,0)_70%)] blur-xl pointer-events-none"></div>
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
-                                <span className="text-xl">📅</span> Today&apos;s Activities
+                            <h3 className="font-heading text-lg font-extrabold text-white flex items-center gap-2">
+                                <span className="text-xl group-hover:scale-110 transition-transform duration-300">📅</span> Today&apos;s Activities
                             </h3>
-                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
-                                Immersion Log
+                            <span className="font-labels text-[8px] text-white/30 uppercase tracking-widest font-extrabold">
+                                IMMERSION LOG
                             </span>
                         </div>
-                        <p className="text-white/60 font-sans text-sm mb-6">
-                            Track the details of your daily reading, audio podcasts, and YouTube immersion sessions.
+                        <p className="text-white/50 font-sans text-xs leading-relaxed mb-6">
+                            Track the details of your daily reading, audio podcasts, and YouTube immersion sessions to record your learning history.
                         </p>
                     </div>
-                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                    <div className="bg-brandDark/40 border border-white/5 rounded-2xl p-4 shadow-inner">
                         <TodaysActivities
                             userId={user?.id}
                             onAddClick={() => setIsLogSheetOpen(true)}
@@ -242,59 +246,64 @@ export default function MobilePortal() {
                 </div>
 
                 {/* 3. Milestone Progress Card */}
-                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                <div className="glass-card glass-card-hover rounded-[28px] p-6 sm:p-8 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute top-[-20%] left-[-10%] w-[30%] h-[150%] bg-[radial-gradient(circle,rgba(255,160,0,0.03)_0%,rgba(255,160,0,0)_70%)] blur-xl pointer-events-none"></div>
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
-                                <span className="text-xl">🎯</span> Next Coaching
+                            <h3 className="font-heading text-lg font-extrabold text-white flex items-center gap-2">
+                                <span className="text-xl group-hover:scale-110 transition-transform duration-300">🎯</span> Next Coaching
                             </h3>
-                            <span className="px-2.5 py-0.5 rounded-full bg-primaryAccent/15 border border-primaryAccent/30 text-primaryAccent font-labels text-[9px] font-extrabold tracking-wider">
+                            <span className="px-3 py-1 rounded-full bg-primaryAccent/10 border border-primaryAccent/20 text-primaryAccent font-labels text-[8px] font-extrabold tracking-widest uppercase shadow-sm shadow-primaryAccent/5">
                                 {nextMilestone}H MILESTONE
                             </span>
                         </div>
-                        <p className="text-white/60 font-sans text-sm mb-6">
-                            Unlock your next personal language coaching session and progress audit in {hoursUntilMilestone.toFixed(1)} hours.
+                        <p className="text-white/50 font-sans text-xs leading-relaxed mb-6">
+                            Unlock your next personal language coaching session and progress audit in <span className="text-primaryAccent font-bold">{hoursUntilMilestone.toFixed(1)}</span> hours of input.
                         </p>
                     </div>
-                    <div className="space-y-3 bg-white/[0.02] border border-white/5 rounded-xl p-5">
-                        <Progress value={Math.max(5, milestoneProgress)} className="h-2.5 bg-white/5 [&>div]:bg-primaryAccent" />
-                        <div className="flex justify-between font-labels text-[10px] text-white/40 uppercase tracking-wider font-bold">
+                    <div className="space-y-4 bg-brandDark/40 border border-white/5 rounded-2xl p-5 shadow-inner">
+                        <Progress 
+                            value={Math.max(5, milestoneProgress)} 
+                            className="h-3 bg-white/5 border border-white/5 rounded-full overflow-hidden [&>div]:bg-gradient-to-r [&>div]:from-primaryAccent [&>div]:to-amber-500 [&>div]:shadow-[0_0_12px_rgba(255,160,0,0.3)] shadow-inner transition-all duration-500" 
+                        />
+                        <div className="flex justify-between font-labels text-[9px] text-white/40 uppercase tracking-widest font-extrabold">
                             <span>{Math.floor(currentHours)} Hours</span>
                             <span>{nextMilestone} Hours</span>
                         </div>
                         {hoursUntilMilestone <= 0 && (
-                            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-bold rounded-xl text-center flex items-center justify-center gap-2 animate-pulse font-heading">
-                                <Lock className="h-4 w-4" /> Coaching Milestone Unlocked!
+                            <div className="mt-2 p-3.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-extrabold rounded-xl text-center flex items-center justify-center gap-2 animate-pulse font-labels tracking-widest uppercase">
+                                <Trophy className="h-4 w-4 text-emerald-400" /> COACHING UNLOCKED
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* 4. Coaching / Mindset Check */}
-                <div className="glass-card rounded-[24px] p-6 shadow-2xl flex flex-col justify-between">
+                <div className="glass-card glass-card-hover rounded-[28px] p-6 sm:p-8 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute top-[-20%] left-[-10%] w-[30%] h-[150%] bg-[radial-gradient(circle,rgba(168,85,247,0.03)_0%,rgba(168,85,247,0)_70%)] blur-xl pointer-events-none"></div>
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
-                                <span className="text-xl">🧠</span> Mindset &amp; Feedback
+                            <h3 className="font-heading text-lg font-extrabold text-white flex items-center gap-2">
+                                <span className="text-xl group-hover:scale-110 transition-transform duration-300">🧠</span> Mindset &amp; Feedback
                             </h3>
-                            <span className="font-labels text-[9px] text-white/40 uppercase tracking-widest font-bold">
-                                Mental Check
+                            <span className="font-labels text-[8px] text-white/30 uppercase tracking-widest font-extrabold">
+                                MENTAL CHECK
                             </span>
                         </div>
-                        <p className="text-white/60 font-sans text-sm mb-6">
+                        <p className="text-white/50 font-sans text-xs leading-relaxed mb-6">
                             Language acquisition is a marathon. Check in daily to log your mood, track frustrations, and align your study mindset.
                         </p>
                     </div>
                     
                     {todaysCheckIn ? (
                         <div 
-                            className="flex items-center gap-4 bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl transition-all cursor-pointer group"
+                            className="flex items-center gap-4 bg-brandDark/40 border border-white/5 hover:border-purple-500/30 p-4 rounded-2xl transition-all duration-300 cursor-pointer group hover:bg-purple-500/[0.02]"
                             onClick={() => router.push("/portal/check-in-history")}
                         >
                             {(() => {
                                 const { icon: Icon, color, bg } = getMoodIcon(todaysCheckIn.rating);
                                 return (
-                                    <div className={`p-3 rounded-xl ${bg} ${color} border border-white/5 shadow-inner`}>
+                                    <div className={`p-3 rounded-xl border border-white/5 shadow-md shadow-black/25 ${bg} ${color}`}>
                                         <Icon className="h-6 w-6" />
                                     </div>
                                 );
@@ -303,25 +312,27 @@ export default function MobilePortal() {
                                 <div className="font-heading font-bold text-white text-base">
                                     Today&apos;s Mindset: <span className="text-purple-400">{getMoodIcon(todaysCheckIn.rating).label}</span>
                                 </div>
-                                {todaysCheckIn.note && (
+                                {todaysCheckIn.note ? (
                                     <p className="text-xs text-white/40 truncate italic mt-0.5">
                                         &quot;{todaysCheckIn.note}&quot;
                                     </p>
+                                ) : (
+                                    <p className="text-xs text-white/35 mt-0.5 font-sans">Click to view check-in history.</p>
                                 )}
                             </div>
                             <ChevronRight className="h-5 w-5 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            <Button
+                            <button
                                 onClick={() => setIsMindsetSheetOpen(true)}
-                                className="w-full h-12 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 hover:scale-[1.02] active:scale-[0.98] text-white shadow-lg shadow-purple-500/10 rounded-xl transition-all font-heading font-bold tracking-wide"
+                                className="w-full h-12 text-xs bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 hover:scale-[1.02] active:scale-[0.98] text-white shadow-[0_0_20px_rgba(124,58,237,0.25)] rounded-xl transition-all font-labels font-extrabold tracking-widest uppercase flex items-center justify-center gap-1.5"
                             >
-                                Start Daily Check-in <ChevronRight className="ml-1 h-4 w-4" />
-                            </Button>
-                            <div className="flex justify-between px-4 py-2 border border-white/5 bg-white/[0.01] rounded-xl opacity-40 hover:opacity-100 transition-all cursor-pointer" onClick={() => setIsMindsetSheetOpen(true)}>
+                                Start Daily Check-in <ChevronRight className="h-4 w-4" />
+                            </button>
+                            <div className="flex justify-between px-6 py-2.5 border border-white/5 bg-brandDark/40 rounded-xl opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer" onClick={() => setIsMindsetSheetOpen(true)}>
                                 {[CloudRain, Cloud, CloudSun, Sun, Sparkles].map((Icon, i) => (
-                                    <Icon key={i} className="h-5 w-5 text-white/60 hover:text-purple-400 transition-colors" />
+                                    <Icon key={i} className="h-4 w-4 text-white/40 hover:text-purple-400 hover:scale-110 transition-all duration-200" />
                                 ))}
                             </div>
                         </div>
@@ -334,12 +345,12 @@ export default function MobilePortal() {
             
             {/* Log Activity Sheet */}
             <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
-                <SheetContent side="bottom" className="h-[90vh] rounded-t-[28px] bg-brandDark border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-2xl">
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-[32px] bg-brandDark/90 border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-xl">
                     <SheetHeader className="mb-6">
                         <SheetTitle className="flex items-center gap-2 text-2xl font-heading font-extrabold text-primaryAccent">
                             ⏱️ Log Activity
                         </SheetTitle>
-                        <SheetDescription className="text-white/60 font-sans text-sm">
+                        <SheetDescription className="text-white/50 font-sans text-xs">
                             What comprehensible input did you immerse yourself in today?
                         </SheetDescription>
                     </SheetHeader>
@@ -355,12 +366,12 @@ export default function MobilePortal() {
 
             {/* Mindset Sheet */}
             <Sheet open={isMindsetSheetOpen} onOpenChange={setIsMindsetSheetOpen}>
-                <SheetContent side="bottom" className="h-[90vh] rounded-t-[28px] bg-brandDark border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-2xl">
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-[32px] bg-brandDark/90 border-t border-white/10 text-white sm:max-w-md sm:mx-auto px-6 py-8 shadow-2xl backdrop-blur-xl">
                     <SheetHeader className="mb-6">
                         <SheetTitle className="flex items-center gap-2 text-2xl font-heading font-extrabold text-purple-400">
                             🧠 Daily Check-in
                         </SheetTitle>
-                        <SheetDescription className="text-white/60 font-sans text-sm">
+                        <SheetDescription className="text-white/50 font-sans text-xs">
                             Log your emotional state, blockers, and mindset parameters.
                         </SheetDescription>
                     </SheetHeader>
