@@ -258,13 +258,13 @@ This granular checklist is designed to guide any software engineer or agentic AI
 *   [x] **Generate High-Fidelity UI Mockup:** Visual representation of the premium dark-mode glassmorphic dashboard (streak statistics, progress rings, cover graphics, and navigation rails).
 *   [x] **Develop Interactive HTML/CSS/JS Prototype:** Single-file browser prototype illustrating navigation tab switches, simulated Whisper karaoke highlighting, vocabulary click glossaries, and 3D SRS card flips.
 
-### ⬜ Phase 1: Design System & Styling Setup
-*   [ ] **Update `tailwind.config.ts`:**
+### 👥 Phase 1: Design System & Styling Setup (Completed)
+*   [x] **Update `tailwind.config.ts`:**
     *   Add custom HSL colors for Dark Background (`#161925`), Dark Surface (`#23283B`), Neon Teal (`#00E5FF`), Gold/Fire (`#FFA000`), and Royal Accent (`#3861FB`).
     *   Set up keyframe animations and utility classes for glassmorphic cards and glowing drop shadows.
-*   [ ] **Import Google Fonts in `app/layout.tsx`:**
+*   [x] **Import Google Fonts in `app/layout.tsx`:**
     *   Configure imports for `Outfit`, `Lexend`, and `Inter`. Expose them as custom CSS variables (`font-heading`, `font-labels`, `font-sans`).
-*   [ ] **Update Global Styles (`app/globals.css`):**
+*   [x] **Update Global Styles (`app/globals.css`):**
     *   Configure core backdrop-filter utility defaults.
     *   Define primary gradient patterns for authentication backgrounds, image cover overlays, and presenter bottom-fades.
 
@@ -296,11 +296,11 @@ This granular checklist is designed to guide any software engineer or agentic AI
     *   Replace standard page embeds with a curated channel grid.
     *   Ensure iFrame state updates reliably invoke the Supabase progress syncer to increment minutes on `user_activities`.
 
-### ⬜ Phase 5: Vocabulary Study & SRS Flashcards
-*   [ ] **Build Flashcard Flipping Panel (`app/portal/review/page.tsx`):**
-    *   Construct 3D CSS transform classes for a double-sided glassmorphic study card.
-    *   Implement SRS response triggers (Again, Hard, Good, Easy) adjusting database intervals.
-    *   Add vocabulary filter panels driven by Lexend category chips.
+### 👥 Phase 5: Vocabulary Study & SRS Flashcards (In Progress)
+*   [/] **Build Flashcard Flipping Panel (`app/portal/review/page.tsx`):**
+    *   [x] Construct 3D CSS transform classes for a double-sided study card.
+    *   [x] Implement SRS response triggers (Again, Hard, Good, Easy) adjusting database intervals.
+    *   [ ] Add vocabulary filter panels driven by Lexend category chips.
 
 ### ⬜ Phase 6: Overhauled Administrative Control Center
 *   [ ] **Upgrade Admin Dashboard Overview (`app/admin/page.tsx`):**
